@@ -1,0 +1,10 @@
+FROM python:3.10-buster as base
+WORKDIR /backend
+
+COPY . /backend
+
+RUN pip install poetry
+
+RUN poetry install
+CMD poetry run uvicorn api:app --host 0.0.0.0 --port 5000 --reload 
+
