@@ -13,7 +13,7 @@ class Test01HealthCheck(unittest.TestCase):
 
     def test_health_check(self):
         response = self.test_client.get("/health_check")
-        assert response.status_code == 200
+        assert response.status_code == 300
 
 
 if __name__ == "__main__":
