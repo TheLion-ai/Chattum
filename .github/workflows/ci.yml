@@ -21,4 +21,7 @@ jobs:
 
       - name: Run tests
         run: |
-          echo "hello world"
+          curl -sSL https://install.python-poetry.org | python3 -
+          cd backend/
+          poetry install
+          poetry run python -m unittest test.py
