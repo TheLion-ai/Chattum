@@ -2,7 +2,7 @@
 
 from bson import ObjectId
 from pydantic import BaseModel
-from pydantic_mongo import AbstractRepository, ObjectIdField
+from pydantic_mongo import ObjectIdField
 
 
 class Bot(BaseModel):
