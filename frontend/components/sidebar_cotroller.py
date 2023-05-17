@@ -28,7 +28,7 @@ class SideBarController:
             unsafe_allow_html=True,
         )
 
-    def __call__(self, state: str = None):
+    def __call__(self, state: str = None) -> None:
         if state is None:
             if st.session_state.sidebar_state == "Hidden":
                 self.render_hidden_sidebar()
@@ -47,10 +47,10 @@ class SideBarController:
                 f"State {state} recognized should be one of the following : [Exapnded, Hidden]"
             )
 
-    def expand_sidebar(self):
+    def expand_sidebar(self) -> None:
         st.session_state.sidebar_state = "Expanded"
 
-    def hide_sidebar(self):
+    def hide_sidebar(self) -> None:
         st.session_state.sidebar_state = "Hidden"
 
 
