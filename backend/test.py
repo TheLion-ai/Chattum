@@ -15,7 +15,7 @@ class Test01HealthCheck(unittest.TestCase):
     def test_health_check(self) -> None:
         """Test the health check endpoint."""
         response = self.test_client.get("/health_check")
-        assert response.status_code == 300
+        assert response.status_code == 200
 
 
 if __name__ == "__main__":
