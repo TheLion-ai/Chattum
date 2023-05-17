@@ -21,4 +21,4 @@ RUN poetry install
 
 EXPOSE 8501
 
-CMD poetry run streamlit run ui.py
+CMD poetry run streamlit run bots.py
