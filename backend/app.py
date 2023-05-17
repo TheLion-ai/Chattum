@@ -1,8 +1,7 @@
+import pydantic_models as pm
 from fastapi import FastAPI
 from fastapi.openapi.utils import get_openapi
-
 from logger import init_logger
-import pydantic_models as pm
 
 app = FastAPI()
 init_logger(app)

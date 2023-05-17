@@ -1,8 +1,7 @@
 import unittest
 
-from fastapi.testclient import TestClient
-
 from api import app
+from fastapi.testclient import TestClient
 
 unittest.TestLoader.sortTestMethodsUsing = None
 
