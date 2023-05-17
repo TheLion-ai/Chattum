@@ -9,6 +9,8 @@ services:
       - deploy_network
     volumes:
       - ./backend:/backend
+    env_file:
+      - .env
     # container_name: fastapi
 
   frontend:

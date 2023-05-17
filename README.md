@@ -11,6 +11,12 @@
 
 
 # Running the application
+Create .env file
+```
+MONGODB_URL =
+```
+
+
 To run the example in a machine running Docker and docker-compose, run:
 
     docker-compose build
@@ -47,6 +53,10 @@ inside the `/frontend`  or `/backend` directory
 ## Debugging
 
 To modify and debug the app, [development in containers](https://davidefiocco.github.io/debugging-containers-with-vs-code) can be useful .
+
+## Testing
+Install https://www.thunderclient.com/
+and set thunder-client.saveToWorkspace to true
 
 ## Running the aplication without docker
 

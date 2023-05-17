@@ -1,0 +1,40 @@
+[
+  {
+    "_id": "a2ebe9e0-0867-4153-a35f-4b597bb601f1",
+    "colId": "cad400a4-97c6-49e0-903e-d813e69f63f4",
+    "containerId": "",
+    "name": "get bots",
+    "url": "localhost:8000/bots",
+    "method": "GET",
+    "sortNum": 10000,
+    "created": "2023-05-17T22:18:23.504Z",
+    "modified": "2023-05-17T22:19:48.834Z",
+    "headers": [],
+    "params": [],
+    "body": {
+      "type": "json",
+      "raw": "{\n  \"username\" : \"test_user\"\n}",
+      "form": []
+    },
+    "tests": []
+  },
+  {
+    "_id": "b03756dc-25b4-4366-bf1a-3e0daa5cbc7f",
+    "colId": "cad400a4-97c6-49e0-903e-d813e69f63f4",
+    "containerId": "",
+    "name": "create bot",
+    "url": "localhost:8000/bots",
+    "method": "POST",
+    "sortNum": 20000,
+    "created": "2023-05-17T22:51:38.654Z",
+    "modified": "2023-05-17T22:53:34.048Z",
+    "headers": [],
+    "params": [],
+    "body": {
+      "type": "json",
+      "raw": "{\n  \"username\" : \"test_user2\",\n  \"name\" : \"test_bot2\"\n}",
+      "form": []
+    },
+    "tests": []
+  }
+]

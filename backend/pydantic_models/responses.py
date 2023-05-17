@@ -7,3 +7,9 @@ class HealthCheckResponse(BaseModel):
     """Response model for the health check endpoint."""
 
     status: str
+
+
+class MessageResponse(BaseModel):
+    """Simple response with a message."""
+
+    message: str
