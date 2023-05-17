@@ -1,7 +1,7 @@
 """Database module for the bots app."""
 import os
 
-from bots.bot_management import Bot
+from pydantic_models.bots import Bot
 from pydantic_mongo import AbstractRepository
 from pymongo import MongoClient
 
