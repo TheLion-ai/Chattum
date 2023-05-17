@@ -7,7 +7,7 @@
 ### Dev
 * python 3.10
 * poetry
-   
+
 
 
 # Running the application
@@ -16,7 +16,7 @@ To run the example in a machine running Docker and docker-compose, run:
     docker-compose build
     docker-compose up
 
-To visit the FastAPI documentation of the resulting service, visit http://localhost:8000/docs with a web browser.  
+To visit the FastAPI documentation of the resulting service, visit http://localhost:8000/docs with a web browser.
 To visit the streamlit UI, visit http://localhost:8501.
 
 Logs can be inspected via:
@@ -25,6 +25,18 @@ Logs can be inspected via:
 
 
 # Development
+## Pre-commits
+Install pre-commits
+https://pre-commit.com/#installation
+
+If you are using VS-code install the extention https://marketplace.visualstudio.com/items?itemName=MarkLarah.pre-commit-vscode
+
+To make a dry-run of the pre-commits to see if your code passes run
+```
+pre-commit run --all-files
+```
+
+
 ## Adding python packages
 Dependencies are handeled by `poetry` framework, to add new dependency run
 ```
@@ -56,7 +68,7 @@ cd backend
 
 poetry install
 
-poetry poetry run uvicorn api:app --host 0.0.0.0 --port 5000 --reload 
+poetry poetry run uvicorn api:app --host 0.0.0.0 --port 5000 --reload
 ```
 
 
@@ -74,4 +86,3 @@ To deploy the app, one option is deployment on Heroku (with [Dockhero](https://e
 - to visualize the api, visit the address adding port `8000/docs`, e.g. `http://dockhero-<named-assigned-to-my-app>-12345.dockhero.io:8000/docs`(not `https`)
 - visit the address adding `:8501` to visit the streamlit interface
 - logs are accessible via `heroku logs -p dockhero --app <my-app>`
-

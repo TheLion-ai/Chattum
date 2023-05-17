@@ -3,7 +3,7 @@ version: '3'
 services:
   backend:
     build: backend/
-    ports: 
+    ports:
       - 8000:5000
     networks:
       - deploy_network
@@ -15,7 +15,7 @@ services:
     build: frontend/
     depends_on:
       - backend
-    ports: 
+    ports:
         - 8501:8501
     networks:
       - deploy_network
