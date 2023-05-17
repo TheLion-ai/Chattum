@@ -25,6 +25,14 @@ Logs can be inspected via:
 
 
 # Development
+## Pre-commits
+Install pre-commits
+https://pre-commit.com/#installation
+To make a dry-run of the pre-commits to see if your code passes run
+```
+pre-commit run --all-files
+```
+
 ## Adding python packages
 Dependencies are handeled by `poetry` framework, to add new dependency run
 ```
