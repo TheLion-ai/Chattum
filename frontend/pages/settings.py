@@ -1,3 +1,5 @@
+"""Settings page."""
+
 import streamlit as st
 from components.sidebar_cotroller import sidebar_controller
 

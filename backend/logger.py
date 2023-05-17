@@ -1,10 +1,13 @@
+"""Json logger for FastAPI."""
 import logging
 import sys
 
+import fastapi
 import json_logging
 
 
-def init_logger(app):
+def init_logger(app: fastapi.FastAPI) -> None:
+    """Initialize the logger."""
     json_logging.init_fastapi(enable_json=True)
     json_logging.init_request_instrument(app)
 

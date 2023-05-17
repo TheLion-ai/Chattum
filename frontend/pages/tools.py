@@ -1,3 +1,4 @@
+"""Tools that the bot can use to perform actions."""
 import streamlit as st
 from components.tools import RequestsTool
 

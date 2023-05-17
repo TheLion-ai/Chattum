@@ -1,12 +1,18 @@
+"""This module contains the sidebar controller class which is used to control the sidebar stat."""
+
 import streamlit as st
 
 
 class SideBarController:
+    """Uused to control the sidebar state."""
+
     def __init__(self) -> None:
+        """Initialize the sidebar state."""
         if "sidebar_state" not in st.session_state:
             st.session_state.sidebar_state = "Hidden"
 
     def render_hidden_sidebar(self) -> None:
+        """Render the hidden sidebar."""
         st.markdown(
             """
             <style>
@@ -18,6 +24,7 @@ class SideBarController:
         )
 
     def render_expanded_sidebar(self) -> None:
+        """Render the expanded sidebar."""
         st.markdown(
             """
             <style>
@@ -29,6 +36,12 @@ class SideBarController:
         )
 
     def __call__(self, state: str = None) -> None:
+        """Call the sidebar controller to render the sidebar.
+
+        Args:
+            state (str, optional): State that the sidebar should be rendered in. Defaults to None.
+
+        """
         if state is None:
             if st.session_state.sidebar_state == "Hidden":
                 self.render_hidden_sidebar()
@@ -48,9 +61,11 @@ class SideBarController:
             )
 
     def expand_sidebar(self) -> None:
+        """Change the sidebar state to expanded."""
         st.session_state.sidebar_state = "Expanded"
 
     def hide_sidebar(self) -> None:
+        """Change the sidebar state to hidden."""
         st.session_state.sidebar_state = "Hidden"
 
 
