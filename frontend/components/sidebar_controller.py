@@ -4,12 +4,11 @@ import streamlit as st
 
 
 class SideBarController:
-    """Uused to control the sidebar state."""
+    """Used to control the sidebar state."""
 
     def __init__(self) -> None:
         """Initialize the sidebar state."""
-        if "sidebar_state" not in st.session_state:
-            st.session_state.sidebar_state = "Hidden"
+        st.session_state.sidebar_state = "Hidden"
 
     def render_hidden_sidebar(self) -> None:
         """Render the hidden sidebar."""
@@ -43,6 +42,7 @@ class SideBarController:
 
         """
         if state is None:
+
             if st.session_state.sidebar_state == "Hidden":
                 self.render_hidden_sidebar()
             elif st.session_state.sidebar_state == "Expanded":
