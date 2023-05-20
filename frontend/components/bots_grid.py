@@ -2,7 +2,8 @@
 
 import streamlit as st
 from backend_controller import create_new_bot, get_bots
-from components import sidebar_controller
+
+from .sidebar import expand_sidebar
 
 
 class BotsGrid:
@@ -19,6 +20,7 @@ class BotsGrid:
 
     def _select_bot(self, bot_id: str) -> None:
         st.session_state.current_bot = bot_id
+        expand_sidebar()
 
     def _display_new_bot_card(self) -> None:
         col1, _, _ = st.columns(3)
@@ -55,6 +57,3 @@ class BotsGrid:
                         on_click=self._select_bot,
                         args=([bot["id"]]),
                     )
-
-
-bots_grid = BotsGrid()
