@@ -1,7 +1,8 @@
 """Settings page."""
 
 import streamlit as st
-from components.sidebar_cotroller import sidebar_controller
+
+from frontend.components.sidebar import sidebar_controller
 
 sidebar_controller("Hidden")
 

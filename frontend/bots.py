@@ -1,5 +1,9 @@
 """Page for managing user bots."""
 import streamlit as st
+from components import bots_grid
+from components.sidebar import sidebar_controller
 
-# construct UI layout
-st.title("Chatttum")
+sidebar_controller()
+
+st.title("Chattum")
+bots_grid()

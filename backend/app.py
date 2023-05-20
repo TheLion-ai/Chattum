@@ -43,9 +43,9 @@ def custom_openapi() -> dict[str, Any]:
     if app.openapi_schema:
         return app.openapi_schema
     openapi_schema = get_openapi(
-        title="Chatttum",
+        title="Chattum",
         version="0.0.1",
-        description="Chatttum API",
+        description="Chattum API",
         routes=app.routes,
     )
     app.openapi_schema = openapi_schema
