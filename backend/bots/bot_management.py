@@ -28,3 +28,19 @@ def get_bots(username: str) -> list[Bot]:
     """
     bots = bots_repository.find_by({"username": username})
     return list(bots)
+
+
+def get_bot_by_id(bot_id: str) -> Bot:
+    """
+    Get bot by id.
+
+    Args:
+    ----
+        bot_id (str): bot id
+
+    Returns:
+    -------
+        Bot: bot with the given id
+    """
+    bot = bots_repository.find_by_id(bot_id)
+    return bot
