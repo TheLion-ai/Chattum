@@ -13,3 +13,16 @@ class MessageResponse(BaseModel):
     """Simple response with a message."""
 
     message: str
+
+
+class CreateBotResponse(BaseModel):
+    """Response model for the create bot endpoint."""
+
+    message: str
+    bot_id: str
+
+
+class PromptResponse(BaseModel):
+    """Response model for the create bot endpoint."""
+
+    prompt: str

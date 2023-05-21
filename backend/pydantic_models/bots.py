@@ -19,9 +19,3 @@ class Bot(BaseModel):
         """The ObjectIdField creates an bson ObjectId value, so its necessary to setup the json encoding"."""
 
         json_encoders = {ObjectId: str}
-
-
-class BotsRequest(BaseModel):
-    """Request model for the bots endpoint."""
-
-    username: str  # name of the user associated with the bot

@@ -27,14 +27,75 @@
     "method": "PUT",
     "sortNum": 20000,
     "created": "2023-05-17T22:51:38.654Z",
-    "modified": "2023-05-17T23:40:01.693Z",
+    "modified": "2023-05-21T21:11:28.753Z",
     "headers": [],
     "params": [],
     "body": {
       "type": "json",
-      "raw": "{\n  \"username\" : \"test_user2\",\n  \"name\" : \"test_bot2\"\n}",
+      "raw": "{\n  \"username\" : \"test_useradsdd3\",\n  \"name\" : \"test_bot3\"\n}",
       "form": []
     },
+    "tests": []
+  },
+  {
+    "_id": "84ecfc61-ef22-48c6-827f-1361e7f39a37",
+    "colId": "cad400a4-97c6-49e0-903e-d813e69f63f4",
+    "containerId": "",
+    "name": "get bot",
+    "url": "localhost:8000/bots/64655b1fbe72a1f9cfbf08ca",
+    "method": "GET",
+    "sortNum": 30000,
+    "created": "2023-05-21T19:56:37.194Z",
+    "modified": "2023-05-21T20:38:18.990Z",
+    "headers": [],
+    "params": [],
+    "tests": []
+  },
+  {
+    "_id": "156f99a8-ce5e-4bde-923b-04dee5fb9c6b",
+    "colId": "cad400a4-97c6-49e0-903e-d813e69f63f4",
+    "containerId": "",
+    "name": "get prompt",
+    "url": "localhost:8000/bots/64655bab13d5a9a616d9664c/prompt",
+    "method": "GET",
+    "sortNum": 40000,
+    "created": "2023-05-21T20:37:06.272Z",
+    "modified": "2023-05-21T22:18:02.269Z",
+    "headers": [],
+    "params": [],
+    "tests": []
+  },
+  {
+    "_id": "2e80ea72-8580-46d1-8acd-a0f771b9a0be",
+    "colId": "cad400a4-97c6-49e0-903e-d813e69f63f4",
+    "containerId": "",
+    "name": "put prompt",
+    "url": "localhost:8000/bots/64655bab13d5a9a616d9664c/prompt",
+    "method": "PUT",
+    "sortNum": 50000,
+    "created": "2023-05-21T20:39:04.081Z",
+    "modified": "2023-05-21T22:17:53.156Z",
+    "headers": [],
+    "params": [],
+    "body": {
+      "type": "json",
+      "raw": "{\n  \"prompt\": \"Hello how are you\"\n}",
+      "form": []
+    },
+    "tests": []
+  },
+  {
+    "_id": "6043190b-4b11-444d-b15a-ce507785281d",
+    "colId": "cad400a4-97c6-49e0-903e-d813e69f63f4",
+    "containerId": "",
+    "name": "delete bot",
+    "url": "localhost:8000/bots/64655b1fbe72a1f9cfbf08ca",
+    "method": "DELETE",
+    "sortNum": 50000,
+    "created": "2023-05-21T21:08:01.193Z",
+    "modified": "2023-05-21T21:08:29.836Z",
+    "headers": [],
+    "params": [],
     "tests": []
   }
 ]
