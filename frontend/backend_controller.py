@@ -29,3 +29,15 @@ def create_new_bot(bot_name: str) -> None:
         st.success(f"Bot {bot_name} created")
     except Exception as e:
         st.warning(e)
+
+
+def create_new_prompt(prompt: str, bot_id: str) -> None:
+    """Create a new prompt based on text from text area."""
+    try:
+        response = requests.put(
+            f"{BACKEND_URL}/{bot_id}/prompt", json={"prompt": prompt}
+        )
+        assert response.status_code == 200
+        st.success("Prompt modified")
+    except Exception as e:
+        st.warning(e)
