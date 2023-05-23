@@ -1,9 +1,10 @@
 """FastAPI application."""
 from typing import Any
 
+import bots
 import pydantic_models as pm
-from bots import create_bot, get_bots
-from fastapi import FastAPI
+from database import bots_repository
+from fastapi import FastAPI, HTTPException
 from fastapi.openapi.utils import get_openapi
 from logger import init_logger
 
@@ -27,15 +28,48 @@ def home() -> str:
 @app.get("/bots", response_model=list[pm.Bot])
 def bots_get(request: pm.BotsRequest) -> list[pm.Bot]:
     """Get all bots associated with the given username."""
-    bots = get_bots(request.username)
-    return bots
+    user_bots = bots.get_bots(request.username)
+
+    return user_bots
 
 
-@app.put("/bots", response_model=pm.MessageResponse)
-def bots_put(bot: pm.Bot) -> pm.MessageResponse:
+@app.put("/bots", response_model=pm.CreateBotResponse)
+def bots_put(bot: pm.Bot) -> pm.CreateBotResponse:
     """Create a bot with the given name and username."""
-    create_bot(bot)
-    return pm.MessageResponse(message="Bot created successfully!")
+    bot = bots.create_bot(bot)
+    return pm.CreateBotResponse(message="Bot created successfully!", bot_id=str(bot.id))
+
+
+@app.get("/bots/{bot_id}")
+def get_bot(bot_id: str) -> pm.Bot:
+    """Get bot by id."""
+    bot = bots.get_bot_by_id(bot_id)
+    return bot
+
+
+@app.delete("/bots/{bot_id}")
+def delete_bot(bot_id: str) -> pm.Bot:
+    """Delete bot by id."""
+    bot = bots.get_bot_by_id(bot_id)
+    bots_repository.delete(bot)
+    return pm.MessageResponse(message="Bot deleted successfully!")
+
+
+@app.get("/bots/{bot_id}/prompt", response_model=pm.PromptResponse)
+def get_prompt(bot_id: str) -> str:
+    """Get prompt of bot by id."""
+    bot = bots.get_bot_by_id(bot_id)
+    if bot is None:
+        raise HTTPException(status_code=404, detail="Bot not found")
+    return pm.PromptResponse(prompt=bot.prompt)
+
+
+@app.put("/bots/{bot_id}/prompt", response_model=pm.MessageResponse)
+def change_prompt(bot_id: str, request: pm.PromptRequest) -> pm.MessageResponse:
+    """Change prompt of bot by id."""
+    bot = bots.get_bot_by_id(bot_id)
+    bots.change_prompt(request.prompt, bot)
+    return pm.MessageResponse(message="Prompt changed successfully!")
 
 
 def custom_openapi() -> dict[str, Any]:
