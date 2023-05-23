@@ -35,9 +35,22 @@ def create_new_prompt(prompt: str, bot_id: str) -> None:
     """Create a new prompt based on text from text area."""
     try:
         response = requests.put(
-            f"{BACKEND_URL}/{bot_id}/prompt", json={"prompt": prompt}
+            f"{BACKEND_URL}/bots/{bot_id}/prompt", json={"prompt": prompt}
         )
-        assert response.status_code == 200
-        st.success("Prompt modified")
+        if response.status_code == 200:
+            st.success("Prompt created", icon="👍")
+        else:
+            raise Exception(f"error: {response.status_code} {response.text}")
     except Exception as e:
         st.warning(e)
+
+
+def get_prompt(bot_id: str) -> str:
+    """Get the current prompt of a bot.
+
+    Returns:
+        str: bot's prompt.
+    """
+    prompt = requests.get(f"{BACKEND_URL}/bots/{bot_id}/prompt").json()["prompt"]
+
+    return prompt
