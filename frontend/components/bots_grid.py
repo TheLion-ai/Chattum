@@ -11,7 +11,10 @@ class BotsGrid:
 
     def __init__(self) -> None:
         """Initialize the current bot state."""
-        st.session_state.current_bot = st.experimental_get_query_params()["bot_id"][0]
+        if "bot_id" in st.experimental_get_query_params():
+            st.session_state.current_bot = st.experimental_get_query_params()["bot_id"][
+                0
+            ]
 
     def __call__(self) -> None:
         """Create a view with available bots and a card for creating new bots."""
