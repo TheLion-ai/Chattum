@@ -2,6 +2,7 @@
 import os
 
 from pydantic_models.bots import Bot
+from pydantic_models.conversations import Conversation
 from pydantic_mongo import AbstractRepository
 from pymongo import MongoClient
 
@@ -18,4 +19,14 @@ class BotsRepository(AbstractRepository[Bot]):
         collection_name = "bots"
 
 
+class ConversationsRepository(AbstractRepository[Conversation]):
+    """Repository for conversations."""
+
+    class Meta:
+        """Meta class for the repository."""
+
+        collection_name = "conversations"
+
+
 bots_repository = BotsRepository(database=database)
+conversations_repository = ConversationsRepository(database=database)

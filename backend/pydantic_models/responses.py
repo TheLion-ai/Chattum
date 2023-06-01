@@ -26,3 +26,10 @@ class PromptResponse(BaseModel):
     """Response model for the create bot endpoint."""
 
     prompt: str
+
+
+class CreateConversationResponse(BaseModel):
+    """Response model for the create conversation endpoint."""
+
+    message: str
+    conversation_id: str

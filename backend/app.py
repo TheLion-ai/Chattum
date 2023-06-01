@@ -72,6 +72,21 @@ def change_prompt(bot_id: str, request: pm.PromptRequest) -> pm.MessageResponse:
     return pm.MessageResponse(message="Prompt changed successfully!")
 
 
+@app.put("/conversations", response_model=pm.CreateConversationResponse)
+def put_conversations(conversation: pm.Conversation) -> pm.CreateConversationResponse:
+    """Create a conversation."""
+    conversation = bots.create_conversation(conversation)
+    return pm.CreateConversationResponse(
+        message="Conversation created successfully!", conversation_id=str(conversation.id))
+
+
+@app.get("/conversations/{conversation_id}")
+def get_conversation(conversation_id: str) -> pm.Conversation:
+    """Get conversation by id."""
+    conversation = bots.get_conversation_by_id(conversation_id)
+    return conversation
+
+
 def custom_openapi() -> dict[str, Any]:
     """Customize the openapi schema."""
     if app.openapi_schema:
