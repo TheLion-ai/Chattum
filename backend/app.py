@@ -49,10 +49,16 @@ def get_bot(bot_id: str) -> pm.Bot:
 
 
 @app.delete("/bots/{bot_id}")
-def delete_bot(bot_id: str) -> pm.Bot:
+def delete_bot(bot_id: str) -> pm.MessageResponse:
     """Delete bot by id."""
     bot = bots.get_bot_by_id(bot_id)
     bots_repository.delete(bot)
+
+    # Delete all conversations involving the bot
+    conversations = bots.get_conversations(bot_id)
+    for conversation in conversations:
+        conversations_repository.delete(conversation)
+
     return pm.MessageResponse(message="Bot deleted successfully!")
 
 
