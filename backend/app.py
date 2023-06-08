@@ -3,7 +3,7 @@ from typing import Any
 
 import bots
 import pydantic_models as pm
-from database import bots_repository
+from database import bots_repository, conversations_repository
 from fastapi import FastAPI, HTTPException
 from fastapi.openapi.utils import get_openapi
 from logger import init_logger
@@ -87,6 +87,14 @@ def get_conversation(conversation_id: str) -> pm.Conversation:
     """Get conversation by id."""
     conversation = bots.get_conversation_by_id(conversation_id)
     return conversation
+
+
+@app.delete("/bots/{bot_id}/conversations/{conversation_id}")
+def delete_conversation(conversation_id: str) -> pm.MessageResponse:
+    """Delete conversation by id."""
+    conversation = bots.get_conversation_by_id(conversation_id)
+    conversations_repository.delete(conversation)
+    return pm.MessageResponse(message="Conversation deleted successfully!")
 
 
 def custom_openapi() -> dict[str, Any]:

@@ -37,6 +37,9 @@ class TestConversations(unittest.TestCase):
         # Get history from database
         response = self.test_client.get(f"/bots/{self.bot_id}/conversations/{conversation_id}")
 
+        # Delete history from database
+        self.test_client.delete(f"/bots/{self.bot_id}/conversations/{conversation_id}")
+
         # Check if history is the same
         assert messages == response.json()['messages']
 
