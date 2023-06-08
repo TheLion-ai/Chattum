@@ -7,6 +7,7 @@ from database import bots_repository
 from fastapi import FastAPI, HTTPException
 from fastapi.openapi.utils import get_openapi
 from logger import init_logger
+from bson import ObjectId
 
 app = FastAPI()
 init_logger(app)
@@ -73,8 +74,9 @@ def change_prompt(bot_id: str, request: pm.PromptRequest) -> pm.MessageResponse:
 
 
 @app.put("/bots/{bot_id}/conversations", response_model=pm.CreateConversationResponse)
-def put_conversations(conversation: pm.Conversation) -> pm.CreateConversationResponse:
+def put_conversations(bot_id: str, conversation: pm.Conversation) -> pm.CreateConversationResponse:
     """Create a conversation."""
+    conversation.bot_id = ObjectId(bot_id)
     conversation = bots.create_conversation(conversation)
     return pm.CreateConversationResponse(
         message="Conversation created successfully!", conversation_id=str(conversation.id))

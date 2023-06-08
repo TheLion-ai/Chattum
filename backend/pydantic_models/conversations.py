@@ -9,8 +9,7 @@ class Conversation(BaseModel):
     """Model for conversations."""
 
     id: ObjectIdField = None  # conversation id
-    bot_id: ObjectIdField  # bot id
-    username: str  # name of the user associated with the conversation
+    bot_id: ObjectIdField = None  # bot id
     messages: list = []  # list of messages
 
     class Config:
