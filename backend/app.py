@@ -73,6 +73,13 @@ def change_prompt(bot_id: str, request: pm.PromptRequest) -> pm.MessageResponse:
     return pm.MessageResponse(message="Prompt changed successfully!")
 
 
+@app.get("/bots/{bot_id}/conversations", response_model=list[pm.Conversation])
+def get_conversations(bot_id: str) -> list[pm.Conversation]:
+    """Get all conversations associated with the given bot."""
+    bot_conversations = bots.get_conversations(bot_id)
+    return bot_conversations
+
+
 @app.put("/bots/{bot_id}/conversations", response_model=pm.CreateConversationResponse)
 def put_conversations(bot_id: str, conversation: pm.Conversation) -> pm.CreateConversationResponse:
     """Create a conversation."""

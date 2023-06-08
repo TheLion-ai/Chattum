@@ -2,7 +2,7 @@
 
 from .bots import Bot
 from .conversations import Conversation
-from .inputs import BotsRequest, PromptRequest
+from .inputs import BotsRequest, PromptRequest, ConversationsRequest
 from .responses import (
     CreateBotResponse,
     CreateConversationResponse,
