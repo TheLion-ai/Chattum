@@ -22,5 +22,5 @@ jobs:
       - name: Run tests
         run: |
           curl -sSL https://install.python-poetry.org | python3 -
-          docker-compose build
-          docker-compose run backend poetry run python -m unittest discover tests
+          poetry install
+          poetry run python -m unittest discover tests
