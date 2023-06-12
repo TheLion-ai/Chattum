@@ -21,4 +21,5 @@ jobs:
 
       - name: Run tests
         run: |
+          touch .env
           ./run_tests.sh
