@@ -21,7 +21,5 @@ jobs:
 
       - name: Run tests
         run: |
-          curl -sSL https://install.python-poetry.org | python3 -
-          cd backend/
-          poetry install
-          poetry run python -m unittest test.py
+          touch .env
+          ./run_tests.sh
