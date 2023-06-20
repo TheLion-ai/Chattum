@@ -60,9 +60,7 @@ def get_prompt(bot_id: str) -> str:
     return prompt
 
 
-def get_conversation(bot_id: str) -> List[dict]:
-    try:
-        messages = requests.get(f"{BACKEND_URL}/bots/{bot_id}/conversations").json()[0]["messages"]
-    except IndexError:
-        messages = []
-    return messages
+def get_conversations(bot_id: str) -> list[dict]:
+    """Get a list of conversations involving given bot."""
+    conversations = requests.get(f"{BACKEND_URL}/bots/{bot_id}/conversations").json()
+    return conversations
