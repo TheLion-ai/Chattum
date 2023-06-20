@@ -10,7 +10,7 @@ def get_bots() -> list[dict]:
     Returns:
         list[dict]: a list of created bots.
     """
-    bots = requests.get(f"{BACKEND_URL}/bots", json={"username": USERNAME}).json()
+    bots = requests.get(f"{BACKEND_URL}/{USERNAME}/bots").json()
 
     return bots
 
@@ -23,7 +23,8 @@ def create_new_bot(bot_name: str) -> None:
     """
     try:
         response = requests.put(
-            f"{BACKEND_URL}/bots", json={"name": bot_name, "username": USERNAME}
+            f"{BACKEND_URL}/{USERNAME}/bots",
+            json={"name": bot_name, "username": USERNAME},
         )
         assert response.status_code == 200
         st.success(f"Bot {bot_name} created")
@@ -35,7 +36,7 @@ def create_new_prompt(prompt: str, bot_id: str) -> None:
     """Create a new prompt based on text from text area."""
     try:
         response = requests.put(
-            f"{BACKEND_URL}/bots/{bot_id}/prompt", json={"prompt": prompt}
+            f"{BACKEND_URL}/{USERNAME}/bots/{bot_id}/prompt", json={"prompt": prompt}
         )
         if response.status_code == 200:
             st.success("Prompt created", icon="👍")
@@ -51,6 +52,8 @@ def get_prompt(bot_id: str) -> str:
     Returns:
         str: bot's prompt.
     """
-    prompt = requests.get(f"{BACKEND_URL}/bots/{bot_id}/prompt").json()["prompt"]
+    prompt = requests.get(f"{BACKEND_URL}/{USERNAME}/bots/{bot_id}/prompt").json()[
+        "prompt"
+    ]
 
     return prompt
