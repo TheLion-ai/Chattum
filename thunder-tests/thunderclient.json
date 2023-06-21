@@ -56,13 +56,18 @@
     "colId": "cad400a4-97c6-49e0-903e-d813e69f63f4",
     "containerId": "",
     "name": "get prompt",
-    "url": "localhost:8000/bots/64655bab13d5a9a616d9664c/prompt",
+    "url": "localhost:8000/test_user2/bots/64655bab13d5a9a616d9664c/sources/64923459c572f3c77c79c010",
     "method": "GET",
     "sortNum": 40000,
     "created": "2023-05-21T20:37:06.272Z",
-    "modified": "2023-05-21T22:18:02.269Z",
+    "modified": "2023-06-20T23:31:40.700Z",
     "headers": [],
     "params": [],
+    "body": {
+      "type": "json",
+      "raw": "{\"name\": \"costam2\",\n\"type\": \"niewiem\",\n\"data\": \"fdf\"}",
+      "form": []
+    },
     "tests": []
   },
   {

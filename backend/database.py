@@ -5,10 +5,16 @@ from functools import lru_cache
 
 from pydantic import BaseModel
 from pydantic_models.bots import Bot
+from pydantic_models.sources import Source
 from pydantic_mongo import AbstractRepository
 from pymongo import MongoClient
 
-Database = namedtuple("Database", ["bots"])
+Database = namedtuple(
+    "Database",
+    [
+        "bots",
+    ],
+)  # "sources"])
 
 
 class BotsRepository(AbstractRepository[Bot]):
@@ -20,9 +26,21 @@ class BotsRepository(AbstractRepository[Bot]):
         collection_name = "bots"
 
 
+class SourcesRepository(AbstractRepository[Source]):
+    """Repository for sources."""
+
+    class Meta:
+        """Meta class for the repository."""
+
+        collection_name = "sources"
+
+
 def create_repositories(mongo_client: MongoClient) -> Database:
     """Create repositories."""
-    return Database(bots=BotsRepository(mongo_client["bots"]))
+    return Database(
+        bots=BotsRepository(mongo_client["bots"]),
+        # sources=SourcesRepository(mongo_client["bots"])
+    )
 
 
 @lru_cache()

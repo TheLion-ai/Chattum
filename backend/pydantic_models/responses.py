@@ -23,6 +23,12 @@ class CreateBotResponse(BaseModel):
 
 
 class PromptResponse(BaseModel):
-    """Response model for the create bot endpoint."""
+    """Response model for the create prompt endpoint."""
 
     prompt: str
+
+
+class SourceResponse(BaseModel):
+    """Response model for the create source endpoint."""
+
+    sources: list

@@ -3,7 +3,7 @@ from functools import lru_cache
 
 import pytest
 from app import app
-from database import BotsRepository, Database, get_database
+from database import BotsRepository, Database, SourcesRepository, get_database
 from fastapi.testclient import TestClient
 from pymongo_inmemory import MongoClient
 
@@ -12,7 +12,10 @@ from pymongo_inmemory import MongoClient
 def get_mock_database():
     """Get the mock database in memory."""
     mongo_client = MongoClient()
-    database = Database(bots=BotsRepository(mongo_client["bots"]))
+    database = Database(
+        bots=BotsRepository(mongo_client["bots"]),
+        sources=SourcesRepository(mongo_client["bots"]),
+    )
     print("MOCK DATABASE CREATED!")
     return database
 
