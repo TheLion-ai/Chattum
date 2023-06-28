@@ -9,12 +9,7 @@ from pydantic_models.sources import Source
 from pydantic_mongo import AbstractRepository
 from pymongo import MongoClient
 
-Database = namedtuple(
-    "Database",
-    [
-        "bots",
-    ],
-)  # "sources"])
+Database = namedtuple("Database", ["bots", "sources"])
 
 
 class BotsRepository(AbstractRepository[Bot]):
@@ -39,7 +34,7 @@ def create_repositories(mongo_client: MongoClient) -> Database:
     """Create repositories."""
     return Database(
         bots=BotsRepository(mongo_client["bots"]),
-        # sources=SourcesRepository(mongo_client["bots"])
+        sources=SourcesRepository(mongo_client["bots"]),
     )
 
 

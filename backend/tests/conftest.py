@@ -2,7 +2,7 @@
 from functools import lru_cache
 
 import pytest
-from app import app
+from app.router import app
 from database import BotsRepository, Database, SourcesRepository, get_database
 from fastapi.testclient import TestClient
 from pymongo_inmemory import MongoClient

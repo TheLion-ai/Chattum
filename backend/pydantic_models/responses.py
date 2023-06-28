@@ -1,5 +1,6 @@
 """Models for validating requests and responses to the API."""
 
+from bson import ObjectId
 from pydantic import BaseModel
 
 
@@ -28,7 +29,19 @@ class PromptResponse(BaseModel):
     prompt: str
 
 
+class CreateSourceResponse(BaseModel):
+    """Response model for the create source endpoint."""
+
+    message: str
+    source_id: str
+
+
 class SourceResponse(BaseModel):
     """Response model for the create source endpoint."""
 
-    sources: list
+    sources: list = []
+
+    class Config:
+        """The ObjectIdField creates an bson ObjectId value, so its necessary to setup the json encoding"."""
+
+        json_encoders = {ObjectId: str}

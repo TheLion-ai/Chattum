@@ -12,7 +12,7 @@ class Bot(BaseModel):
     name: str  # name of bot
     username: str  # name of the user associated with the bot
     tools: list = []  # list of tools that the bot can use
-    sources: list = [ObjectId]  # list of sources that the bot can use
+    sources: list = []  # list of sources that the bot can use
     prompt: str = ""  # prompt for the bot
 
     class Config:

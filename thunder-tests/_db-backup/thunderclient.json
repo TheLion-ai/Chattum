@@ -4,18 +4,13 @@
     "colId": "cad400a4-97c6-49e0-903e-d813e69f63f4",
     "containerId": "",
     "name": "get bots",
-    "url": "localhost:8000/bots",
+    "url": "localhost:8000/test_user2/bots",
     "method": "GET",
     "sortNum": 10000,
     "created": "2023-05-17T22:18:23.504Z",
-    "modified": "2023-05-17T23:40:07.375Z",
+    "modified": "2023-06-21T19:53:39.959Z",
     "headers": [],
     "params": [],
-    "body": {
-      "type": "json",
-      "raw": "{\n  \"username\": \"test_user2\"\n}",
-      "form": []
-    },
     "tests": []
   },
   {
@@ -23,11 +18,11 @@
     "colId": "cad400a4-97c6-49e0-903e-d813e69f63f4",
     "containerId": "",
     "name": "create bot",
-    "url": "localhost:8000/bots",
+    "url": "localhost:8000/test_user2/bots",
     "method": "PUT",
     "sortNum": 20000,
     "created": "2023-05-17T22:51:38.654Z",
-    "modified": "2023-05-21T21:11:28.753Z",
+    "modified": "2023-06-21T19:53:51.185Z",
     "headers": [],
     "params": [],
     "body": {
@@ -56,18 +51,13 @@
     "colId": "cad400a4-97c6-49e0-903e-d813e69f63f4",
     "containerId": "",
     "name": "get prompt",
-    "url": "localhost:8000/test_user2/bots/64655bab13d5a9a616d9664c/sources/64923459c572f3c77c79c010",
+    "url": "localhost:8000/test_user2/bots/64655bab13d5a9a616d9664c/sources",
     "method": "GET",
     "sortNum": 40000,
     "created": "2023-05-21T20:37:06.272Z",
-    "modified": "2023-06-20T23:31:40.700Z",
+    "modified": "2023-06-21T21:01:38.831Z",
     "headers": [],
     "params": [],
-    "body": {
-      "type": "json",
-      "raw": "{\"name\": \"costam2\",\n\"type\": \"niewiem\",\n\"data\": \"fdf\"}",
-      "form": []
-    },
     "tests": []
   },
   {
@@ -75,18 +65,13 @@
     "colId": "cad400a4-97c6-49e0-903e-d813e69f63f4",
     "containerId": "",
     "name": "put prompt",
-    "url": "localhost:8000/bots/64655bab13d5a9a616d9664c/prompt",
-    "method": "PUT",
+    "url": "localhost:8000/test_user2/bots",
+    "method": "GET",
     "sortNum": 50000,
     "created": "2023-05-21T20:39:04.081Z",
-    "modified": "2023-05-21T22:17:53.156Z",
+    "modified": "2023-06-21T19:54:48.258Z",
     "headers": [],
     "params": [],
-    "body": {
-      "type": "json",
-      "raw": "{\n  \"prompt\": \"Hello how are you\"\n}",
-      "form": []
-    },
     "tests": []
   },
   {
@@ -94,11 +79,11 @@
     "colId": "cad400a4-97c6-49e0-903e-d813e69f63f4",
     "containerId": "",
     "name": "delete bot",
-    "url": "localhost:8000/bots/64861d9c332af1a230400c43",
+    "url": "localhost:8000/test_user2/bots/64861d9c332af1a230400c43",
     "method": "DELETE",
     "sortNum": 50000,
     "created": "2023-05-21T21:08:01.193Z",
-    "modified": "2023-06-11T19:16:55.531Z",
+    "modified": "2023-06-21T19:54:42.586Z",
     "headers": [],
     "params": [],
     "tests": []

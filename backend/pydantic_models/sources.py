@@ -9,7 +9,7 @@ class Source(BaseModel):
 
     id: ObjectIdField = None  # id of source
     name: str  # name of source
-    type: str  # type of source
+    type: str = ""  # type of source
     data: str = ""  # data of source
 
     class Config:
