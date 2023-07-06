@@ -3,10 +3,7 @@ from typing import Any
 
 import pydantic_models as pm
 from app.app import app
-from database import Database, get_database
-from fastapi import FastAPI
 from fastapi.openapi.utils import get_openapi
-from logger import init_logger
 
 from .routers import bots, prompts, sources
 

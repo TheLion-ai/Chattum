@@ -1,15 +1,23 @@
+# mypy: ignore-errors
 """create app instance."""
-from database import Database, get_database
+from contextlib import asynccontextmanager, contextmanager
+
+from database import Database, get_mongo_client
 from fastapi import FastAPI
 from logger import init_logger
 
-app = FastAPI()
+database = Database()
+
+
+@contextmanager
+def lifespan(app: FastAPI) -> None:
+    """Startup event."""
+    global database
+    mongo_client = app.dependency_overrides.get(get_mongo_client, get_mongo_client)()
+    database.init_repositories(mongo_client)
+    yield
+    database = None
+
+
+app = FastAPI(lifespan=lifespan)
 init_logger(app)
-
-database: Database = None
-
-# @app.on_event("startup")
-# async def startup_event() -> None:
-#     """Startup event."""
-#     global database
-database = app.dependency_overrides.get(get_database, get_database)()

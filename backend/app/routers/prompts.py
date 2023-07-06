@@ -11,7 +11,7 @@ router = APIRouter(prefix="/{username}/bots/{bot_id}/prompt", tags=["prompts"])
 
 
 @router.get("", response_model=pm.PromptResponse)
-async def get_prompt(bot_id: str, username: str) -> str:
+def get_prompt(bot_id: str, username: str) -> str:
     """Get prompt of bot by id."""
     bot = get_bot(bot_id, username)
     if bot is None:
@@ -20,7 +20,7 @@ async def get_prompt(bot_id: str, username: str) -> str:
 
 
 @router.put("", response_model=pm.MessageResponse)
-async def change_prompt(
+def change_prompt(
     bot_id: str,
     username: str,
     request: pm.PromptRequest,

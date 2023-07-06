@@ -11,7 +11,7 @@ router = APIRouter(prefix="/{username}/bots/{bot_id}/sources", tags=["sources"])
 
 
 @router.get("", response_model=pm.SourceResponse)
-async def get_sources(bot_id: str, username: str) -> list[str]:
+def get_sources(bot_id: str, username: str) -> list[str]:
     """Get sources of bot by id."""
     bot = get_bot(bot_id, username)
     if bot is None:
@@ -20,7 +20,7 @@ async def get_sources(bot_id: str, username: str) -> list[str]:
 
 
 @router.put("", response_model=pm.CreateSourceResponse)
-async def add_source(
+def add_source(
     source: pm.Source, username: str, bot_id: str
 ) -> pm.CreateSourceResponse:
     """Add source to bot by id."""
@@ -34,7 +34,7 @@ async def add_source(
 
 
 @router.get("/{source_id}", response_model=pm.Source)
-async def get_source(bot_id: str, source_id: str, username: str) -> pm.Source:
+def get_source(bot_id: str, source_id: str, username: str) -> pm.Source:
     """Get source of bot by id."""
     source = database.sources.find_one_by_id(ObjectId(source_id))
     if source is None:
@@ -43,9 +43,7 @@ async def get_source(bot_id: str, source_id: str, username: str) -> pm.Source:
 
 
 @router.delete("/{source_id}", response_model=pm.MessageResponse)
-async def delete_source(
-    bot_id: str, source_id: str, username: str
-) -> pm.MessageResponse:
+def delete_source(bot_id: str, source_id: str, username: str) -> pm.MessageResponse:
     """Delete source of bot by id."""
     source = get_source(bot_id, source_id, username)
     database.sources.delete(source)

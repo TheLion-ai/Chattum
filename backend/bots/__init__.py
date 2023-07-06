@@ -1,1 +1,0 @@
-"""Everytning related to bots."""

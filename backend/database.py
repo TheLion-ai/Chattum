@@ -1,15 +1,13 @@
 """Database module for the bots app."""
 import os
-from collections import namedtuple
+from dataclasses import dataclass
 from functools import lru_cache
+from typing import Optional
 
-from pydantic import BaseModel
 from pydantic_models.bots import Bot
 from pydantic_models.sources import Source
 from pydantic_mongo import AbstractRepository
 from pymongo import MongoClient
-
-Database = namedtuple("Database", ["bots", "sources"])
 
 
 class BotsRepository(AbstractRepository[Bot]):
@@ -30,17 +28,20 @@ class SourcesRepository(AbstractRepository[Source]):
         collection_name = "sources"
 
 
-def create_repositories(mongo_client: MongoClient) -> Database:
-    """Create repositories."""
-    return Database(
-        bots=BotsRepository(mongo_client["bots"]),
-        sources=SourcesRepository(mongo_client["bots"]),
-    )
+@dataclass
+class Database:
+    """Database class."""
+
+    bots: Optional[BotsRepository] = None
+    sources: Optional[SourcesRepository] = None
+
+    def init_repositories(self, mongo_client: MongoClient) -> None:
+        """Create a database repositories from a mongo client."""
+        self.bots = BotsRepository(mongo_client["bots"])
+        self.sources = SourcesRepository(mongo_client["bots"])
 
 
 @lru_cache()
-def get_database() -> Database:
+def get_mongo_client() -> MongoClient:
     """Get the database."""
-    mongo_client = MongoClient(os.environ["MONGODB_URL"])
-    database = create_repositories(mongo_client)
-    return database
+    return MongoClient(os.environ["MONGODB_URL"])
