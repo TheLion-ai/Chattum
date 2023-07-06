@@ -34,32 +34,34 @@ def home() -> str:
     return hello_world
 
 
-@app.get("/bots", response_model=list[pm.Bot])
-def bots_get(request: pm.BotsRequest) -> list[pm.Bot]:
+@app.get("/{username}/bots", response_model=list[pm.Bot])
+def bots_get(username: str) -> list[pm.Bot]:
     """Get bots by username."""
-    user_bots = list(database.bots.find_by({"username": request.username}))
+    user_bots = list(database.bots.find_by({"username": username}))
 
     return user_bots
 
 
-@app.put("/bots", response_model=pm.CreateBotResponse)
-def bots_put(bot: pm.Bot) -> pm.CreateBotResponse:
+@app.put("/{username}/bots", response_model=pm.CreateBotResponse)
+def bots_put(bot: pm.Bot, username: str) -> pm.CreateBotResponse:
     """Create a bot with the given name and username."""
     database.bots.save(bot)
     return pm.CreateBotResponse(message="Bot created successfully!", bot_id=str(bot.id))
 
 
-@app.get("/bots/{bot_id}")
-def get_bot(bot_id: str) -> Union[pm.Bot, None]:
+@app.get("/{username}/bots/{bot_id}")
+def get_bot(bot_id: str, username: str) -> Union[pm.Bot, None]:
     """Get bot by id."""
     bot = database.bots.find_one_by_id(ObjectId(bot_id))
+    if bot is None:
+        raise HTTPException(status_code=404, detail="Bot not found")
     return bot
 
 
-@app.delete("/bots/{bot_id}")
-def delete_bot(bot_id: str) -> pm.MessageResponse:
+@app.delete("/{username}/bots/{bot_id}")
+def delete_bot(bot_id: str, username: str) -> pm.MessageResponse:
     """Delete bot by id."""
-    bot = get_bot(bot_id)
+    bot = get_bot(bot_id, username)
     database.bots.delete(bot)
     # Delete all conversations involving the bot
     conversations = get_conversations(bot_id)
@@ -68,19 +70,25 @@ def delete_bot(bot_id: str) -> pm.MessageResponse:
     return pm.MessageResponse(message="Bot deleted successfully!")
 
 
-@app.get("/bots/{bot_id}/prompt", response_model=pm.PromptResponse)
-def get_prompt(bot_id: str) -> str:
+@app.get("/{username}/bots/{bot_id}/prompt", response_model=pm.PromptResponse)
+def get_prompt(bot_id: str, username: str) -> str:
     """Get prompt of bot by id."""
-    bot = get_bot(bot_id)
+    bot = get_bot(bot_id, username)
     if bot is None:
         raise HTTPException(status_code=404, detail="Bot not found")
     return pm.PromptResponse(prompt=bot.prompt)
 
 
-@app.put("/bots/{bot_id}/prompt", response_model=pm.MessageResponse)
-def change_prompt(bot_id: str, request: pm.PromptRequest) -> pm.MessageResponse:
+
+@app.put("/{username}/bots/{bot_id}/prompt", response_model=pm.MessageResponse)
+def change_prompt(
+    bot_id: str,
+    username: str,
+    request: pm.PromptRequest,
+    database: Database = Depends(get_database),
+) -> pm.MessageResponse:
     """Change prompt of bot by id."""
-    bot = get_bot(bot_id)
+    bot = get_bot(bot_id, username)
     bot.prompt = request.prompt
     database.bots.save(bot)
     return pm.MessageResponse(message="Prompt changed successfully!")
