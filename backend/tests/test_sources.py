@@ -9,16 +9,19 @@ def test_create_bot(test_client) -> None:
     global bot_id
     global username
     username = "test_user"
-    bot_id = test_client.put(
+    response = test_client.put(
         f"/{username}/bots", json={"name": "test_bot", "username": username}
-    ).json()["bot_id"]
+    )
+    bot_id = response.json()["bot_id"]
 
 
 def test_put_source(test_client) -> None:
     """Test the put source endpoint."""
+    global source_id
     response = test_client.put(
-        f"/{username}/bots/{bot_id}/sources", json={"source": "test_source"}
+        f"/{username}/bots/{bot_id}/sources", json={"name": "test_source"}
     )
+    source_id = response.json()["source_id"]
     assert response.status_code == 200
 
 
@@ -26,7 +29,7 @@ def test_get_sources(test_client) -> None:
     """Test the get sources endpoint."""
     response = test_client.get(f"/{username}/bots/{bot_id}/sources")
     assert response.status_code == 200
-    assert response.json() == {"sources": ["test_source"]}
+    assert response.json() == {"sources": [source_id]}
 
 
 def test_get_sources_not_found(test_client) -> None:
@@ -38,12 +41,12 @@ def test_get_sources_not_found(test_client) -> None:
 
 def test_delete_source(test_client) -> None:
     """Test the delete source endpoint."""
-    response = test_client.delete(f"/{username}/bots/{bot_id}/sources/test_source")
+    response = test_client.delete(f"/{username}/bots/{bot_id}/sources/{source_id}")
     assert response.status_code == 200
 
 
 def test_delete_source_not_found(test_client) -> None:
     """Test the delete source endpoint with a bot that does not exist."""
     fake_id = ObjectId("123456789012345678901234")
-    response = test_client.delete(f"/{username}/bots/{fake_id}/sources/test_source")
+    response = test_client.delete(f"/{username}/bots/{fake_id}/sources/{source_id}")
     assert response.status_code == 404

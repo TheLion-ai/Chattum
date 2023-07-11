@@ -9,8 +9,8 @@ from logger import init_logger
 database = Database()
 
 
-@contextmanager
-def lifespan(app: FastAPI) -> None:
+@asynccontextmanager
+async def lifespan(app: FastAPI) -> None:
     """Startup event."""
     global database
     mongo_client = app.dependency_overrides.get(get_mongo_client, get_mongo_client)()
