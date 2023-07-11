@@ -2,8 +2,8 @@
 from functools import lru_cache
 
 import pytest
+from app.database import get_mongo_client
 from app.router import app
-from database import get_mongo_client
 from fastapi.testclient import TestClient
 from pymongo_inmemory import MongoClient
 
