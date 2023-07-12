@@ -7,6 +7,8 @@ from app.app import database
 from bson import ObjectId
 from fastapi import APIRouter, HTTPException
 
+from .conversations import get_conversations
+
 router = APIRouter(prefix="/{username}/bots", tags=["bots"])
 
 
@@ -34,9 +36,13 @@ def get_bot(bot_id: str, username: str) -> Union[pm.Bot, None]:
     return bot
 
 
-@router.delete("/{bot_id}")
+@router.delete("/{username}/bots/{bot_id}")
 def delete_bot(bot_id: str, username: str) -> pm.MessageResponse:
     """Delete bot by id."""
     bot = get_bot(bot_id, username)
     database.bots.delete(bot)
+    # Delete all conversations involving the bot
+    conversations = get_conversations(bot_id)
+    for conversation in conversations:
+        database.conversations.delete(conversation)
     return pm.MessageResponse(message="Bot deleted successfully!")
