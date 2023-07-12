@@ -2,25 +2,19 @@
 from functools import lru_cache
 
 import pytest
-from app import app
-from database import BotsRepository, ConversationsRepository, Database, get_database
+from app.database import get_mongo_client
+from app.router import app
 from fastapi.testclient import TestClient
 from pymongo_inmemory import MongoClient
 
 
 @lru_cache()
-def get_mock_database():
+def get_mock_mongo_client():
     """Get the mock database in memory."""
-    mongo_client = MongoClient()
-    database = Database(
-        bots=BotsRepository(mongo_client["bots"]),
-        conversations=ConversationsRepository(mongo_client["conversations"]),
-    )
-    print("MOCK DATABASE CREATED!")
-    return database
+    return MongoClient()
 
 
-app.dependency_overrides[get_database] = get_mock_database
+app.dependency_overrides[get_mongo_client] = get_mock_mongo_client
 
 
 @pytest.fixture(scope="session")

@@ -3,9 +3,8 @@ from typing import List
 
 import requests
 import streamlit as st
-from langchain.memory import ChatMessageHistory
-
 from constants import BACKEND_URL, USERNAME
+from langchain.memory import ChatMessageHistory
 
 
 def get_bots() -> list[dict]:
@@ -65,5 +64,7 @@ def get_prompt(bot_id: str) -> str:
 
 def get_conversations(bot_id: str) -> list[dict]:
     """Get a list of conversations involving given bot."""
-    conversations = requests.get(f"{BACKEND_URL}/bots/{bot_id}/conversations").json()
+    conversations = requests.get(
+        f"{BACKEND_URL}/{USERNAME}/bots/{bot_id}/conversations"
+    ).json()
     return conversations
