@@ -4,7 +4,7 @@ from typing import Any, Union
 import pydantic_models as pm
 from bson import ObjectId
 from database import Database, get_database
-from fastapi import Depends, FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException
 from fastapi.openapi.utils import get_openapi
 from logger import init_logger
 
@@ -63,6 +63,10 @@ def delete_bot(bot_id: str, username: str) -> pm.MessageResponse:
     """Delete bot by id."""
     bot = get_bot(bot_id, username)
     database.bots.delete(bot)
+    # Delete all conversations involving the bot
+    conversations = get_conversations(bot_id)
+    for conversation in conversations:
+        database.conversations.delete(conversation)
     return pm.MessageResponse(message="Bot deleted successfully!")
 
 
@@ -73,6 +77,7 @@ def get_prompt(bot_id: str, username: str) -> str:
     if bot is None:
         raise HTTPException(status_code=404, detail="Bot not found")
     return pm.PromptResponse(prompt=bot.prompt)
+
 
 
 @app.put("/{username}/bots/{bot_id}/prompt", response_model=pm.MessageResponse)
@@ -87,6 +92,44 @@ def change_prompt(
     bot.prompt = request.prompt
     database.bots.save(bot)
     return pm.MessageResponse(message="Prompt changed successfully!")
+
+
+@app.get("/bots/{bot_id}/conversations", response_model=list[pm.Conversation])
+def get_conversations(bot_id: str) -> list[pm.Conversation]:
+    """Get all conversations associated with the given bot."""
+    bot_conversations = list(
+        database.conversations.find_by({"bot_id": ObjectId(bot_id)})
+    )
+    return bot_conversations
+
+
+@app.put("/bots/{bot_id}/conversations", response_model=pm.CreateConversationResponse)
+def put_conversations(
+    bot_id: str, conversation: pm.Conversation
+) -> pm.CreateConversationResponse:
+    """Create a conversation."""
+    conversation.bot_id = ObjectId(bot_id)
+    database.conversations.save(conversation)
+    conversation = database.conversations.find_one_by_id(conversation.id)
+    return pm.CreateConversationResponse(
+        message="Conversation created successfully!",
+        conversation_id=str(conversation.id),
+    )
+
+
+@app.get("/bots/{bot_id}/conversations/{conversation_id}")
+def get_conversation(conversation_id: str) -> pm.Conversation:
+    """Get conversation by id."""
+    conversation = database.conversations.find_one_by_id(ObjectId(conversation_id))
+    return conversation
+
+
+@app.delete("/bots/{bot_id}/conversations/{conversation_id}")
+def delete_conversation(conversation_id: str) -> pm.MessageResponse:
+    """Delete conversation by id."""
+    conversation = get_conversation(conversation_id)
+    database.conversations.delete(conversation)
+    return pm.MessageResponse(message="Conversation deleted successfully!")
 
 
 def custom_openapi() -> dict[str, Any]:
