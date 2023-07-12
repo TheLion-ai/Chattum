@@ -6,9 +6,11 @@ from langchain.schema import messages_to_dict
 
 def test_create_bot(test_client) -> None:
     """Set up the test client."""
+    global username
     global bot_id
+    username = "test_user"
     bot_id = test_client.put(
-        "/bots", json={"name": "test_bot", "username": "test_user"}
+        "/{username}/bots", json={"name": "test_bot", "username": "test_user"}
     ).json()["bot_id"]
 
 
@@ -22,15 +24,17 @@ def test_put_and_get(test_client) -> None:
 
     # Save history to database
     response = test_client.put(
-        f"/bots/{bot_id}/conversations", json={"messages": messages}
+        f"/{username}/bots/{bot_id}/conversations", json={"messages": messages}
     )
     conversation_id = response.json()["conversation_id"]
 
     # Get history from database
-    response = test_client.get(f"/bots/{bot_id}/conversations/{conversation_id}")
+    response = test_client.get(
+        f"/{username}/bots/{bot_id}/conversations/{conversation_id}"
+    )
 
     # Delete history from database
-    test_client.delete(f"/bots/{bot_id}/conversations/{conversation_id}")
+    test_client.delete(f"/{username}/bots/{bot_id}/conversations/{conversation_id}")
 
     # Check if history is the same
     assert messages == response.json()["messages"]

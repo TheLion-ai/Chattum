@@ -5,9 +5,11 @@ import pydantic_models as pm
 from app.app import database
 from app.routers.bots import get_bot
 from bson import ObjectId
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 
-router = APIRouter(prefix="/{username}/bots/{bot_id}/conversations", tags=["prompts"])
+router = APIRouter(
+    prefix="/{username}/bots/{bot_id}/conversations", tags=["conversations"]
+)
 
 
 @router.get("", response_model=list[pm.Conversation])
@@ -37,6 +39,8 @@ def put_conversations(
 def get_conversation(conversation_id: str) -> pm.Conversation:
     """Get conversation by id."""
     conversation = database.conversations.find_one_by_id(ObjectId(conversation_id))
+    if conversation is None:
+        raise HTTPException(status_code=404, detail="Conversation not found")
     return conversation
 
 
