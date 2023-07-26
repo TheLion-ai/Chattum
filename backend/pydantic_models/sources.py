@@ -9,7 +9,7 @@ class Source(BaseModel):
 
     id: ObjectIdField = None  # id of source
     name: str  # name of source
-    type: str  # type of source
+    source_type: str  # type of source
 
     class Config:
         """The ObjectIdField creates an bson ObjectId value, so its necessary to setup the json encoding"."""

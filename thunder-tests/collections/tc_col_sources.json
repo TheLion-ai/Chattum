@@ -10,12 +10,42 @@
             "colId": "be86f8a7-22ca-4faa-869c-8bbae67100f1",
             "containerId": "",
             "name": "Put source",
-            "url": "",
-            "method": "GET",
+            "url": "localhost:8000/test_user2/bots/64655bab13d5a9a616d9664c/sources",
+            "method": "PUT",
             "sortNum": 10000,
             "created": "2023-07-11T17:23:06.917Z",
-            "modified": "2023-07-11T17:23:06.917Z",
-            "headers": []
+            "modified": "2023-07-20T12:14:07.145Z",
+            "headers": [],
+            "params": [],
+            "tests": []
+        },
+        {
+            "_id": "6d3128cf-96bc-4833-a4f5-e40532708703",
+            "colId": "be86f8a7-22ca-4faa-869c-8bbae67100f1",
+            "containerId": "",
+            "name": "Get source",
+            "url": "localhost:8000/test_user2/bots/64655bab13d5a9a616d9664c/sources/649233d30917b56aaf506bf8",
+            "method": "GET",
+            "sortNum": 20000,
+            "created": "2023-07-20T12:10:41.547Z",
+            "modified": "2023-07-20T12:37:03.719Z",
+            "headers": [],
+            "params": [],
+            "tests": []
+        },
+        {
+            "_id": "477665bd-f12a-46d3-9335-3e99ef2b965d",
+            "colId": "be86f8a7-22ca-4faa-869c-8bbae67100f1",
+            "containerId": "",
+            "name": "get sources",
+            "url": "localhost:8000/test_user2/bots/64655bab13d5a9a616d9664c/sources",
+            "method": "GET",
+            "sortNum": 30000,
+            "created": "2023-07-20T12:11:06.287Z",
+            "modified": "2023-07-20T12:14:25.223Z",
+            "headers": [],
+            "params": [],
+            "tests": []
         }
     ]
 }
