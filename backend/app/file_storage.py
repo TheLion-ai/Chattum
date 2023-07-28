@@ -18,28 +18,30 @@ class FileStorage:
     client: Optional[boto3.client] = None
     bucket_name: str = os.environ["S3_BUCKET"]
 
-    def upload_source(self, file: bytes, id: str, type: str, bot_id: str) -> None:
+    def upload_source(
+        self, file: bytes, id: str, source_type: str, bot_id: str
+    ) -> None:
         """Upload a source file to the storage."""
         self.client.put_object(
             Bucket=self.bucket_name,
-            Key=f"sources/{bot_id}/{id}.{type}",
+            Key=f"sources/{bot_id}/{id}.{source_type}",
             Body=file,
         )
 
-    def download_source(self, id: str, type: str, bot_id: str) -> str:
+    def download_source(self, id: str, source_type: str, bot_id: str) -> str:
         """Get a source file from the storage."""
-        fd, path = tempfile.mkstemp(suffix=f".{type}")
+        fd, path = tempfile.mkstemp(suffix=f".{source_type}")
         with os.fdopen(fd, "wb") as tmp:
             self.client.download_fileobj(
-                self.bucket_name, f"sources/{bot_id}/{id}.{type}", tmp
+                self.bucket_name, f"sources/{bot_id}/{id}.{source_type}", tmp
             )
         return path
 
-    def delete_source(self, id: str, type: str, bot_id: str) -> None:
+    def delete_source(self, id: str, source_type: str, bot_id: str) -> None:
         """Delete a source file from the storage."""
         self.client.delete_object(
             Bucket=self.bucket_name,
-            Key=f"sources/{bot_id}/{id}.{type}",
+            Key=f"sources/{bot_id}/{id}.{source_type}",
         )
 
 

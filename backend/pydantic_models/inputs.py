@@ -18,5 +18,5 @@ class SourceRequest(BaseModel):
     """Request model for the sources endpoint."""
 
     name: str  # name of the source
-    type: str  # type of the source
+    source_type: str  # type of the source
     data: str = ""  # data of the source

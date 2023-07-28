@@ -1,0 +1,42 @@
+{
+    "_id": "ca0426ab-f981-4619-acca-be5df81ede70",
+    "colName": "prompts",
+    "created": "2023-07-20T12:13:37.223Z",
+    "sortNum": 30000,
+    "folders": [],
+    "requests": [
+        {
+            "_id": "156f99a8-ce5e-4bde-923b-04dee5fb9c6b",
+            "colId": "ca0426ab-f981-4619-acca-be5df81ede70",
+            "containerId": "",
+            "name": "get prompt",
+            "url": "localhost:8000/test_user2/bots/64655bab13d5a9a616d9664c/prompt",
+            "method": "GET",
+            "sortNum": 10000,
+            "created": "2023-07-20T12:14:52.189Z",
+            "modified": "2023-07-20T12:18:26.244Z",
+            "headers": [],
+            "params": [],
+            "tests": []
+        },
+        {
+            "_id": "2e80ea72-8580-46d1-8acd-a0f771b9a0be",
+            "colId": "ca0426ab-f981-4619-acca-be5df81ede70",
+            "containerId": "",
+            "name": "put prompt",
+            "url": "localhost:8000/test_user2/bots/64655bab13d5a9a616d9664c/prompt",
+            "method": "PUT",
+            "sortNum": 20000,
+            "created": "2023-07-20T12:14:58.957Z",
+            "modified": "2023-07-20T12:20:53.940Z",
+            "headers": [],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"prompt\": \"Masz sprzedać rower\"\n}",
+                "form": []
+            },
+            "tests": []
+        }
+    ]
+}

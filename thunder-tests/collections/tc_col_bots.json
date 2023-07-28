@@ -53,34 +53,6 @@
             "tests": []
         },
         {
-            "_id": "156f99a8-ce5e-4bde-923b-04dee5fb9c6b",
-            "colId": "cad400a4-97c6-49e0-903e-d813e69f63f4",
-            "containerId": "",
-            "name": "get prompt",
-            "url": "localhost:8000/test_user2/bots/64655bab13d5a9a616d9664c/sources",
-            "method": "GET",
-            "sortNum": 40000,
-            "created": "2023-05-21T20:37:06.272Z",
-            "modified": "2023-06-21T21:01:38.831Z",
-            "headers": [],
-            "params": [],
-            "tests": []
-        },
-        {
-            "_id": "2e80ea72-8580-46d1-8acd-a0f771b9a0be",
-            "colId": "cad400a4-97c6-49e0-903e-d813e69f63f4",
-            "containerId": "",
-            "name": "put prompt",
-            "url": "localhost:8000/test_user2/bots",
-            "method": "GET",
-            "sortNum": 50000,
-            "created": "2023-05-21T20:39:04.081Z",
-            "modified": "2023-06-21T19:54:48.258Z",
-            "headers": [],
-            "params": [],
-            "tests": []
-        },
-        {
             "_id": "6043190b-4b11-444d-b15a-ce507785281d",
             "colId": "cad400a4-97c6-49e0-903e-d813e69f63f4",
             "containerId": "",
