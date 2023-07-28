@@ -26,6 +26,6 @@ jobs:
           echo "S3_BUCKET = $S3_BUCKET" >> .env
           echo "S3_ACCESS_KEY = $S3_ACCESS_KEY" >> .env
           echo "S3_SECRET_KEY = $S3_SECRET_KEY" >> .env
-
+          cat .env
           docker-compose build
           docker-compose run -p 27017:27017 backend poetry run python -m pytest
