@@ -24,7 +24,7 @@ def test_put_source(test_client) -> None:
     with open("tests/files/sample.pdf", "rb") as file:
         response = test_client.put(
             f"/{username}/bots/{bot_id}/sources",
-            data={"name": "sample", "type": "pdf"},
+            data={"name": "sample", "source_type": "pdf"},
             files={"file": file},
         )
         source_id = response.json()["source_id"]
@@ -42,7 +42,7 @@ def test_get_source(test_client) -> None:
     """Test the get source endpoint."""
     response = test_client.get(f"/{username}/bots/{bot_id}/sources/{source_id}")
     assert response.status_code == 200
-    assert response.json() == {"id": source_id, "name": "sample", "type": "pdf"}
+    assert response.json() == {"id": source_id, "name": "sample", "source_type": "pdf"}
 
     response = test_client.get(f"/{username}/bots/{bot_id}/sources/{source_id}/file")
     try:

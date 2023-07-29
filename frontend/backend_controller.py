@@ -1,5 +1,5 @@
 """Functions exchanging information from frontend with backend."""
-from typing import List
+from typing import Annotated
 
 import requests
 import streamlit as st
@@ -33,6 +33,85 @@ def create_new_bot(bot_name: str) -> None:
         st.success(f"Bot {bot_name} created")
     except Exception as e:
         st.warning(e)
+
+
+def get_sources(bot_id: str) -> list[dict]:
+    """Get a list of available source for the selected bot.
+
+    Returns:
+        list[dict]: a list of created sources for the bot.
+    """
+    sources = requests.get(f"{BACKEND_URL}/{USERNAME}/bots/{bot_id}/sources").json()
+
+    return sources
+
+
+def get_source(bot_id: str, source_id: str) -> dict:
+    """Get a source with a given id.
+
+    Args:
+        bot_id (str): id of the bot to which the source belongs
+        source_id (str): id of the source to get
+    Returns:
+        dict: a source with a given id.
+    """
+    source = requests.get(f"{BACKEND_URL}/{USERNAME}/bots/{bot_id}/sources/{source_id}")
+    return source.json()
+
+
+def get_source_file(bot_id: str, source_id: str) -> bytes:
+    """Get a source file with a given id.
+
+    Args:
+        bot_id (str): id of the bot to which the source belongs
+        source_id (str): id of the source to get
+    Returns:
+        bytes: a source file with a given id.
+    """
+    file = requests.get(
+        f"{BACKEND_URL}/{USERNAME}/bots/{bot_id}/sources/{source_id}/file"
+    ).content
+    return file
+
+
+def delete_source(bot_id: str, source_id: str) -> None:
+    """Delete a source with a given id.
+
+    Args:
+        bot_id (str): id of the bot to which the source belongs
+        source_id (str): id of the source to delete
+    """
+    try:
+        response = requests.delete(
+            f"{BACKEND_URL}/{USERNAME}/bots/{bot_id}/sources/{source_id}",
+        )
+        assert response.status_code == 200
+        st.success(f"Source {source_id} deleted")
+    except Exception as e:
+        st.warning(e)
+
+
+def create_new_source(
+    file: bytes, source_name: str, source_type: str, bot_id: str
+) -> None:
+    """Create a new source for the bot with a given name.
+
+    Args:
+        source_name (str): a name for a new source for the bot
+    """
+    try:
+        response = requests.put(
+            f"{BACKEND_URL}/{USERNAME}/bots/{bot_id}/sources",
+            data={
+                "name": source_name,
+                "source_type": source_type,
+            },
+            files={"file": file},
+        )
+        assert response.status_code == 200
+        st.success(f"Source {source_name} added")
+    except Exception as e:
+        st.warning(response.text, e)
 
 
 def create_new_prompt(prompt: str, bot_id: str) -> None:
