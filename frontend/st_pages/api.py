@@ -2,4 +2,7 @@
 import streamlit.components.v1 as components
 from constants import EXTERNAL_BACKEND_URL
 
-components.iframe(f"{EXTERNAL_BACKEND_URL}/docs", height=800, scrolling=True)
+
+def render_api() -> None:
+    """Render the api page."""
+    components.iframe(f"{EXTERNAL_BACKEND_URL}/docs", height=800, scrolling=True)

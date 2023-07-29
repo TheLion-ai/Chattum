@@ -1,4 +1,4 @@
-"""This module contains fixtures for the tests."""
+"""Fixtures for the tests."""
 from functools import lru_cache
 
 import pytest

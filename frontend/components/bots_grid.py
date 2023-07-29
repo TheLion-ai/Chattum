@@ -3,7 +3,7 @@
 import streamlit as st
 from backend_controller import create_new_bot, get_bots
 
-from .sidebar import expand_sidebar
+# from .utils import query_params
 
 
 class BotsGrid:
@@ -11,33 +11,32 @@ class BotsGrid:
 
     def __init__(self) -> None:
         """Initialize the current bot state."""
-        if "bot_id" in st.experimental_get_query_params():
-            st.session_state.current_bot = st.experimental_get_query_params()["bot_id"][
-                0
-            ]
+        # st.session_state.current_bot = query_params.get_form_url("bot_id")
 
     def __call__(self) -> None:
         """Create a view with available bots and a card for creating new bots."""
         self._display_new_bot_card()
-        self._display_bots()
+        search_bar = st.text_input("Search")
+        self._display_bots(search_bar)
 
     def _select_bot(self, bot_id: str) -> None:
         st.session_state.current_bot = bot_id
         st.experimental_set_query_params(bot_id=bot_id)
-        expand_sidebar()
 
     def _display_new_bot_card(self) -> None:
         col1, _, _ = st.columns(3)
         with col1:
-            with st.expander("Create a new bot", expanded=True):
+            with st.expander("Create a new bot", expanded=False):
                 bot_name = st.text_input(
                     "Bot name"
                 )  # TODO validator to ensure the name is not en empty string
-                st.button("'Create'", on_click=create_new_bot, args=([bot_name]))
+                st.button("Create", on_click=create_new_bot, args=([bot_name]))
         st.write("")
 
-    def _display_bots(self) -> None:
+    def _display_bots(self, search: str) -> None:
         bots = get_bots()
+        if search:
+            bots = [bot for bot in bots if search in bot["name"]]
         col1, col2, col3 = st.columns(3)
 
         for idx, bot in enumerate(bots):
@@ -49,12 +48,14 @@ class BotsGrid:
             else:
                 col = col3
             with col:
-                with st.expander(bot["name"], expanded=True):
-                    st.button(
+                with st.form(key=f"bot-{idx}"):
+                    # with st.expander(bot["name"], expanded=True):
+                    st.markdown(f"### {bot['name']}")
+                    st.text(bot["prompt"])
+                    st.form_submit_button(
                         "Selected"
                         if st.session_state.get("current_bot", None) == bot["id"]
                         else "Select",
-                        key=idx,
                         type="primary"
                         if st.session_state.get("current_bot", None) == bot["id"]
                         else "secondary",
