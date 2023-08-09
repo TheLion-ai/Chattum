@@ -147,3 +147,31 @@ def get_conversations(bot_id: str) -> list[dict]:
         f"{BACKEND_URL}/{USERNAME}/bots/{bot_id}/conversations"
     ).json()
     return conversations
+
+
+def get_conversation(bot_id: str, conversation_id: str) -> dict | None:
+    """Get a conversation by id."""
+    response = requests.get(
+        f"{BACKEND_URL}/{USERNAME}/bots/{bot_id}/conversations/{conversation_id}"
+    )
+    if response.status_code == 200:
+        return response.json()
+    elif response.status_code == 404:
+        return None
+    else:
+        raise Exception(f"error: {response.status_code} {response.text}")
+
+
+def get_bot(bot_id: str) -> dict:
+    """Get a bot by id."""
+    bot = requests.get(f"{BACKEND_URL}/{USERNAME}/bots/{bot_id}").json()
+    return bot
+
+
+def send_message(bot_id: str, conversation_id: str, message: str) -> tuple[str, str]:
+    """Send a message to a bot and get a response."""
+    response = requests.post(
+        f"{BACKEND_URL}/{USERNAME}/bots/{bot_id}/chat",
+        json={"message": message, "conversation_id": str(conversation_id)},
+    ).json()
+    return response["message"], response["conversation_id"]

@@ -2,8 +2,9 @@
 
 from .bots import Bot
 from .conversations import Conversation
-from .inputs import BotsRequest, PromptRequest, SourceRequest
+from .inputs import BotsRequest, ChatInput, PromptRequest, SourceRequest
 from .responses import (
+    ChatResponse,
     CreateBotResponse,
     CreateConversationResponse,
     CreateSourceResponse,

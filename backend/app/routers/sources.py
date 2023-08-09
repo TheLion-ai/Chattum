@@ -19,13 +19,18 @@ def remove_file(path: str) -> None:
 router = APIRouter(prefix="/{username}/bots/{bot_id}/sources", tags=["sources"])
 
 
-@router.get("", response_model=pm.SourceResponse)
-def get_sources(bot_id: str, username: str) -> list[str]:
+@router.get("", response_model=list[pm.Source])
+def get_sources(bot_id: str, username: str) -> list[pm.Source]:
     """Get sources of bot by id."""
     bot = get_bot(bot_id, username)
+    bot_sources = bot.sources
+    # bot_sources = [str(source_id) for source_id in list(bot_sources)]
+    print(bot_sources)
+    sources = database.sources.find_by({"_id": {"$in": bot_sources}})
+
     if bot is None:
         raise HTTPException(status_code=404, detail="Bot not found")
-    return pm.SourceResponse(sources=bot.sources)
+    return list(sources)
 
 
 @router.put("", response_model=pm.CreateSourceResponse)

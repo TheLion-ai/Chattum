@@ -2,6 +2,7 @@
 
 from bson import ObjectId
 from pydantic import BaseModel
+from pydantic_mongo import ObjectIdField
 
 
 class HealthCheckResponse(BaseModel):
@@ -47,6 +48,18 @@ class SourceResponse(BaseModel):
     """Response model for the create source endpoint."""
 
     sources: list = []
+
+    class Config:
+        """The ObjectIdField creates an bson ObjectId value, so its necessary to setup the json encoding"."""
+
+        json_encoders = {ObjectId: str}
+
+
+class ChatResponse(BaseModel):
+    """Response model for the chat endpoint."""
+
+    message: str
+    conversation_id: ObjectIdField
 
     class Config:
         """The ObjectIdField creates an bson ObjectId value, so its necessary to setup the json encoding"."""

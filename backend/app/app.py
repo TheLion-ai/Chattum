@@ -1,6 +1,6 @@
 # mypy: ignore-errors
 """create app instance."""
-from contextlib import asynccontextmanager, contextmanager
+from contextlib import asynccontextmanager
 
 from app.database import Database, get_mongo_client
 from app.file_storage import FileStorage, get_s3_client
