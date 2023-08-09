@@ -23,9 +23,14 @@ router = APIRouter(prefix="/{username}/bots/{bot_id}/sources", tags=["sources"])
 def get_sources(bot_id: str, username: str) -> list[str]:
     """Get sources of bot by id."""
     bot = get_bot(bot_id, username)
+    bot_sources = bot.sources
+    sources = database.sources.find_by(
+        {"_id": {"$in": [str(source_id) for source_id in bot_sources]}}
+    )
+
     if bot is None:
         raise HTTPException(status_code=404, detail="Bot not found")
-    return pm.SourceResponse(sources=bot.sources)
+    return pm.SourceResponse(sources=list(sources))
 
 
 @router.put("", response_model=pm.CreateSourceResponse)

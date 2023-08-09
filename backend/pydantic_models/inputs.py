@@ -2,7 +2,7 @@
 from typing import Optional
 
 from bson import ObjectId
-from pydantic import BaseModel
+from pydantic import BaseModel, validator
 from pydantic_mongo import ObjectIdField
 
 
@@ -29,7 +29,7 @@ class SourceRequest(BaseModel):
 class ChatInput(BaseModel):
     """Request model for the chat endpoint."""
 
-    conversation_id: Optional[ObjectIdField] = ObjectId()  # conversation id
+    conversation_id: Optional[ObjectIdField]  # = ObjectId()  # conversation id
 
     message: str
 
@@ -37,3 +37,8 @@ class ChatInput(BaseModel):
         """The ObjectIdField creates an bson ObjectId value, so its necessary to setup the json encoding"."""
 
         json_encoders = {ObjectId: str}
+
+    @validator("conversation_id", pre=True, always=True)
+    def set_conversation_id(cls, v: ObjectId | None) -> ObjectId:
+        """When conversation_id is None then create a new conversation."""
+        return v or ObjectId()

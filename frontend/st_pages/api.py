@@ -5,4 +5,4 @@ from constants import EXTERNAL_BACKEND_URL
 
 def render_api() -> None:
     """Render the api page."""
-    components.iframe(f"{EXTERNAL_BACKEND_URL}/docs", height=800, scrolling=True)
+    components.iframe(f"{EXTERNAL_BACKEND_URL}/docs", height=1200, scrolling=True)

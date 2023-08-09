@@ -20,7 +20,7 @@ def chat(
     username: str,
     chat_input: pm.ChatInput,
 ) -> pm.ChatResponse:
-    """Get all conversations associated with the given bot."""
+    """Chat with a bot. If the conversation id is not provided, a new conversation is created."""
     bot = get_bot(bot_id, username)
     bot_conversations = get_conversations(bot_id)
     if any(

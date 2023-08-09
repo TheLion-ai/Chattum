@@ -3,6 +3,7 @@ import streamlit as st
 from components import bots_grid
 from components.bot_menu import BotMenu
 from components.sidebar import sidebar_controller
+from st_pages.api import render_api
 from st_pages.chat import render_chat
 from st_pages.conversations import render_conversations
 from st_pages.prompt import render_prompt
@@ -38,6 +39,10 @@ pages = {
     "Chat": {
         "icon": "chat",
         "content": render_chat,
+    },
+    "API": {
+        "icon": "link-45deg",
+        "content": render_api,
     },
 }
 sidebar_controller("Expanded")
