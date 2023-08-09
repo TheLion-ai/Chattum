@@ -45,17 +45,15 @@ class SourcesGrid:
         st.write("")
 
     def _display_sources(self) -> None:
-        sources = get_sources(self.bot_id)["sources"]
+        sources = get_sources(self.bot_id)
         if len(sources) > 0:
-            for idx, source_id in enumerate(sources):
-                source = get_source(self.bot_id, source_id)
-
+            for idx, source in enumerate(sources):
                 with st.container():
                     with st.expander(source["name"], expanded=False):
                         st.button(
                             "Delete",
                             on_click=delete_source,
-                            args=([self.bot_id, source_id]),
+                            args=([self.bot_id, source["id"]]),
                             key=f"delete_source_{idx}",
                         )
                         st.write(f"ID: {source['id']}")
@@ -65,7 +63,7 @@ class SourcesGrid:
                         elif source["source_type"] == "pdf":
                             st.download_button(
                                 "Download file",
-                                data=get_source_file(self.bot_id, source_id),
+                                data=get_source_file(self.bot_id, source["id"]),
                                 file_name=f"{source['name']}.{source['source_type']}",
                                 mime=None,
                                 key=f"download_pdf_{idx}",
@@ -73,7 +71,7 @@ class SourcesGrid:
                         elif source["source_type"] == "xls":
                             st.download_button(
                                 "Download file",
-                                data=get_source_file(self.bot_id, source_id),
+                                data=get_source_file(self.bot_id, source["id"]),
                                 file_name=f"{source['name']}.{source['source_type']}",
                                 mime="text/xls",
                                 key=f"download_xls_{idx}",
@@ -81,7 +79,7 @@ class SourcesGrid:
                         elif source["source_type"] == "txt":
                             st.download_button(
                                 "Download file",
-                                data=get_source_file(self.bot_id, source_id),
+                                data=get_source_file(self.bot_id, source["id"]),
                                 file_name=f"{source['name']}.{source['source_type']}",
                                 mime="text/plain",
                                 key=f"download_txt_{idx}",

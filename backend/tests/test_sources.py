@@ -35,7 +35,9 @@ def test_get_sources(test_client) -> None:
     """Test the get sources endpoint."""
     response = test_client.get(f"/{username}/bots/{bot_id}/sources")
     assert response.status_code == 200
-    assert response.json() == {"sources": [source_id]}
+    assert response.json() == [
+        {"name": "sample", "source_type": "pdf", "id": source_id}
+    ]
 
 
 def test_get_source(test_client) -> None:
