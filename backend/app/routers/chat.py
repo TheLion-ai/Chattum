@@ -31,7 +31,12 @@ def chat(
 
     else:
         conversation = pm.Conversation(bot_id=bot_id, messages=[])
-    chat_engine = ChatGPTEngine2(user_prompt=bot.prompt, messages=conversation.messages)
+    chat_engine = ChatGPTEngine2(
+        bot_id=bot_id,
+        username=username,
+        user_prompt=bot.prompt,
+        messages=conversation.messages,
+    )
     response = chat_engine.chat(chat_input.message)
     conversation.messages = chat_engine.export_messages()
 
