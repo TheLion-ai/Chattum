@@ -27,42 +27,6 @@ from langchain.schema import (
 from langchain.tools import BaseTool, StructuredTool, Tool, tool
 from langchain.vectorstores import Chroma
 
-# def load_document(filename: str) -> List[Document]:
-#     """Load given local file as a LangChain Document."""
-#     loaders = {
-#         "pdf": PyPDFLoader,
-#         "txt": UnstructuredFileLoader,
-#         "xls": UnstructuredExcelLoader,
-#     }
-#
-#     extension = filename.split(".")[-1]
-#     loader = loaders[extension](filename)
-#     data = loader.load()
-#     return data
-
-
-# class SearchDocumentsTool:
-#     def __init__(self, documents: List[Document]):
-#         embedding_function = SentenceTransformerEmbeddings(
-#             model_name="distiluse-base-multilingual-cased-v1"
-#         )
-#         self.db = Chroma.from_documents(documents, embedding_function)
-#
-#     def _run(self, query: str):
-#         _docs = self.db.similarity_search(query)
-#         answer = _docs[0]
-#         return answer
-#
-#     def _arun(self, query: str):
-#         raise NotImplementedError("This tool does not support async")
-#
-#     def as_tool(self):
-#         return Tool.from_function(
-#             func=self._run,
-#             name="Search Documents Tool",
-#             description="You must use this tool each time",
-#         )
-
 
 class BaseChatEngine(ABC):
     """Base class for chat engines."""
@@ -70,7 +34,7 @@ class BaseChatEngine(ABC):
     def __init__(
         self,
         user_prompt: str,
-        sources: str,
+        sources: list[Document],
         messages: list[dict] = [],
         llm_kwargs: dict = {},
     ) -> None:
@@ -93,7 +57,7 @@ class BaseChatEngine(ABC):
         llm: BaseLLM,
         prompt: BasePromptTemplate,
         memory: BaseChatMemory,
-        sources: str,
+        sources: list[Document],
     ) -> ConversationChain:
         """Create a conversation chain."""
         raise NotImplementedError
@@ -135,7 +99,7 @@ class ChatGPTEngine(BaseChatEngine):
         llm: BaseLLM,
         prompt: BasePromptTemplate,
         memory: BaseChatMemory,
-        sources: str,
+        sources: list[Document],
     ) -> ConversationChain:
         return ConversationChain(llm=llm, prompt=prompt, memory=memory, verbose=True)
 
@@ -165,7 +129,7 @@ class ChatGPTEngine2(BaseChatEngine):
         llm: BaseLLM,
         prompt: BasePromptTemplate,
         memory: BaseChatMemory,
-        sources: str,
+        sources: list[Document],
     ) -> Any:
         class Chain:
             def __init__(self, llm: BaseLLM, messages: list[dict]):
@@ -174,6 +138,8 @@ class ChatGPTEngine2(BaseChatEngine):
 
             def run(self, message: str) -> str:
                 message = str(len(sources))
+                message = str(type(sources[0]))
+                # message = str(sources[0])
                 self.messages.append(HumanMessage(content=message))
 
                 response = self.llm(self.messages)

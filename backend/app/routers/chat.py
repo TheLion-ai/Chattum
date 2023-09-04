@@ -9,8 +9,10 @@ from app.routers.conversations import (
     get_conversations,
     put_conversations,
 )
+from app.routers.documents import load_document
 from app.routers.sources import get_sources
 from fastapi import APIRouter, HTTPException
+from starlette.background import BackgroundTasks
 
 router = APIRouter(prefix="/{username}/bots/{bot_id}/chat", tags=["chat"])
 
@@ -25,6 +27,21 @@ def chat(
     bot = get_bot(bot_id, username)
     bot_conversations = get_conversations(bot_id)
     bot_sources = get_sources(bot_id, username)
+    background_tasks = BackgroundTasks()
+    print("\n\n*************************************************************\n\n")
+    print(bot_id)
+    print(username)
+    print(bot_sources)
+    print("\n\n*************************************************************\n\n")
+    documents = [
+        load_document(str(source.id), bot_id, background_tasks)
+        for source in bot_sources
+    ]
+    documents = [item for sublist in documents for item in sublist]  # make flat list
+    # documents = [str(source.id) for source in bot_sources]
+    print("\n====================================================== documents:")
+    print(documents)
+    print("\n=================================================================")
     if any(
         conversation.id == chat_input.conversation_id
         for conversation in bot_conversations
@@ -36,7 +53,7 @@ def chat(
     chat_engine = ChatGPTEngine2(
         user_prompt=bot.prompt,
         messages=conversation.messages,
-        sources=bot_sources,
+        sources=documents,
     )
     response = chat_engine.chat(chat_input.message)
     conversation.messages = chat_engine.export_messages()
