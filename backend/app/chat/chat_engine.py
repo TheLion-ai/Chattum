@@ -69,9 +69,8 @@ class BaseChatEngine(ABC):
 
     def __init__(
         self,
-        bot_id: str,
-        username: str,
         user_prompt: str,
+        sources: str,
         messages: list[dict] = [],
         llm_kwargs: dict = {},
     ) -> None:
@@ -80,7 +79,7 @@ class BaseChatEngine(ABC):
         self.prompt: BasePromptTemplate = self._create_prompt(user_prompt)
         self.memory: BaseChatMemory = self._load_memory(messages)
         self.chain: LLMChain = self._create_chain(
-            bot_id, username, self.llm, self.prompt, self.memory
+            self.llm, self.prompt, self.memory, sources
         )
 
     @abstractmethod
@@ -91,11 +90,10 @@ class BaseChatEngine(ABC):
     @abstractmethod
     def _create_chain(
         self,
-        bot_id: str,
-        username: str,
         llm: BaseLLM,
         prompt: BasePromptTemplate,
         memory: BaseChatMemory,
+        sources: str,
     ) -> ConversationChain:
         """Create a conversation chain."""
         raise NotImplementedError
@@ -134,11 +132,10 @@ class ChatGPTEngine(BaseChatEngine):
 
     def _create_chain(
         self,
-        bot_id: str,
-        username: str,
         llm: BaseLLM,
         prompt: BasePromptTemplate,
         memory: BaseChatMemory,
+        sources: str,
     ) -> ConversationChain:
         return ConversationChain(llm=llm, prompt=prompt, memory=memory, verbose=True)
 
@@ -165,11 +162,10 @@ class ChatGPTEngine2(BaseChatEngine):
 
     def _create_chain(
         self,
-        bot_id: str,
-        username: str,
         llm: BaseLLM,
         prompt: BasePromptTemplate,
         memory: BaseChatMemory,
+        sources: str,
     ) -> Any:
         class Chain:
             def __init__(self, llm: BaseLLM, messages: list[dict]):
@@ -177,7 +173,7 @@ class ChatGPTEngine2(BaseChatEngine):
                 self.messages = messages
 
             def run(self, message: str) -> str:
-                message = bot_id + " " + username
+                message = str(len(sources))
                 self.messages.append(HumanMessage(content=message))
 
                 response = self.llm(self.messages)

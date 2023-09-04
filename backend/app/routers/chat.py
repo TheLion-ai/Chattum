@@ -9,6 +9,7 @@ from app.routers.conversations import (
     get_conversations,
     put_conversations,
 )
+from app.routers.sources import get_sources
 from fastapi import APIRouter, HTTPException
 
 router = APIRouter(prefix="/{username}/bots/{bot_id}/chat", tags=["chat"])
@@ -23,6 +24,7 @@ def chat(
     """Chat with a bot. If the conversation id is not provided, a new conversation is created."""
     bot = get_bot(bot_id, username)
     bot_conversations = get_conversations(bot_id)
+    bot_sources = get_sources(bot_id, username)
     if any(
         conversation.id == chat_input.conversation_id
         for conversation in bot_conversations
@@ -32,10 +34,9 @@ def chat(
     else:
         conversation = pm.Conversation(bot_id=bot_id, messages=[])
     chat_engine = ChatGPTEngine2(
-        bot_id=bot_id,
-        username=username,
         user_prompt=bot.prompt,
         messages=conversation.messages,
+        sources=bot_sources,
     )
     response = chat_engine.chat(chat_input.message)
     conversation.messages = chat_engine.export_messages()
