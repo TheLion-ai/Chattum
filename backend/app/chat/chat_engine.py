@@ -2,6 +2,7 @@
 from abc import ABC, abstractmethod
 from typing import Any, List
 
+from app.routers.documents import SearchDocumentsTool
 from langchain import ConversationChain, LLMChain
 from langchain.chat_models import ChatOpenAI
 from langchain.document_loaders import (
@@ -141,6 +142,9 @@ class ChatGPTEngine2(BaseChatEngine):
                 message = str(type(sources[0]))
                 # message = str(sources[0])
                 self.messages.append(HumanMessage(content=message))
+
+                tools = [SearchDocumentsTool(sources).as_tool()]
+                print(len(tools))  # just so that it passes the pre-commit
 
                 response = self.llm(self.messages)
                 self.messages.append(response)
