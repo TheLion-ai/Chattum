@@ -11,7 +11,6 @@ from langchain.document_loaders import (
     UnstructuredExcelLoader,
     UnstructuredFileLoader,
 )
-from langchain.embeddings.sentence_transformer import SentenceTransformerEmbeddings
 from langchain.llms.base import BaseLLM
 from langchain.memory import ConversationBufferMemory
 from langchain.memory.chat_memory import BaseChatMemory

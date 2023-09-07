@@ -9,7 +9,7 @@ from langchain.document_loaders import (
     UnstructuredExcelLoader,
     UnstructuredFileLoader,
 )
-from langchain.embeddings.sentence_transformer import SentenceTransformerEmbeddings
+from langchain.embeddings import OpenAIEmbeddings
 from langchain.schema import Document
 from langchain.tools import Tool
 from langchain.vectorstores import Chroma
@@ -47,9 +47,7 @@ class SearchDocumentsTool:
 
     def __init__(self, documents: list[Document]) -> None:
         """Initialize tool."""
-        embedding_function = SentenceTransformerEmbeddings(
-            model_name="distiluse-base-multilingual-cased-v1"
-        )
+        embedding_function = OpenAIEmbeddings()
         self.db = Chroma.from_documents(documents, embedding_function)
 
     def _run(self, query: str) -> Document:
