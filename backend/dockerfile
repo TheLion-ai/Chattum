@@ -1,4 +1,4 @@
-FROM  --platform=linux/amd64 python:3.10-buster as base
+FROM  --platform=linux/amd64 python:3.10-bookworm as base
 WORKDIR /backend
 
 COPY . /backend
