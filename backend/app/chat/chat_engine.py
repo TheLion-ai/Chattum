@@ -3,7 +3,14 @@ from abc import ABC, abstractmethod
 from typing import Any, List
 
 from app.routers.documents import SearchDocumentsTool
-from langchain import ConversationChain, LLMChain
+from langchain import ConversationChain, LLMChain, OpenAI
+from langchain.agents import (
+    AgentExecutor,
+    AgentType,
+    Tool,
+    ZeroShotAgent,
+    initialize_agent,
+)
 from langchain.chat_models import ChatOpenAI
 from langchain.document_loaders import (
     PyPDFLoader,
@@ -24,8 +31,6 @@ from langchain.schema import (
     messages_from_dict,
     messages_to_dict,
 )
-from langchain.tools import BaseTool, StructuredTool, Tool, tool
-from langchain.vectorstores import Chroma
 
 
 class BaseChatEngine(ABC):
@@ -137,13 +142,7 @@ class ChatGPTEngine2(BaseChatEngine):
                 self.messages = messages
 
             def run(self, message: str) -> str:
-                message = str(len(sources))
-                message = str(type(sources[0]))
-                # message = str(sources[0])
                 self.messages.append(HumanMessage(content=message))
-
-                tools = [SearchDocumentsTool(sources).as_tool()]
-                print(len(tools))  # just so that it passes the pre-commit
 
                 response = self.llm(self.messages)
                 self.messages.append(response)
@@ -152,7 +151,43 @@ class ChatGPTEngine2(BaseChatEngine):
                 )
                 return response.content
 
-        return Chain(llm, self.messages)
+        print(
+            "\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ prompt 1\n"
+        )
+        print(prompt)
+        print(type(prompt))
+        print(
+            "\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ prompt 1 end\n"
+        )
+
+        tools = [SearchDocumentsTool(sources).as_tool()]
+
+        prefix = """Have a conversation with a human, answering the following questions as best you can. You have access to the following tools:"""
+        suffix = """Begin!"
+
+        {chat_history}
+        Question: {input}
+        {agent_scratchpad}"""
+
+        prompt = ZeroShotAgent.create_prompt(
+            tools,
+            prefix=prefix,
+            suffix=suffix,
+            input_variables=["input", "chat_history", "agent_scratchpad"],
+        )
+
+        memory = ConversationBufferMemory(memory_key="chat_history")
+        llm_chain = LLMChain(llm=OpenAI(temperature=0), prompt=prompt)
+        agent = ZeroShotAgent(llm_chain=llm_chain, tools=tools, verbose=True)
+        agent_chain = AgentExecutor.from_agent_and_tools(
+            agent=agent, tools=tools, verbose=True, memory=memory
+        )
+        agent_chain.run(input="How many people live in canada?")
+        print(
+            "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ 2"
+        )
+
+        return agent_chain
 
     def _create_prompt(self, user_prompt: str) -> BasePromptTemplate:
         prompt = SystemMessage(content=user_prompt)

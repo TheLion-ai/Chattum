@@ -28,20 +28,13 @@ def chat(
     bot_conversations = get_conversations(bot_id)
     bot_sources = get_sources(bot_id, username)
     background_tasks = BackgroundTasks()
-    print("\n\n*************************************************************\n\n")
-    print(bot_id)
-    print(username)
-    print(bot_sources)
-    print("\n\n*************************************************************\n\n")
     documents = [
         load_document(str(source.id), bot_id, background_tasks)
         for source in bot_sources
     ]
     documents = [item for sublist in documents for item in sublist]  # make flat list
     # documents = [str(source.id) for source in bot_sources]
-    print("\n====================================================== documents:")
-    print(documents)
-    print("\n=================================================================")
+
     if any(
         conversation.id == chat_input.conversation_id
         for conversation in bot_conversations

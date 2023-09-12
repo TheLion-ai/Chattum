@@ -20,7 +20,6 @@ def load_document(
     source_id: str, bot_id: str, background_tasks: BackgroundTasks
 ) -> Document:
     """Load bot source as a LangChain Document."""
-    print("\n\n******************************* 1 *******************************\n\n")
     loaders = {
         "pdf": PyPDFLoader,
         "txt": UnstructuredFileLoader,
@@ -28,7 +27,6 @@ def load_document(
     }
 
     source = database.sources.find_one_by_id(ObjectId(source_id))
-    print("\n\n******************************* 2 *******************************\n\n")
     if source is None:
         raise HTTPException(status_code=404, detail="Source not found")
     file_path = file_storage.download_source(source_id, source.source_type, bot_id)

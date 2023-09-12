@@ -25,7 +25,6 @@ def get_sources(bot_id: str, username: str) -> list[pm.Source]:
     bot = get_bot(bot_id, username)
     bot_sources = bot.sources
     # bot_sources = [str(source_id) for source_id in list(bot_sources)]
-    print(bot_sources)
     sources = database.sources.find_by({"_id": {"$in": bot_sources}})
 
     if bot is None:
