@@ -25,6 +25,7 @@ from langchain.memory.chat_message_histories.in_memory import ChatMessageHistory
 from langchain.prompts import BasePromptTemplate
 from langchain.prompts.chat import PromptTemplate
 from langchain.schema import (
+    AIMessage,
     Document,
     HumanMessage,
     SystemMessage,
@@ -137,57 +138,47 @@ class ChatGPTEngine2(BaseChatEngine):
         sources: list[Document],
     ) -> Any:
         class Chain:
-            def __init__(self, llm: BaseLLM, messages: list[dict]):
+            def __init__(
+                self, llm: BaseLLM, messages: list[dict], prompt: BasePromptTemplate
+            ):
                 self.llm = llm
                 self.messages = messages
+                self.prompt = prompt
 
             def run(self, message: str) -> str:
                 self.messages.append(HumanMessage(content=message))
 
-                response = self.llm(self.messages)
-                self.messages.append(response)
+                tools = [SearchDocumentsTool(sources).as_tool()]
+
+                suffix = """Begin!"
+                {chat_history}
+                Question: {input}
+                {agent_scratchpad}"""
+
+                prompt = ZeroShotAgent.create_prompt(
+                    tools,
+                    prefix=self.prompt.content,
+                    suffix=suffix,
+                    input_variables=["input", "chat_history", "agent_scratchpad"],
+                )
+
+                memory = ConversationBufferMemory(memory_key="chat_history")
+                llm_chain = LLMChain(llm=OpenAI(temperature=0), prompt=prompt)
+                agent = ZeroShotAgent(llm_chain=llm_chain, tools=tools, verbose=True)
+                agent_chain = AgentExecutor.from_agent_and_tools(
+                    agent=agent, tools=tools, verbose=True, memory=memory
+                )
+
+                response = agent_chain.run(input=message)
+                self.messages.append(AIMessage(content=response))
+
                 self.memory = ConversationBufferMemory(
                     chat_memory=ChatMessageHistory(messages=self.messages, llm=self.llm)
                 )
-                return response.content
 
-        print(
-            "\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ prompt 1\n"
-        )
-        print(prompt)
-        print(type(prompt))
-        print(
-            "\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ prompt 1 end\n"
-        )
+                return response
 
-        tools = [SearchDocumentsTool(sources).as_tool()]
-
-        prefix = """Have a conversation with a human, answering the following questions as best you can. You have access to the following tools:"""
-        suffix = """Begin!"
-
-        {chat_history}
-        Question: {input}
-        {agent_scratchpad}"""
-
-        prompt = ZeroShotAgent.create_prompt(
-            tools,
-            prefix=prefix,
-            suffix=suffix,
-            input_variables=["input", "chat_history", "agent_scratchpad"],
-        )
-
-        memory = ConversationBufferMemory(memory_key="chat_history")
-        llm_chain = LLMChain(llm=OpenAI(temperature=0), prompt=prompt)
-        agent = ZeroShotAgent(llm_chain=llm_chain, tools=tools, verbose=True)
-        agent_chain = AgentExecutor.from_agent_and_tools(
-            agent=agent, tools=tools, verbose=True, memory=memory
-        )
-        agent_chain.run(input="How many people live in canada?")
-        print(
-            "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ 2"
-        )
-
-        return agent_chain
+        return Chain(llm, self.messages, self.prompt)
 
     def _create_prompt(self, user_prompt: str) -> BasePromptTemplate:
         prompt = SystemMessage(content=user_prompt)
