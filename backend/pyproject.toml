@@ -3,6 +3,9 @@ name = "backend"
 version = "0.1.0"
 description = ""
 authors = ["Your Name <you@example.com>"]
+packages = [
+    { include = "app"},
+]
 
 [tool.poetry.dependencies]
 python = "^3.10"
@@ -21,6 +24,7 @@ minio = "^7.1.15"
 boto3 = "^1.28.2"
 openai = "^0.27.8"
 
+newspaper3k = "^0.2.8"
 
 [tool.poetry.dev-dependencies]
 

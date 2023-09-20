@@ -6,6 +6,8 @@ COPY . /frontend
 
 RUN pip install poetry
 
+RUN poetry lock
+
 RUN poetry install
 
 
