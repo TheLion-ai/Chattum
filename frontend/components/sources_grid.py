@@ -1,13 +1,15 @@
 """This module contains the SourcesGrid class which is used to display and select from available sources or create a new one."""
 
 import streamlit as st
+import streamlit.components.v1 as components
 from backend_controller import (
     create_new_source,
     delete_source,
-    get_source,
     get_source_file,
     get_sources,
 )
+from components.delete_modal import DeleteModal
+from streamlit_modal import Modal
 
 
 class SourcesGrid:
@@ -21,68 +23,75 @@ class SourcesGrid:
         """
         self.bot_id = bot_id
 
+        self.delete_modal = DeleteModal(
+            "Delete source", key="delete_source_modal", delete_function=delete_source
+        )
+        self.sources = get_sources(self.bot_id)["sources"]
+
     def __call__(self) -> None:
         """Create a view with available sources and a card for creating new sources."""
+        self.delete_modal()
+
         self._display_new_source_card()
         self._display_sources()
 
     def _display_new_source_card(self) -> None:
         with st.container():
             with st.expander("Add new source", expanded=False):
+                source_type = st.selectbox("File", ["pdf", "url", "pdf", "xls", "txt"])
                 with st.form(clear_on_submit=True, key="File submit"):
                     source_name = st.text_input("Name")
-                    source_type = st.selectbox("File", ["pdf", "url", "xls", "txt"])
                     if source_type == "url":
-                        source_file = st.text_input("URL")
+                        url = st.text_input("URL")
+                        source_file = None
                     else:
                         source_file = st.file_uploader("File")
-                    submit = st.form_submit_button("Add")
+                        url = None
+                    submit = st.form_submit_button("Add", type="secondary")
                     if submit:
-                        create_new_source(
-                            source_file, source_name, source_type, self.bot_id
-                        )
+                        if source_type == "url":
+                            create_new_source(
+                                source_name,
+                                source_type,
+                                self.bot_id,
+                                file=None,
+                                url=url,
+                            )
+                        else:
+                            create_new_source(
+                                source_name,
+                                source_type,
+                                self.bot_id,
+                                file=source_file.getvalue(),  # type: ignore
+                                url=None,
+                            )
+                        self.sources = get_sources(self.bot_id)["sources"]
 
         st.write("")
 
     def _display_sources(self) -> None:
-        sources = get_sources(self.bot_id)["sources"]
-        if len(sources) > 0:
-            for idx, source_id in enumerate(sources):
-                source = get_source(self.bot_id, source_id)
-
-                with st.container():
-                    with st.expander(source["name"], expanded=False):
-                        st.button(
-                            "Delete",
-                            on_click=delete_source,
-                            args=([self.bot_id, source_id]),
-                            key=f"delete_source_{idx}",
-                        )
-                        st.write(f"ID: {source['id']}")
-                        st.write(f"Type: {source['source_type']}")
-                        if source["source_type"] == "url":
-                            st.write(f"URL: {source['file']}")
-                        elif source["source_type"] == "pdf":
-                            st.download_button(
-                                "Download file",
-                                data=get_source_file(self.bot_id, source_id),
-                                file_name=f"{source['name']}.{source['source_type']}",
-                                mime=None,
-                                key=f"download_pdf_{idx}",
-                            )  # "application/octet-stream")
-                        elif source["source_type"] == "xls":
-                            st.download_button(
-                                "Download file",
-                                data=get_source_file(self.bot_id, source_id),
-                                file_name=f"{source['name']}.{source['source_type']}",
-                                mime="text/xls",
-                                key=f"download_xls_{idx}",
-                            )
-                        elif source["source_type"] == "txt":
-                            st.download_button(
-                                "Download file",
-                                data=get_source_file(self.bot_id, source_id),
-                                file_name=f"{source['name']}.{source['source_type']}",
-                                mime="text/plain",
-                                key=f"download_txt_{idx}",
-                            )
+        """Display available sources."""
+        if len(self.sources) > 0:
+            for source in self.sources:
+                with st.expander(source["name"], expanded=False):
+                    open_modal_button = st.button(
+                        "Delete",
+                        args=([source["id"]]),
+                        key=f"delete_source_{source['id']}",
+                    )
+                    if open_modal_button:
+                        self.delete_modal.open([self.bot_id, source["id"]])
+                        st.experimental_rerun()
+                    st.write(f"ID: {source['id']}")
+                    st.write(f"Type: {source['source_type']}")
+                    if source["source_type"] == "url":
+                        file_extension = "txt"
+                    else:
+                        file_extension = source["source_type"]
+                    st.download_button(
+                        "Download file",
+                        data=get_source_file(self.bot_id, source["id"]),
+                        file_name=f"{source['name']}.{file_extension}",
+                        mime=None,
+                        key=f"download_pdf_{source['id']}",
+                    )

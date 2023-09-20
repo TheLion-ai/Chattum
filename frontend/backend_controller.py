@@ -87,12 +87,12 @@ def delete_source(bot_id: str, source_id: str) -> None:
         )
         assert response.status_code == 200
         st.success(f"Source {source_id} deleted")
-    except Exception as e:
-        st.warning(e)
+    except Exception:
+        st.warning(response.text)
 
 
 def create_new_source(
-    file: bytes, source_name: str, source_type: str, bot_id: str
+    source_name: str, source_type: str, bot_id: str, file: bytes = None, url: str = None
 ) -> None:
     """Create a new source for the bot with a given name.
 
@@ -100,18 +100,33 @@ def create_new_source(
         source_name (str): a name for a new source for the bot
     """
     try:
-        response = requests.put(
-            f"{BACKEND_URL}/{USERNAME}/bots/{bot_id}/sources",
-            data={
-                "name": source_name,
-                "source_type": source_type,
-            },
-            files={"file": file},
-        )
+        if source_type == "url":
+            st.write("uploading url")
+            response = requests.put(
+                f"{BACKEND_URL}/{USERNAME}/bots/{bot_id}/sources",
+                params={
+                    "name": source_name,
+                    "source_type": source_type,
+                    "url": url,
+                },
+            )
+        else:
+            st.write("uploading file")
+            st.write(type(file))
+            response = requests.put(
+                f"{BACKEND_URL}/{USERNAME}/bots/{bot_id}/sources",
+                params={
+                    "name": source_name,
+                    "source_type": source_type,
+                },
+                files={"file": file},  # type: ignore
+            )
+        st.write(response.status_code)
         assert response.status_code == 200
         st.success(f"Source {source_name} added")
     except Exception as e:
-        st.warning(response.text, e)
+        st.warning(e)
+        st.warning(response.text)
 
 
 def create_new_prompt(prompt: str, bot_id: str) -> None:
