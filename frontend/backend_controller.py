@@ -112,7 +112,6 @@ def create_new_source(
             )
         else:
             st.write("uploading file")
-            st.write(type(file))
             response = requests.put(
                 f"{BACKEND_URL}/{USERNAME}/bots/{bot_id}/sources",
                 params={
@@ -121,7 +120,6 @@ def create_new_source(
                 },
                 files={"file": file},  # type: ignore
             )
-        st.write(response.status_code)
         assert response.status_code == 200
         st.success(f"Source {source_name} added")
     except Exception as e:
