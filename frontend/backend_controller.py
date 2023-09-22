@@ -122,8 +122,8 @@ def create_new_source(
             )
         assert response.status_code == 200
         st.success(f"Source {source_name} added")
-    except Exception as e:
-        st.warning(e)
+    except Exception:
+        st.warning(f"Please provide a valid {source_type}")
         st.warning(response.text)
 
 

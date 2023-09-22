@@ -78,7 +78,6 @@ def add_source(
         source.source_type = source_type
 
         database.sources.save(source)
-    print(source)
     if source_id not in bot.sources:
         bot.sources.append(source_id)
         database.bots.save(bot)

@@ -27,6 +27,8 @@ class SourcesGrid:
             "Delete source", key="delete_source_modal", delete_function=delete_source
         )
         self.sources = get_sources(self.bot_id)["sources"]
+        if "disabled" not in st.session_state:
+            st.session_state.disabled = False
 
     def __call__(self) -> None:
         """Create a view with available sources and a card for creating new sources."""
@@ -36,35 +38,47 @@ class SourcesGrid:
         self._display_sources()
 
     def _display_new_source_card(self) -> None:
+        """Display a card for creating new sources."""
         with st.container():
             with st.expander("Add new source", expanded=False):
                 source_type = st.selectbox("File", ["pdf", "url", "pdf", "xls", "txt"])
                 with st.form(clear_on_submit=True, key="File submit"):
-                    source_name = st.text_input("Name")
+                    source_name = st.text_input(
+                        "Name",
+                    )
                     if source_type == "url":
                         url = st.text_input("URL")
                         source_file = None
                     else:
                         source_file = st.file_uploader("File")
                         url = None
+
+                    st.session_state.disabled = source_name != ""  # or (
+                    #     source_type == "url" and url == ""
+                    # ) or (source_type != "url" and source_file is None)
                     submit = st.form_submit_button("Add", type="secondary")
                     if submit:
-                        if source_type == "url":
-                            create_new_source(
-                                source_name,
-                                source_type,
-                                self.bot_id,
-                                file=None,
-                                url=url,
-                            )
+                        if source_name.replace(" ", "") == "" or (
+                            source_type == "url" and url.replace(" ", "") == ""
+                        ):
+                            st.warning("Please fill in all fields")
                         else:
-                            create_new_source(
-                                source_name,
-                                source_type,
-                                self.bot_id,
-                                file=source_file.getvalue(),  # type: ignore
-                                url=None,
-                            )
+                            if source_type == "url":
+                                create_new_source(
+                                    source_name,
+                                    source_type,
+                                    self.bot_id,
+                                    file=None,
+                                    url=url,
+                                )
+                            else:
+                                create_new_source(
+                                    source_name,
+                                    source_type,
+                                    self.bot_id,
+                                    file=source_file.getvalue(),  # type: ignore
+                                    url=None,
+                                )
                         self.sources = get_sources(self.bot_id)["sources"]
 
         st.write("")

@@ -47,3 +47,4 @@ repos:
       - id: check-merge-conflict
       - id: check-yaml
         args: [--unsafe]
+exclude: backend/tests/files/
