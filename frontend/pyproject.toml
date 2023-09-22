@@ -16,6 +16,7 @@ langchain = "^0.0.196"
 bson = "^0.5.10"
 streamlit-extras = "^0.2.7"
 streamlit-option-menu = "^0.3.6"
+streamlit-modal = "^0.1.0"
 
 
 [build-system]

@@ -1,6 +1,6 @@
 """Create source endpoints."""
 import os
-from typing import Annotated
+from typing import Annotated, Optional, Union
 
 import pydantic_models as pm
 from app.app import database, file_storage
@@ -9,6 +9,7 @@ from bson import ObjectId
 from fastapi import APIRouter, File, Form, HTTPException, UploadFile
 from fastapi.responses import FileResponse
 from starlette.background import BackgroundTasks
+from utils.scraping import scrape
 
 
 def remove_file(path: str) -> None:
@@ -19,7 +20,7 @@ def remove_file(path: str) -> None:
 router = APIRouter(prefix="/{username}/bots/{bot_id}/sources", tags=["sources"])
 
 
-@router.get("", response_model=list[pm.Source])
+@router.get("", response_model=pm.SourceResponse)
 def get_sources(bot_id: str, username: str) -> list[pm.Source]:
     """Get sources of bot by id."""
     bot = get_bot(bot_id, username)
@@ -30,19 +31,29 @@ def get_sources(bot_id: str, username: str) -> list[pm.Source]:
 
     if bot is None:
         raise HTTPException(status_code=404, detail="Bot not found")
-    return list(sources)
+    source_ids = bot.sources
+
+    sources = list(database.sources.find_by({"_id": {"$in": source_ids}}))
+
+    return pm.SourceResponse(sources=sources)
 
 
 @router.put("", response_model=pm.CreateSourceResponse)
 def add_source(
-    file: Annotated[bytes, File()],
-    name: Annotated[str, Form()],
-    source_type: Annotated[str, Form()],
+    name: str,
+    source_type: str,
     bot_id: str,
     username: str,
-    source_id: Annotated[str, Form()] = None,
+    file: Annotated[bytes, File()] = None,
+    url: str = None,
+    source_id: str = None,
 ) -> pm.CreateSourceResponse:
     """Add source to bot by id."""
+    if file is None and url is None:
+        raise HTTPException(status_code=400, detail="No file or url provided")
+    elif file is not None and url is not None:
+        raise HTTPException(status_code=400, detail="Provide only file or url")
+
     bot = get_bot(bot_id, username)
     if bot is None:
         raise HTTPException(status_code=404, detail="Bot not found")
@@ -71,7 +82,11 @@ def add_source(
         bot.sources.append(source_id)
         database.bots.save(bot)
 
-    file_storage.upload_source(file, source_id, source_type, bot_id)
+    if file is not None:
+        file_storage.upload_source(file, source_id, source_type, bot_id)
+    if url is not None:
+        file = scrape(url)
+        file_storage.upload_source(file, source_id, source_type, bot_id)
     return pm.CreateSourceResponse(
         message="Source added successfully!", source_id=str(source_id)
     )
