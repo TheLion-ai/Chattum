@@ -12,7 +12,7 @@ Maybe you can mention me or this repo in the acknowledgements too
   <h1>Chattum</h1>
 
   <p>
-    An awesome README template for your projects!
+    Open-source bot platform based on Large Language Models
   </p>
 
 
@@ -48,9 +48,10 @@ Maybe you can mention me or this repo in the acknowledgements too
 <!-- Screenshots -->
 ### :camera: Demo
 
-<div align="center">
-  <img src="https://placehold.co/600x400?text=Your+Screenshot+here" alt="screenshot" />
-</div>
+
+
+https://github.com/TheLion-ai/Chattum/assets/12778421/93dbf48e-9f03-47ed-9a0b-ac9899fedb3a
+
 
 
 <!-- TechStack -->
