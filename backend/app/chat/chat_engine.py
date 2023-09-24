@@ -2,8 +2,8 @@
 from abc import ABC, abstractmethod
 from typing import Any, List
 
-from app.routers.documents import SearchDocumentsTool
-from langchain import ConversationChain, LLMChain, OpenAI
+from app.chat.prompts.templates import conversation_with_tools
+from langchain import ConversationChain, LLMChain, OpenAI, hub
 from langchain.agents import (
     AgentExecutor,
     AgentType,
@@ -11,13 +11,9 @@ from langchain.agents import (
     ZeroShotAgent,
     initialize_agent,
 )
+from langchain.agents.format_scratchpad import format_log_to_str
+from langchain.agents.output_parsers import ReActSingleInputOutputParser
 from langchain.chat_models import ChatOpenAI
-from langchain.document_loaders import (
-    PyPDFLoader,
-    SeleniumURLLoader,
-    UnstructuredExcelLoader,
-    UnstructuredFileLoader,
-)
 from langchain.llms.base import BaseLLM
 from langchain.memory import ConversationBufferMemory
 from langchain.memory.chat_memory import BaseChatMemory
@@ -32,6 +28,7 @@ from langchain.schema import (
     messages_from_dict,
     messages_to_dict,
 )
+from langchain.tools.render import render_text_description
 
 
 class BaseChatEngine(ABC):
@@ -40,7 +37,6 @@ class BaseChatEngine(ABC):
     def __init__(
         self,
         user_prompt: str,
-        sources: list[Document],
         messages: list[dict] = [],
         llm_kwargs: dict = {},
     ) -> None:
@@ -49,7 +45,9 @@ class BaseChatEngine(ABC):
         self.prompt: BasePromptTemplate = self._create_prompt(user_prompt)
         self.memory: BaseChatMemory = self._load_memory(messages)
         self.chain: LLMChain = self._create_chain(
-            self.llm, self.prompt, self.memory, sources
+            self.llm,
+            self.prompt,
+            self.memory,
         )
 
     @abstractmethod
@@ -63,7 +61,6 @@ class BaseChatEngine(ABC):
         llm: BaseLLM,
         prompt: BasePromptTemplate,
         memory: BaseChatMemory,
-        sources: list[Document],
     ) -> ConversationChain:
         """Create a conversation chain."""
         raise NotImplementedError
@@ -87,7 +84,7 @@ class BaseChatEngine(ABC):
         return self.chain.run(message)
 
 
-class ChatGPTEngine(BaseChatEngine):
+class GPTEngine(BaseChatEngine):
     """Chat engine based on GPT with prompt in the template."""
 
     def _create_llm(self) -> BaseLLM:
@@ -105,7 +102,6 @@ class ChatGPTEngine(BaseChatEngine):
         llm: BaseLLM,
         prompt: BasePromptTemplate,
         memory: BaseChatMemory,
-        sources: list[Document],
     ) -> ConversationChain:
         return ConversationChain(llm=llm, prompt=prompt, memory=memory, verbose=True)
 
@@ -118,7 +114,7 @@ class ChatGPTEngine(BaseChatEngine):
         return prompt
 
 
-class ChatGPTEngine2(BaseChatEngine):
+class ChatGPTEngine(BaseChatEngine):
     """Chat engine based on GPT with prompt as a system message."""
 
     def _create_llm(self) -> BaseLLM:
@@ -131,54 +127,24 @@ class ChatGPTEngine2(BaseChatEngine):
             self.messages = messages_from_dict(messages)
 
     def _create_chain(
-        self,
-        llm: BaseLLM,
-        prompt: BasePromptTemplate,
-        memory: BaseChatMemory,
-        sources: list[Document],
+        self, llm: BaseLLM, prompt: BasePromptTemplate, memory: BaseChatMemory
     ) -> Any:
         class Chain:
-            def __init__(
-                self, llm: BaseLLM, messages: list[dict], prompt: BasePromptTemplate
-            ):
+            def __init__(self, llm: BaseLLM, messages: list[dict]):
                 self.llm = llm
                 self.messages = messages
-                self.prompt = prompt
 
             def run(self, message: str) -> str:
                 self.messages.append(HumanMessage(content=message))
 
-                tools = [SearchDocumentsTool(sources).as_tool()]
-
-                suffix = """Begin!"
-                {chat_history}
-                Question: {input}
-                {agent_scratchpad}"""
-
-                prompt = ZeroShotAgent.create_prompt(
-                    tools,
-                    prefix=self.prompt.content,
-                    suffix=suffix,
-                    input_variables=["input", "chat_history", "agent_scratchpad"],
-                )
-
-                memory = ConversationBufferMemory(memory_key="chat_history")
-                llm_chain = LLMChain(llm=OpenAI(temperature=0), prompt=prompt)
-                agent = ZeroShotAgent(llm_chain=llm_chain, tools=tools, verbose=True)
-                agent_chain = AgentExecutor.from_agent_and_tools(
-                    agent=agent, tools=tools, verbose=True, memory=memory
-                )
-
-                response = agent_chain.run(input=message)
-                self.messages.append(AIMessage(content=response))
-
+                response = self.llm(self.messages)
+                self.messages.append(response)
                 self.memory = ConversationBufferMemory(
                     chat_memory=ChatMessageHistory(messages=self.messages, llm=self.llm)
                 )
+                return response.content
 
-                return response
-
-        return Chain(llm, self.messages, self.prompt)
+        return Chain(llm, self.messages)
 
     def _create_prompt(self, user_prompt: str) -> BasePromptTemplate:
         prompt = SystemMessage(content=user_prompt)
@@ -187,3 +153,100 @@ class ChatGPTEngine2(BaseChatEngine):
     def export_messages(self) -> list[dict]:
         """Export messages from the memory."""
         return messages_to_dict(self.chain.memory.chat_memory.messages)
+
+
+class BaseAgentEngine(ABC):
+    """Base class for agent based chat engines."""
+
+    def __init__(
+        self, user_prompt: str, messages: list, tools: list, **kwargs: dict
+    ) -> None:
+        """Initialize the chat engine."""
+        self.llm: BaseLLM = self._create_llm(**kwargs)
+        self.prompt: BasePromptTemplate = self._create_prompt(user_prompt, **kwargs)
+        self.memory: BaseChatMemory = self._load_memory(messages, **kwargs)
+        self.agent_executor: AgentExecutor = self._create_agent(
+            prompt=self.prompt, memory=self.memory, tools=tools, llm=self.llm, **kwargs
+        )
+
+    @abstractmethod
+    def _create_agent(
+        self,
+        prompt: str,
+        memory: BaseChatMemory,
+        tools: list,
+        llm: BaseLLM,
+        **kwargs: dict,
+    ) -> AgentExecutor:
+        """Create an agent."""
+        raise NotImplementedError
+
+    @abstractmethod
+    def _create_prompt(self, user_prompt: str, **kwargs: dict) -> BasePromptTemplate:
+        """Create a prompt."""
+        raise NotImplementedError
+
+    @abstractmethod
+    def _create_llm(self, **kwargs: dict) -> BaseLLM:
+        """Create a language model."""
+        raise NotImplementedError
+
+    @abstractmethod
+    def _load_memory(self, messages: list[dict]) -> ConversationBufferMemory:
+        """Load the memory from a list of messages."""
+        raise NotImplementedError
+
+    def export_messages(self) -> list[dict]:
+        """Export messages from the memory."""
+        return messages_to_dict(self.memory.chat_memory.messages)
+
+    def chat(self, message: str) -> str:
+        """Chat with the bot."""
+        return self.agent_executor.invoke({"input": message})["output"]
+
+
+class ReactEngine(BaseAgentEngine):
+    """Chat engine based on Re:Act with prompt in the template."""
+
+    def _create_prompt(self, user_prompt: str, **kwargs: dict) -> BasePromptTemplate:
+        return PromptTemplate.from_template(conversation_with_tools).partial(
+            user_prompt=user_prompt
+        )
+
+    def _create_llm(self, **kwargs: dict) -> BaseLLM:
+        return OpenAI(temperature=0, verbose=True)
+
+    def _load_memory(self, messages: list[dict]) -> ConversationBufferMemory:
+        return ConversationBufferMemory(
+            chat_memory=ChatMessageHistory(
+                messages=messages_from_dict(messages), llm=self.llm
+            ),
+            memory_key="chat_history",
+        )
+
+    def _create_agent(
+        self,
+        prompt: BasePromptTemplate,
+        memory: BaseChatMemory,
+        tools: list,
+        llm: BaseLLM,
+        **kwargs: dict,
+    ) -> ConversationChain:
+        llm_with_stop = llm.bind(stop=["\nObservation"])
+        agent = (
+            {
+                "input": lambda x: x["input"],
+                "agent_scratchpad": lambda x: format_log_to_str(
+                    x["intermediate_steps"]
+                ),
+                "chat_history": lambda x: x["chat_history"],
+                "tool_names": lambda x: ", ".join([tool.name for tool in tools]),
+                "tools": lambda x: "\n".join(
+                    f"{tool.name}: {tool.description}" for tool in tools
+                ),
+            }
+            | prompt
+            | llm_with_stop
+            | ReActSingleInputOutputParser()
+        )
+        return AgentExecutor(agent=agent, tools=tools, verbose=True, memory=memory)

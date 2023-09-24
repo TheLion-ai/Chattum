@@ -3,7 +3,7 @@ import os
 from typing import Annotated, Optional, Union
 
 import pydantic_models as pm
-from app.app import database, file_storage
+from app.app import chroma_controller, database, file_storage
 from app.routers.bots import get_bot
 from bson import ObjectId
 from fastapi import APIRouter, File, Form, HTTPException, UploadFile
@@ -86,6 +86,8 @@ def add_source(
     if url is not None:
         file = scrape(url)
         file_storage.upload_source(file, source_id, source_type, bot_id)
+
+    chroma_controller.update_source(bot_id, source)
     return pm.CreateSourceResponse(
         message="Source added successfully!", source_id=str(source_id)
     )
@@ -124,4 +126,5 @@ def delete_source(bot_id: str, source_id: str, username: str) -> pm.MessageRespo
 
     database.sources.delete(source)
     file_storage.delete_source(source_id, source.source_type, bot_id)
+    chroma_controller.delete_source(bot_id, source)
     return pm.MessageResponse(message="Source deleted successfully!")

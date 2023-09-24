@@ -15,7 +15,7 @@ json-logging = "^1.3.0"
 requests = "^2.27.1"
 pytest = "^7.0.1"
 pydantic-mongo = "^1.0.1"
-langchain = "^0.0.281"
+langchain = "^0.0.300"
 pymongo-inmemory = "^0.2.13"
 anyio = "^3.7.0"
 httpx = "^0.24.1"
@@ -28,6 +28,8 @@ chromadb = "^0.4.9"
 tiktoken = "^0.4.0"
 
 newspaper3k = "^0.2.8"
+langchainhub = "^0.1.13"
+unstructured = "^0.10.16"
 
 [tool.poetry.dev-dependencies]
 

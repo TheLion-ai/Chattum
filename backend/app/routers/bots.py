@@ -43,4 +43,9 @@ def delete_bot(bot_id: str, username: str) -> pm.MessageResponse:
     conversations = list(database.conversations.find_by({"bot_id": ObjectId(bot_id)}))
     for conversation in conversations:
         database.conversations.delete(conversation)
+    # Delete all sources of the bot
+    sources = list(database.sources.find_by({"bot_id": ObjectId(bot_id)}))
+    for source in sources:
+        database.sources.delete(source)
+
     return pm.MessageResponse(message="Bot deleted successfully!")

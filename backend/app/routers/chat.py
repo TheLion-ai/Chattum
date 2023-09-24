@@ -1,18 +1,16 @@
 """Create conversation endpoints."""
-from typing import Union
 
 import pydantic_models as pm
-from app.chat.chat_engine import ChatGPTEngine, ChatGPTEngine2
+from app.app import chroma_controller
+from app.chat.chat_engine import ChatGPTEngine, ReactEngine
+from app.chat.tools.document_search import search_documents_tool
 from app.routers.bots import get_bot
 from app.routers.conversations import (
     get_conversation,
     get_conversations,
     put_conversations,
 )
-from app.routers.documents import load_document
-from app.routers.sources import get_sources
-from fastapi import APIRouter, HTTPException
-from starlette.background import BackgroundTasks
+from fastapi import APIRouter
 
 router = APIRouter(prefix="/{username}/bots/{bot_id}/chat", tags=["chat"])
 
@@ -26,13 +24,6 @@ def chat(
     """Chat with a bot. If the conversation id is not provided, a new conversation is created."""
     bot = get_bot(bot_id, username)
     bot_conversations = get_conversations(bot_id)
-    bot_sources = get_sources(bot_id, username)
-    background_tasks = BackgroundTasks()
-    documents = [
-        load_document(str(source.id), bot_id, background_tasks)
-        for source in bot_sources
-    ]
-    documents = [item for sublist in documents for item in sublist]  # make flat list
     # documents = [str(source.id) for source in bot_sources]
 
     if any(
@@ -43,11 +34,22 @@ def chat(
 
     else:
         conversation = pm.Conversation(bot_id=bot_id, messages=[])
-    chat_engine = ChatGPTEngine2(
-        user_prompt=bot.prompt,
-        messages=conversation.messages,
-        sources=documents,
-    )
+
+    bot_database = chroma_controller.get_database(bot_id)
+    if bot_database is not None and bot_database["db"] is not None:
+        tools = [search_documents_tool(bot_database["db"], bot_database["sources"])]
+        chat_engine = ReactEngine(
+            user_prompt=bot.prompt,
+            messages=conversation.messages,
+            tools=tools,
+        )
+    else:
+        tools = []
+        chat_engine = ChatGPTEngine(
+            user_prompt=bot.prompt,
+            messages=conversation.messages,
+        )
+
     response = chat_engine.chat(chat_input.message)
     conversation.messages = chat_engine.export_messages()
 
