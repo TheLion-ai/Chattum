@@ -43,7 +43,9 @@ Maybe you can mention me or this repo in the acknowledgements too
 
 <!-- About the Project -->
 ## 🤩 About the Project
-
+```
+Warning: This project is currently in alpha stage and may be subject to major changes
+```
 
 <!-- Screenshots -->
 ### :camera: Demo
@@ -65,7 +67,7 @@ https://github.com/TheLion-ai/Chattum/assets/12778421/93dbf48e-9f03-47ed-9a0b-ac
 </details>
 
 <details>
-  <summary>Backed</summary>
+  <summary>Backend</summary>
   <ul>
     <li><a href="https://www.python.org/">Python</a></li>
     <li><a href="https://python.langchain.com/">Langchain</a></li>
