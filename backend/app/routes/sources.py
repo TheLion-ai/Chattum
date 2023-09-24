@@ -4,7 +4,7 @@ from typing import Annotated, Optional, Union
 
 import pydantic_models as pm
 from app.app import chroma_controller, database, file_storage
-from app.routers.bots import get_bot
+from app.routes.bots import get_bot
 from bson import ObjectId
 from fastapi import APIRouter, File, Form, HTTPException, UploadFile
 from fastapi.responses import FileResponse
