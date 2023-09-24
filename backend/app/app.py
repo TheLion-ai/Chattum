@@ -36,5 +36,5 @@ async def lifespan(app: FastAPI) -> None:
     file_storage = None
 
 
-app = FastAPI(lifespan=lifespan)
+app = FastAPI(lifespan=lifespan, docs_url=None)
 init_logger(app)

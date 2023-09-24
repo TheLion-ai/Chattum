@@ -1,7 +1,7 @@
 """Create prompt endpoints."""
 import pydantic_models as pm
 from app.app import database
-from app.routers.bots import get_bot
+from app.routes.bots import get_bot
 from fastapi import APIRouter, HTTPException
 
 router = APIRouter(prefix="/{username}/bots/{bot_id}/prompt", tags=["prompts"])

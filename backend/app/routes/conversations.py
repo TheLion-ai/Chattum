@@ -3,7 +3,7 @@ from typing import Union
 
 import pydantic_models as pm
 from app.app import database
-from app.routers.bots import get_bot
+from app.routes.bots import get_bot
 from bson import ObjectId
 from fastapi import APIRouter, HTTPException
 

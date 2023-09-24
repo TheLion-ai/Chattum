@@ -4,8 +4,8 @@ import pydantic_models as pm
 from app.app import chroma_controller
 from app.chat.chat_engine import ChatGPTEngine, ReactEngine
 from app.chat.tools.document_search import search_documents_tool
-from app.routers.bots import get_bot
-from app.routers.conversations import (
+from app.routes.bots import get_bot
+from app.routes.conversations import (
     get_conversation,
     get_conversations,
     put_conversations,
