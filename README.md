@@ -24,6 +24,9 @@ Maybe you can mention me or this repo in the acknowledgements too
   <a href="">
     <img src="https://img.shields.io/github/last-commit/TheLion-ai/Chattum" alt="last update" />
   </a>
+  <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
+    <img src="https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-lightgrey.svg" alt="license" />
+  </a>
 
 </p>
 
