@@ -1,4 +1,5 @@
 """Create conversation endpoints."""
+from datetime import datetime
 from typing import Union
 
 import pydantic_models as pm
@@ -27,6 +28,7 @@ def put_conversations(
 ) -> pm.CreateConversationResponse:
     """Create a conversation."""
     conversation.bot_id = ObjectId(bot_id)
+    conversation.last_message_time = datetime.now()
     database.conversations.save(conversation)
     conversation = database.conversations.find_one_by_id(conversation.id)
     return pm.CreateConversationResponse(
