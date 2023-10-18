@@ -3,6 +3,7 @@ from datetime import datetime
 
 import streamlit as st
 from backend_controller import get_conversations
+from components.conversations import display_conversation
 from streamlit_chat import message
 from utils import query_params
 
@@ -56,10 +57,4 @@ def render_conversations() -> None:
 
     with conversation_content_container:
         if current_conversation:
-            for i, m in enumerate(current_conversation["messages"]):
-                is_user = m["type"] == "human"
-                message(
-                    m["data"]["content"],
-                    is_user=is_user,
-                    key=f"{current_conversation['id']}-{i}",
-                )
+            display_conversation(current_conversation)
