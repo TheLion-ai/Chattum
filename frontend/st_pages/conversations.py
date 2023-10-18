@@ -1,4 +1,6 @@
 """Page for chatting with the bot."""
+from datetime import datetime
+
 import streamlit as st
 from backend_controller import get_conversations
 from streamlit_chat import message
@@ -30,8 +32,15 @@ def render_conversations() -> None:
             st.write("Click on a conversation to view it!")
 
             for conversation in conversations:
+                # Reformat the date
+                f1 = "%Y-%m-%dT%H:%M:%S.%f"
+                f2 = "%d/%m/%Y %H:%M:%S"
+                last_message_time_str = datetime.strptime(
+                    conversation["last_message_time"], f1
+                ).strftime(f2)
+
                 st.button(
-                    conversation["id"],
+                    last_message_time_str,
                     use_container_width=True,
                     on_click=query_params.set_to_url,
                     kwargs={"conversation_id": conversation["id"]},
