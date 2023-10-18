@@ -31,13 +31,18 @@ def render_conversations() -> None:
         else:
             st.write("Click on a conversation to view it!")
 
+            # Sort conversations by timestamp
+            conversations = sorted(
+                conversations, key=lambda x: x["last_message_time"], reverse=True
+            )
+
             for conversation in conversations:
                 # Reformat the date
-                f1 = "%Y-%m-%dT%H:%M:%S.%f"
-                f2 = "%d/%m/%Y %H:%M:%S"
+                format_1 = "%Y-%m-%dT%H:%M:%S.%f"
+                format_2 = "%d/%m/%Y %H:%M:%S"
                 last_message_time_str = datetime.strptime(
-                    conversation["last_message_time"], f1
-                ).strftime(f2)
+                    conversation["last_message_time"], format_1
+                ).strftime(format_2)
 
                 st.button(
                     last_message_time_str,
