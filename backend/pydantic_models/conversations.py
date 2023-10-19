@@ -1,4 +1,5 @@
 """Pydantic models for conversations."""
+import datetime
 
 from bson import ObjectId
 from pydantic import BaseModel
@@ -11,6 +12,7 @@ class Conversation(BaseModel):
     id: ObjectIdField = None  # conversation id
     bot_id: ObjectIdField = None  # bot id
     messages: list = []  # list of messages
+    last_message_time: datetime.datetime | None = None
 
     class Config:
         """The ObjectIdField creates an bson ObjectId value, so its necessary to setup the json encoding"."""
