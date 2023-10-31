@@ -1,8 +1,8 @@
 """Tools that the bot can use to perform actions."""
 import streamlit as st
-
-from utils import query_params
 from components.tools import ToolsPanel
+from utils import query_params
+
 
 def render_tools() -> None:
     """Render the tools page."""

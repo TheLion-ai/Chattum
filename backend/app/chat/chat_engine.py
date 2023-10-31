@@ -2,21 +2,26 @@
 from abc import ABC, abstractmethod
 from typing import Any, List
 
+from app.chat.prompts.templates import react_json
 from app.chat.prompts.templates.react import conversation_with_tools
 from langchain import ConversationChain, LLMChain, OpenAI
-from langchain.agents import (
-    AgentExecutor,
-
-)
+from langchain.agents import AgentExecutor
 from langchain.agents.format_scratchpad import format_log_to_str
-from langchain.agents.output_parsers import ReActSingleInputOutputParser, JSONAgentOutputParser
+from langchain.agents.output_parsers import (
+    JSONAgentOutputParser,
+    ReActSingleInputOutputParser,
+)
 from langchain.chat_models import ChatOpenAI
 from langchain.llms.base import BaseLLM
 from langchain.memory import ConversationBufferMemory
 from langchain.memory.chat_memory import BaseChatMemory
 from langchain.memory.chat_message_histories.in_memory import ChatMessageHistory
-from langchain.prompts import BasePromptTemplate, ChatPromptTemplate
-from langchain.prompts import SystemMessagePromptTemplate, HumanMessagePromptTemplate
+from langchain.prompts import (
+    BasePromptTemplate,
+    ChatPromptTemplate,
+    HumanMessagePromptTemplate,
+    SystemMessagePromptTemplate,
+)
 from langchain.prompts.chat import PromptTemplate
 from langchain.schema import (
     HumanMessage,
@@ -25,7 +30,7 @@ from langchain.schema import (
     messages_to_dict,
 )
 from langchain.tools.render import render_text_description
-from app.chat.prompts.templates import react_json
+
 
 class BaseChatEngine(ABC):
     """Base class for chat engines."""
@@ -252,12 +257,14 @@ class ReactJsonEngine(BaseAgentEngine):
     """Chat engine based on Re:Act with prompt in the template."""
 
     def _create_prompt(self, user_prompt: str, **kwargs: dict) -> BasePromptTemplate:
-        prompt = ChatPromptTemplate.from_messages([
-            SystemMessagePromptTemplate.from_template(react_json.system_prompt),
-            HumanMessagePromptTemplate.from_template(react_json.user_prompt)
-        ])
+        prompt = ChatPromptTemplate.from_messages(
+            [
+                SystemMessagePromptTemplate.from_template(react_json.system_prompt),
+                HumanMessagePromptTemplate.from_template(react_json.user_prompt),
+            ]
+        )
         prompt = prompt.partial(user_prompt=user_prompt)
-        return prompt  
+        return prompt
 
     def _create_llm(self, **kwargs: dict) -> BaseLLM:
         return OpenAI(temperature=0, verbose=True)

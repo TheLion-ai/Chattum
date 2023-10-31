@@ -1,7 +1,8 @@
-import requests
-from pydantic import create_model
-from pybars import Compiler
 import json
+
+import requests
+from pybars import Compiler
+from pydantic import create_model
 
 from .base_tool import ToolTemplate, UserVariable
 
@@ -12,8 +13,12 @@ class PostTool(ToolTemplate):
     user_description: str = "use this tool to sent data to a server."
 
     user_variables: list[UserVariable] = [
-        UserVariable(name="url", description="The url of the request", form_type="text"),
-        UserVariable(name="body", description="The body of the request", form_type="editor"),
+        UserVariable(
+            name="url", description="The url of the request", form_type="text"
+        ),
+        UserVariable(
+            name="body", description="The body of the request", form_type="editor"
+        ),
     ]
 
     @property
@@ -33,7 +38,3 @@ class PostTool(ToolTemplate):
         json_body = json.loads(self.body_template(kwargs))
         # json_body = self.body_template(name=name, age=age, color=color)
         return requests.post(json=json_body, url=self.variables_dict["url"])
-
-
-
-    

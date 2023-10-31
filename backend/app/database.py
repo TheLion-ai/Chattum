@@ -20,9 +20,12 @@ class BotsRepository(AbstractRepository[Bot]):
 
         collection_name = "bots"
 
+
 class ToolsRepository(AbstractRepository[Tool]):
     class Meta:
         collection_name = "tools"
+
+
 class SourcesRepository(AbstractRepository[Source]):
     """Repository for sources."""
 

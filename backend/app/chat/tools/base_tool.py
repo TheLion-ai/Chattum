@@ -1,7 +1,8 @@
 from abc import ABC, abstractmethod
-from pydantic import BaseModel
 from typing import Any
+
 from langchain.tools import StructuredTool
+from pydantic import BaseModel
 from pydantic_models.tools import UserVariable
 
 
@@ -15,7 +16,6 @@ class ToolTemplate:
     def __init__(self, user_variables: list[dict] = []):
         self.set_user_variables(user_variables)
         self._create_user_variables_dict()
-        
 
     def _create_user_variables_dict(self):
         self.variables_dict = {var.name: var.value for var in self.user_variables}

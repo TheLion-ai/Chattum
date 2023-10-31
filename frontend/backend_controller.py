@@ -202,15 +202,18 @@ def get_available_tools(bot_id: str) -> list[dict]:
 
     return tools
 
-def create_new_tool(bot_id: str, tool_name: str, user_variables : list):
-    #TODO: update existing tool
+
+def create_new_tool(bot_id: str, tool_name: str, user_variables: list):
+    # TODO: update existing tool
     requests.put(
-         f"{BACKEND_URL}/{USERNAME}/bots/{bot_id}/tools",
-        json = {
-        "name": tool_name,
-        "description": "test",
-        "user_variables": user_variables,
-    })
+        f"{BACKEND_URL}/{USERNAME}/bots/{bot_id}/tools",
+        json={
+            "name": tool_name,
+            "description": "test",
+            "user_variables": user_variables,
+        },
+    )
+
 
 def get_tools(bot_id: str) -> list[dict]:
     """Get a list of available tools for the selected bot.
@@ -218,11 +221,10 @@ def get_tools(bot_id: str) -> list[dict]:
     Returns:
         list[dict]: a list of created tools for the bot.
     """
-    tools = requests.get(
-        f"{BACKEND_URL}/{USERNAME}/bots/{bot_id}/tools"
-    ).json()
+    tools = requests.get(f"{BACKEND_URL}/{USERNAME}/bots/{bot_id}/tools").json()
 
     return tools
+
 
 def delete_tool(bot_id: str, tool_id: str):
     requests.delete(f"{BACKEND_URL}/{USERNAME}/bots/{bot_id}/tools/{tool_id}")
