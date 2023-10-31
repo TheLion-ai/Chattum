@@ -11,7 +11,7 @@ class Bot(BaseModel):
     id: ObjectIdField = None  # id of bot
     name: str  # name of bot
     username: str  # name of the user associated with the bot
-    tools: list = []  # list of tools that the bot can use
+    tools: list = []
     sources: list = []  # list of sources that the bot can use
     prompt: str = ""  # prompt for the bot
 

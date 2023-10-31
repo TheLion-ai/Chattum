@@ -21,6 +21,4 @@ RUN poetry install
 
 # COPY . /streamlit
 
-EXPOSE 8501
-
 CMD poetry run streamlit run main.py

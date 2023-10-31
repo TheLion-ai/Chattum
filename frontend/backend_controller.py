@@ -188,3 +188,41 @@ def send_message(bot_id: str, conversation_id: str, message: str) -> tuple[str, 
         json={"message": message, "conversation_id": str(conversation_id)},
     ).json()
     return response["message"], response["conversation_id"]
+
+
+def get_available_tools(bot_id: str) -> list[dict]:
+    """Get a list of available tools for the selected bot.
+
+    Returns:
+        list[dict]: a list of created tools for the bot.
+    """
+    tools = requests.get(
+        f"{BACKEND_URL}/{USERNAME}/bots/{bot_id}/tools/available_tools"
+    ).json()
+
+    return tools
+
+def create_new_tool(bot_id: str, tool_name: str, user_variables : list):
+    #TODO: update existing tool
+    requests.put(
+         f"{BACKEND_URL}/{USERNAME}/bots/{bot_id}/tools",
+        json = {
+        "name": tool_name,
+        "description": "test",
+        "user_variables": user_variables,
+    })
+
+def get_tools(bot_id: str) -> list[dict]:
+    """Get a list of available tools for the selected bot.
+
+    Returns:
+        list[dict]: a list of created tools for the bot.
+    """
+    tools = requests.get(
+        f"{BACKEND_URL}/{USERNAME}/bots/{bot_id}/tools"
+    ).json()
+
+    return tools
+
+def delete_tool(bot_id: str, tool_id: str):
+    requests.delete(f"{BACKEND_URL}/{USERNAME}/bots/{bot_id}/tools/{tool_id}")
