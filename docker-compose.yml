@@ -29,6 +29,21 @@ services:
       - deploy_network
     volumes:
       - ./frontend:/frontend
+
+  frontend_flet:
+    build: frontend_flet/
+    depends_on:
+      backend:
+        condition: service_healthy
+    ports:
+        - 8080:8080
+    networks:
+      - deploy_network
+    volumes:
+      - type: bind
+        source: ./frontend_flet
+        target: /frontend_flet
+
   mongo:
     image: mongo
     restart: always
