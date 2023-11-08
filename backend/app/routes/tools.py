@@ -13,6 +13,7 @@ router = APIRouter(prefix="/{username}/bots/{bot_id}/tools", tags=["tools"])
 
 @router.get("/available_tools", response_model=list[pm.Tool])
 def get_available_tools(username: str) -> list[pm.Tool]:
+    """Get available tools and their templates."""
     return [pm.Tool(**t.template) for t in available_tools]
 
 
@@ -42,9 +43,11 @@ def get_tools(username: str, bot_id: str) -> list[pm.Tool]:
 def delete_tool(tool_id: str, username: str, bot_id: str) -> pm.MessageResponse:
     """Delete tool by id."""
     tool = database.tools.find_one_by_id(ObjectId(tool_id))
+    if tool is None:
+        raise HTTPException(status_code=404, detail="Tool not found")
     bot = database.bots.find_one_by_id(ObjectId(bot_id))
 
     database.tools.delete(tool)
-    bot.sources.remove(ObjectId(tool_id))
+    bot.tools.remove(ObjectId(tool_id))
 
     return pm.MessageResponse(message="Tool deleted successfully!")

@@ -13,11 +13,13 @@ from app.routes.conversations import (
 )
 from bson import ObjectId
 from fastapi import APIRouter
+from langchain.tools import StructuredTool
 
 router = APIRouter(prefix="/{username}/bots/{bot_id}/chat", tags=["chat"])
 
 
-def load_tools(bot_id: str):
+def load_tools(bot_id: str) -> list[StructuredTool]:
+    """Load tools for a bot."""
     loaded_tools = []
     bot = database.bots.find_one_by_id(ObjectId(bot_id))
     bot_tools = bot.tools
@@ -52,9 +54,10 @@ def chat(
     bot_database = chroma_controller.get_database(bot_id)
     bot_tools = load_tools(bot_id)
 
-    # if bot_database is not None and bot_database["db"] is not None:
-    #     # tools = [search_documents_tool(bot_database["db"], bot_database["sources"])]
-    #     bot_tools.append(SearchDocumentTool(bot_database["db"], bot_database["sources"]).as_tool())
+    if bot_database is not None and bot_database["db"] is not None:
+        bot_tools.append(
+            SearchDocumentTool(bot_database["db"], bot_database["sources"]).as_tool()
+        )
 
     if len(bot_tools) > 0:
         chat_engine = ReactJsonEngine(

@@ -267,7 +267,7 @@ class ReactJsonEngine(BaseAgentEngine):
         return prompt
 
     def _create_llm(self, **kwargs: dict) -> BaseLLM:
-        return OpenAI(temperature=0, verbose=True)
+        return ChatOpenAI(temperature=0, verbose=True)
 
     def _load_memory(self, messages: list[dict]) -> ConversationBufferMemory:
         return ConversationBufferMemory(

@@ -1,6 +1,6 @@
-import json
+"""Tool for sending sms to a phone number using twillio.""" ""
 
-import requests
+
 from langchain.utilities.twilio import TwilioAPIWrapper
 from pybars import Compiler
 from pydantic import BaseModel, create_model
@@ -9,8 +9,9 @@ from .base_tool import ToolTemplate, UserVariable
 
 
 class TwilloTool(ToolTemplate):
+    """Tool for sending sms to a phone number using twillio."""
+
     name: str = "Send sms tool"
-    description: str = "use this tool to sent sms to a phone number."
     user_description: str = "sent sms to a phone number."
 
     user_variables: list[UserVariable] = [
@@ -20,14 +21,17 @@ class TwilloTool(ToolTemplate):
     ]
 
     @property
-    def args_schema(self):
+    def args_schema(self) -> BaseModel:
+        """Return the args schema for langchain."""
+
         class ArgsSchema(BaseModel):
             message: str
             to_number: str
 
         return ArgsSchema
 
-    def __init__(self, user_variables: list[dict] = ...):
+    def __init__(self, user_variables: list[dict] = []):
+        """Initialize the tool using the user variables with TwilioAPIWrapper."""
         super().__init__(user_variables)
         self.twilio = TwilioAPIWrapper(
             account_sid=self.variables_dict["account_sid"],
@@ -35,5 +39,14 @@ class TwilloTool(ToolTemplate):
             from_number=self.variables_dict["from_number"],
         )
 
-    def run(self, **kwargs):
+    def run(self, **kwargs: dict) -> str:
+        """Run the tool."""
         self.twilio.run(kwargs["message"], kwargs["to_number"])
+        return "message sent"
+
+    @property
+    def description(
+        self,
+    ) -> str:
+        """Return the tool description for llm."""
+        return "use this tool to sent sms to a phone number."

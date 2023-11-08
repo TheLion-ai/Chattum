@@ -1,3 +1,5 @@
+"""Prompt templates for ReAct JSON chat interface."""
+
 system_prompt = """Respond to the human as helpfully and accurately as possible.
 
 Additional Instructions:

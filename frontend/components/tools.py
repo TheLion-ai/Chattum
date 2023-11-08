@@ -1,3 +1,4 @@
+"""Compontents for tools."""
 import streamlit as st
 from backend_controller import (
     create_new_tool,
@@ -10,7 +11,10 @@ from utils import query_params
 
 
 class ToolsPanel:
-    def __init__(self, bot_id):
+    """Tools panel."""
+
+    def __init__(self, bot_id: str) -> None:
+        """Initialize the tools panel, load tools using the bot id."""
         self.bot_id = bot_id
         self.available_tools = get_available_tools(self.bot_id)
         self.available_tools_dict = {
@@ -23,7 +27,8 @@ class ToolsPanel:
         self._selected_tool_id = query_params.get_form_url("tool_id")
         self._selected_tool = self.tools_dict.get(self._selected_tool_id, None)
 
-    def __call__(self):
+    def __call__(self) -> None:
+        """Display the tools panel."""
         with st.expander("Add new tool"):
             self._display_new_tool()
 
@@ -46,12 +51,14 @@ class ToolsPanel:
                     self._selected_tool, key=f"{self._selected_tool['id']}_form"
                 )
 
-    def _display_new_tool(self):
+    def _display_new_tool(self) -> None:
+        """Display the new tool form."""
         new_tool_name = st.selectbox("Select tool", self.available_tools_dict.keys())
         new_tool = self.available_tools_dict[new_tool_name]
         self._display_tool_form(new_tool)
 
-    def _display_tool_form(self, tool, key="tool_form"):
+    def _display_tool_form(self, tool: dict, key: str = "tool_form") -> None:
+        """Display the tool form."""
         tool_variables = tool["user_variables"]
         st.write(tool["user_description"])
         with st.form(key=key):

@@ -7,6 +7,7 @@ from utils import query_params
 def render_tools() -> None:
     """Render the tools page."""
     st.title("Tools")
+    st.warning("Tools are currently in development.")
     bot_id = query_params.get_form_url("bot_id")
     tools_panel = ToolsPanel(bot_id)
     tools_panel()
