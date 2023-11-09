@@ -1,28 +1,59 @@
-import flet as ft
+import flet
+from flet import (  
+    ElevatedButton, 
+    Page, 
+    TemplateRoute,
+    ProgressRing, 
+    UserControl,
+    View,
+    colors,  
+)
 
-def main(page: ft.Page):
-    page.title = "Flet counter example"
-    page.vertical_alignment = ft.MainAxisAlignment.CENTER
+class ChattumApp(UserControl):
+    def __init__(self, page: Page):
+        super().__init__()
+        self.page = page
+        self.page.on_route_change = self.route_change
+        self.page.update()
 
-    txt_number = ft.TextField(value="0", text_align=ft.TextAlign.RIGHT, width=100)
+    def build(self):
+        self.layout = ProgressRing()
+        return self.layout
+    
+    def initialize(self):
+        # TODO: some async work
+        self.page.go("/") 
 
-    def minus_click(e):
-        txt_number.value = str(int(txt_number.value) - 1)
+    def route_change(self, e): 
+        troute = TemplateRoute(self.page.route) 
+        if troute.match("/"): 
+            self.page.views.append(
+                    View(
+                        "/",
+                        [ 
+                            ElevatedButton("Go Store", on_click=lambda _: self.page.go("/store")),
+                        ],
+                    )
+                )
+        elif troute.match("/store"): 
+            self.page.views.append(
+                    View(
+                        "/store",
+                        [ 
+                            ElevatedButton("Go Home", on_click=lambda _: self.page.go("/")),
+                        ],
+                    )
+                ) 
+        self.page.update() 
+
+if __name__ == "__main__":
+    def main(page: Page):
+        page.title = "Chattum"
+        page.padding = 0
+        page.bgcolor = colors.WHITE70
+        app = ChattumApp(page)
+        page.add(app)
         page.update()
+        app.initialize() 
 
-    def plus_click(e):
-        txt_number.value = str(int(txt_number.value) + 1)
-        page.update()
-
-    page.add(
-        ft.Row(
-            [
-                ft.IconButton(ft.icons.REMOVE, on_click=minus_click),
-                txt_number,
-                ft.IconButton(ft.icons.ADD, on_click=plus_click),
-            ],
-            alignment=ft.MainAxisAlignment.CENTER,
-        )
-    )
-
-ft.app(port=8080, target=main, view=ft.AppView.WEB_BROWSER)
+    flet.app(target=main, view=flet.WEB_BROWSER)
