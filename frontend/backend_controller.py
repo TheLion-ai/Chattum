@@ -188,3 +188,9 @@ def send_message(bot_id: str, conversation_id: str, message: str) -> tuple[str, 
         json={"message": message, "conversation_id": str(conversation_id)},
     ).json()
     return response["message"], response["conversation_id"]
+
+
+def get_model(bot_id: str) -> str:
+    """Get the current model of the bot."""
+    model = requests.get(f"{BACKEND_URL}/{USERNAME}/bots/{bot_id}/model").json()
+    return model
