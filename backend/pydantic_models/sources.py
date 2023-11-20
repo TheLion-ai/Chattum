@@ -15,3 +15,9 @@ class Source(BaseModel):
         """The ObjectIdField creates an bson ObjectId value, so its necessary to setup the json encoding"."""
 
         json_encoders = {ObjectId: str}
+
+
+class FileUrlResponse(BaseModel):
+    """Model for a response with a file url."""
+
+    file_url: str  # url of the file

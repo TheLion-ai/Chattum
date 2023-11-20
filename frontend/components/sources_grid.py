@@ -62,7 +62,7 @@ class SourcesGrid:
                             source_type == "url" and url.replace(" ", "") == ""
                         ):
                             st.warning("Please fill in all fields")
-                        else:
+                        else:                   
                             if source_type == "url":
                                 create_new_source(
                                     source_name,

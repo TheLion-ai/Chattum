@@ -102,17 +102,17 @@ def get_source(bot_id: str, source_id: str, username: str) -> pm.Source:
     return source
 
 
-@router.get("/{source_id}/file", response_model=pm.Source)
+@router.get("/{source_id}/file", response_model=pm.FileUrlResponse)
 def get_source_file(
     bot_id: str, source_id: str, username: str, background_tasks: BackgroundTasks
-) -> FileResponse:
+) -> pm.FileUrlResponse:
     """Get source of bot by id."""
     source = database.sources.find_one_by_id(ObjectId(source_id))
     if source is None:
         raise HTTPException(status_code=404, detail="Source not found")
-    file_path = file_storage.download_source(source_id, source.source_type, bot_id)
-    background_tasks.add_task(remove_file, file_path)
-    return FileResponse(file_path)
+    url = file_storage.download_source(source_id, source.source_type, bot_id)
+    # background_tasks.add_task(remove_file, file_path)
+    return pm.FileUrlResponse(file_url=url)
 
 
 @router.delete("/{source_id}", response_model=pm.MessageResponse)

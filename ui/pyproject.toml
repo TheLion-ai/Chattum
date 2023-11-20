@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "reflex-test"
+version = "0.1.0"
+description = ""
+authors = ["Your Name <you@example.com>"]
+packages = [
+    {include = "chattum_ui"},
+]
+[tool.poetry.dependencies]
+python = "^3.10"
+reflex = "^0.3.2"
+requests = "^2.31.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

@@ -13,5 +13,5 @@ from .responses import (
     PromptResponse,
     SourceResponse,
 )
-from .sources import Source
+from .sources import Source, FileUrlResponse
 from .tools import Tool

@@ -2,7 +2,7 @@
 import streamlit as st
 
 BACKEND_URL = "http://backend:5000"
-EXTERNAL_BACKEND_URL = "http://localhost:8000"
+EXTERNAL_BACKEND_URL = "http://localhost:8001"
 USERNAME = "chattum"
 
 st.session_state.username = "chattum"
