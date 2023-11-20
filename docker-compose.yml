@@ -15,7 +15,7 @@ services:
       test: curl --fail backend:5000/health_check || exit 1
       interval: 10s
       retries: 5
-      start_period: 20s
+      start_period: 30s
       timeout: 10s
 
   frontend:
@@ -42,6 +42,8 @@ services:
     profiles:
       - mongo
       - standalone
+    ports:
+      - 27017:27017
 
   minio:
     image: minio/minio
