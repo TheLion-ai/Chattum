@@ -1,8 +1,7 @@
 """The dashboard page."""
-from chattum_ui.templates import template
-
 import reflex as rx
 from chattum_ui.state import State
+from chattum_ui.templates import template
 from settings import EXTERNAL_BACKEND_URL, USERNAME
 
 

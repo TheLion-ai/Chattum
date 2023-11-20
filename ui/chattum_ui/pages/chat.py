@@ -1,9 +1,8 @@
 """The dashboard page."""
-from chattum_ui.templates import template
-
 import reflex as rx
-from chattum_ui.state import State, ChatState
 from chattum_ui.components.conversations import conversation_button, show_conversation
+from chattum_ui.state import ChatState, State
+from chattum_ui.templates import template
 
 
 @template(route="/chat", title="Chat", image="/page_icons/chat.svg")

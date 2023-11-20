@@ -2,11 +2,12 @@
 
 from __future__ import annotations
 
+from typing import Callable
+
+import reflex as rx
 from chattum_ui import styles
 from chattum_ui.components.sidebar import sidebar
-from typing import Callable
 from chattum_ui.state import State
-import reflex as rx
 
 # Meta tags for the app.
 default_meta = [

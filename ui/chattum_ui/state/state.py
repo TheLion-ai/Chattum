@@ -1,9 +1,10 @@
 """Base state for the app."""
-from typing import Optional
 import json
+from time import sleep
+from typing import Optional
+
 import reflex as rx
 from chattum_ui.utils import backend_controller as bc
-from time import sleep
 
 
 class State(rx.State):

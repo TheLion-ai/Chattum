@@ -1,9 +1,8 @@
 """The dashboard page."""
-from chattum_ui.templates import template
-
 import reflex as rx
-from chattum_ui.state import State
 from chattum_ui.components.bots import bot_card, new_bot_modal
+from chattum_ui.state import State
+from chattum_ui.templates import template
 
 
 @template(route="/", title="Bots", image="/page_icons/bots.svg")

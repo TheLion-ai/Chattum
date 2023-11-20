@@ -1,9 +1,8 @@
 """The dashboard page."""
-from chattum_ui.templates import template
-
 import reflex as rx
+from chattum_ui.components.tools import create_new_tool, tool_button, tool_form
 from chattum_ui.state import State, ToolsState
-from chattum_ui.components.tools import tool_form, tool_button, create_new_tool
+from chattum_ui.templates import template
 
 
 @template(

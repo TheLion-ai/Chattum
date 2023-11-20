@@ -36,8 +36,16 @@ class FileStorage:
         #         self.bucket_name, f"sources/{bot_id}/{id}.{source_type}", tmp
         #     )
         # return path
-        response = self.client.generate_presigned_url('get_object', Params={'Bucket': self.bucket_name, 'Key':  f"sources/{bot_id}/{id}.{source_type}"}, ExpiresIn=3600)
+        response = self.client.generate_presigned_url(
+            "get_object",
+            Params={
+                "Bucket": self.bucket_name,
+                "Key": f"sources/{bot_id}/{id}.{source_type}",
+            },
+            ExpiresIn=3600,
+        )
         return response
+
     def delete_source(self, id: str, source_type: str, bot_id: str) -> None:
         """Delete a source file from the storage."""
         self.client.delete_object(

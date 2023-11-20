@@ -1,9 +1,8 @@
 """Sidebar component for the app."""
 
+import reflex as rx
 from chattum_ui import styles
 from chattum_ui.state import State
-
-import reflex as rx
 
 
 def sidebar_header() -> rx.Component:

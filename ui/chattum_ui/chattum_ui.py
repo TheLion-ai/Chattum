@@ -1,11 +1,10 @@
 """Welcome to Reflex!."""
-from pydantic import BaseModel
+import reflex as rx
 from chattum_ui import styles
 
 # Import all the pages.
 from chattum_ui.pages import *
-
-import reflex as rx
+from pydantic import BaseModel
 
 # Create the app and compile it.
 app = rx.App(style=styles.base_style)
