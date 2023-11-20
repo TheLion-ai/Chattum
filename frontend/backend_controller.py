@@ -230,3 +230,9 @@ def get_tools(bot_id: str) -> list[dict]:
 def delete_tool(bot_id: str, tool_id: str) -> None:
     """Delete a tool with a given id."""
     requests.delete(f"{BACKEND_URL}/{USERNAME}/bots/{bot_id}/tools/{tool_id}")
+
+
+def get_model(bot_id: str) -> str:
+    """Get the current model of the bot."""
+    model = requests.get(f"{BACKEND_URL}/{USERNAME}/bots/{bot_id}/model").json()
+    return model
