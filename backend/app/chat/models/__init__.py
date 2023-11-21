@@ -1,5 +1,6 @@
 """Gather all LLMs in one place."""
-from .openai import OpenAIModel
+from .huggingface_hub import HugggingfaceHubModel
+from .openai import ChatOpenAIModel
 
-available_models = [OpenAIModel]
+available_models = [ChatOpenAIModel, HugggingfaceHubModel]
 available_models_dict = {model.name: model for model in available_models}

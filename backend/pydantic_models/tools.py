@@ -21,6 +21,7 @@ class Tool(BaseModel):
     id: ObjectIdField = None
     name: str
     user_description: str = ""
+    bot_description: Optional[str] = None
     user_variables: list[UserVariable] = []
 
     class Config:

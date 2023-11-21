@@ -38,11 +38,11 @@ class BaseChatEngine(ABC):
     def __init__(
         self,
         user_prompt: str,
+        llm: BaseLLM,
         messages: list[dict] = [],
-        llm_kwargs: dict = {},
     ) -> None:
         """Initialize the chat engine."""
-        self.llm: BaseLLM = self._create_llm(**llm_kwargs)
+        self.llm: BaseLLM = llm
         self.prompt: BasePromptTemplate = self._create_prompt(user_prompt)
         self.memory: BaseChatMemory = self._load_memory(messages)
         self.chain: LLMChain = self._create_chain(
@@ -69,11 +69,6 @@ class BaseChatEngine(ABC):
     @abstractmethod
     def _create_prompt(self, user_prompt: str) -> BasePromptTemplate:
         """Create a prompt."""
-        raise NotImplementedError
-
-    @abstractmethod
-    def _create_llm(self) -> BaseLLM:
-        """Create a language model."""
         raise NotImplementedError
 
     def export_messages(self) -> list[dict]:
@@ -118,9 +113,6 @@ class GPTEngine(BaseChatEngine):
 class ChatGPTEngine(BaseChatEngine):
     """Chat engine based on GPT with prompt as a system message."""
 
-    def _create_llm(self) -> BaseLLM:
-        return ChatOpenAI(temperature=0, verbose=True)
-
     def _load_memory(self, messages: list[dict]) -> ConversationBufferMemory:
         if messages == []:
             self.messages = [self.prompt]
@@ -160,10 +152,15 @@ class BaseAgentEngine(ABC):
     """Base class for agent based chat engines."""
 
     def __init__(
-        self, user_prompt: str, messages: list, tools: list, **kwargs: dict
+        self,
+        user_prompt: str,
+        messages: list,
+        tools: list,
+        llm: BaseLLM,
+        **kwargs: dict,
     ) -> None:
         """Initialize the chat engine."""
-        self.llm: BaseLLM = self._create_llm(**kwargs)
+        self.llm: BaseLLM = llm
         self.prompt: BasePromptTemplate = self._create_prompt(user_prompt, **kwargs)
         self.memory: BaseChatMemory = self._load_memory(messages, **kwargs)
         self.agent_executor: AgentExecutor = self._create_agent(
@@ -185,11 +182,6 @@ class BaseAgentEngine(ABC):
     @abstractmethod
     def _create_prompt(self, user_prompt: str, **kwargs: dict) -> BasePromptTemplate:
         """Create a prompt."""
-        raise NotImplementedError
-
-    @abstractmethod
-    def _create_llm(self, **kwargs: dict) -> BaseLLM:
-        """Create a language model."""
         raise NotImplementedError
 
     @abstractmethod
@@ -265,9 +257,6 @@ class ReactJsonEngine(BaseAgentEngine):
         )
         prompt = prompt.partial(user_prompt=user_prompt)
         return prompt
-
-    def _create_llm(self, **kwargs: dict) -> BaseLLM:
-        return ChatOpenAI(temperature=0, verbose=True)
 
     def _load_memory(self, messages: list[dict]) -> ConversationBufferMemory:
         return ConversationBufferMemory(

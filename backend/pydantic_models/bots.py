@@ -2,6 +2,7 @@
 
 from bson import ObjectId
 from pydantic import BaseModel
+from pydantic_models.models import LLM
 from pydantic_mongo import ObjectIdField
 
 
@@ -14,6 +15,7 @@ class Bot(BaseModel):
     tools: list = []
     sources: list = []  # list of sources that the bot can use
     prompt: str = ""  # prompt for the bot
+    model: LLM = None  # model for the bot
 
     class Config:
         """The ObjectIdField creates an bson ObjectId value, so its necessary to setup the json encoding"."""

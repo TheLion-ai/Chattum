@@ -2,9 +2,10 @@
 
 import pydantic_models as pm
 from app.app import chroma_controller, database
-from app.chat.chat_engine import ChatGPTEngine, ReactEngine, ReactJsonEngine
+from app.chat.chat_engine import ChatGPTEngine, GPTEngine, ReactEngine, ReactJsonEngine
+from app.chat.models import available_models_dict
 from app.chat.tools import available_tools_dict
-from app.chat.tools.document_search import SearchDocumentTool, search_documents_tool
+from app.chat.tools.document_search import SearchDocumentTool
 from app.routes.bots import get_bot
 from app.routes.conversations import (
     get_conversation,
@@ -26,7 +27,9 @@ def load_tools(bot_id: str) -> list[StructuredTool]:
     bot_tools = list(database.tools.find_by({"_id": {"$in": bot_tools}}))
     for tool in bot_tools:
         loaded_tools.append(
-            available_tools_dict[tool.name](tool.user_variables).as_tool()
+            available_tools_dict[tool.name](
+                tool.user_variables, tool.bot_description
+            ).as_tool()
         )
     return loaded_tools
 
@@ -51,6 +54,8 @@ def chat(
     else:
         conversation = pm.Conversation(bot_id=bot_id, messages=[])
 
+    llm = available_models_dict[bot.model.name](bot.model.user_variables)
+
     bot_database = chroma_controller.get_database(bot_id)
     bot_tools = load_tools(bot_id)
 
@@ -59,17 +64,22 @@ def chat(
             SearchDocumentTool(bot_database["db"], bot_database["sources"]).as_tool()
         )
 
-    if len(bot_tools) > 0:
+    if len(bot_tools) > 0 and llm.supports_tools:
         chat_engine = ReactJsonEngine(
             user_prompt=bot.prompt,
             messages=conversation.messages,
             tools=bot_tools,
+            llm=llm.as_llm(),
         )
     else:
-        chat_engine = ChatGPTEngine(
-            user_prompt=bot.prompt,
-            messages=conversation.messages,
-        )
+        if llm.model_type == "llm":
+            chat_engine = GPTEngine(
+                user_prompt=bot.prompt, messages=conversation.messages, llm=llm.as_llm()
+            )
+        elif llm.model_type == "chat":
+            chat_engine = ChatGPTEngine(
+                user_prompt=bot.prompt, messages=conversation.messages, llm=llm.as_llm()
+            )
 
     response = chat_engine.chat(chat_input.message)
     conversation.messages = chat_engine.export_messages()

@@ -32,6 +32,7 @@ langchainhub = "^0.1.13"
 unstructured = "^0.10.16"
 pybars3 = "^0.9.7"
 twilio = "^8.9.1"
+huggingface-hub = "^0.19.4"
 
 [tool.poetry.dev-dependencies]
 

@@ -1,4 +1,5 @@
 """Page for chatting with the bot."""
+import math
 from datetime import datetime
 
 import streamlit as st
@@ -34,16 +35,24 @@ def render_conversations() -> None:
 
             # Sort conversations by timestamp
             conversations = sorted(
-                conversations, key=lambda x: x["last_message_time"], reverse=True
+                conversations,
+                key=lambda x: x.get("last_message_time")
+                if x.get("last_message_time") is not None
+                else "",
+                reverse=True,
             )
 
             for conversation in conversations:
                 # Reformat the date
                 format_1 = "%Y-%m-%dT%H:%M:%S.%f"
                 format_2 = "%d/%m/%Y %H:%M:%S"
-                last_message_time_str = datetime.strptime(
-                    conversation["last_message_time"], format_1
-                ).strftime(format_2)
+                last_message_time_str = (
+                    datetime.strptime(
+                        conversation["last_message_time"], format_1
+                    ).strftime(format_2)
+                    if conversation.get("last_message_time") is not None
+                    else ""
+                )
 
                 st.button(
                     last_message_time_str,
@@ -53,6 +62,7 @@ def render_conversations() -> None:
                     type="primary"
                     if conversation_id == conversation["id"]
                     else "secondary",
+                    key=conversation["id"],
                 )
 
     with conversation_content_container:

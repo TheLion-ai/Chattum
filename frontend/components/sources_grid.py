@@ -88,13 +88,15 @@ class SourcesGrid:
         if len(self.sources) > 0:
             for source in self.sources:
                 with st.expander(source["name"], expanded=False):
-                    open_modal_button = st.button(
+                    delete_button = st.button(
                         "Delete",
                         args=([source["id"]]),
                         key=f"delete_source_{source['id']}",
                     )
-                    if open_modal_button:
-                        self.delete_modal.open([self.bot_id, source["id"]])
+
+                    if delete_button:
+                        delete_source(self.bot_id, source["id"])
+
                         st.experimental_rerun()
                     st.write(f"ID: {source['id']}")
                     st.write(f"Type: {source['source_type']}")

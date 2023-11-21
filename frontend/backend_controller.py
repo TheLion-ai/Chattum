@@ -1,5 +1,5 @@
 """Functions exchanging information from frontend with backend."""
-from typing import Annotated
+from typing import Annotated, Optional
 
 import requests
 import streamlit as st
@@ -203,17 +203,29 @@ def get_available_tools(bot_id: str) -> list[dict]:
     return tools
 
 
-def create_new_tool(bot_id: str, tool_name: str, user_variables: list) -> None:
+def create_or_edit_tool(
+    bot_id: str,
+    tool_name: str,
+    bot_description: str,
+    user_variables: list,
+    tool_id: Optional[str] = None,
+) -> None:
     """Create a new tool for the bot with a given name and user variabes."""
-    # TODO: update existing tool
-    requests.put(
+    print(tool_id)
+
+    response = requests.put(
         f"{BACKEND_URL}/{USERNAME}/bots/{bot_id}/tools",
         json={
+            "id": tool_id,
             "name": tool_name,
-            "description": "test",
+            "bot_description": bot_description,
             "user_variables": user_variables,
         },
     )
+    if response.status_code == 200:
+        st.success(f"Tool {tool_name} added")
+    else:
+        st.danger(f"error: {response.status_code} {response.text}")
 
 
 def get_tools(bot_id: str) -> list[dict]:
@@ -236,3 +248,24 @@ def get_model(bot_id: str) -> str:
     """Get the current model of the bot."""
     model = requests.get(f"{BACKEND_URL}/{USERNAME}/bots/{bot_id}/model").json()
     return model
+
+
+def get_available_models(bot_id: str) -> list[dict]:
+    """Get a list of available models.
+
+    Returns:
+        list[dict]: a list of available models.
+    """
+    models = requests.get(
+        f"{BACKEND_URL}/{USERNAME}/bots/{bot_id}/model/available_models"
+    ).json()
+
+    return models
+
+
+def change_model(bot_id: str, model: dict) -> None:
+    """Change the current model of the bot."""
+    requests.put(
+        f"{BACKEND_URL}/{USERNAME}/bots/{bot_id}/model",
+        json=model,
+    )

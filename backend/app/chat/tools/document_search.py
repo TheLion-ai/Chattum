@@ -49,12 +49,13 @@ class SearchDocumentTool(ToolTemplate):
         self.sources = sources
 
     @property
-    def description(self) -> str:
+    def bot_description(self) -> str:  # type: ignore
         """Return the tool description for llm."""
         return f"Useful for searching information if you don't know the answer. Contains information about things such as {','.join([s.name for s in self.sources])}"
 
-    def run(self, **kwargs: dict) -> str:
+    def run(self, *args: list, **kwargs: dict) -> str:
         """Run the tool by sending a post request to the url with the body."""
-        _docs = self.db.similarity_search(kwargs["query"])
+        query = kwargs.get("query", None) or args[0]
+        _docs = self.db.similarity_search(query)
         answer = _docs[0].page_content
         return answer

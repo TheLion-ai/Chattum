@@ -12,7 +12,9 @@ class UserVariable(BaseModel):
     name: str = ""
     description: str = ""
     value: Any = None
-    form_type: Optional[str] = None
+    default_value: Any = None
+    form_type: str = "text"
+    available_values: Optional[list[Any]] = None
 
 
 class LLM(BaseModel):
