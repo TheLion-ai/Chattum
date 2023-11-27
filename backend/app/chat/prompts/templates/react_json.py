@@ -1,8 +1,7 @@
 """Prompt templates for ReAct JSON chat interface."""
 
-system_prompt = """Respond to the human as helpfully and accurately as possible.
+system_prompt = """
 
-Additional Instructions:
 {user_prompt}
 
 You have access to the following tools:

@@ -18,14 +18,21 @@ def get_available_tools(username: str) -> list[pm.Tool]:
 
 
 @router.put("/", response_model=pm.MessageResponse)
-def put_tool(tool: pm.Tool, username: str, bot_id: str) -> pm.MessageResponse:
-    # TODO: update existing tool
+def put_tool(new_tool: pm.Tool, username: str, bot_id: str) -> pm.MessageResponse:
     """Create a tool with the given name and username."""
     bot = database.bots.find_one_by_id(ObjectId(bot_id))
-    database.tools.save(tool)
-
-    bot.tools.append(tool.id)
-    database.bots.save(bot)
+    if new_tool.id is None:
+        database.tools.save(new_tool)
+        bot.tools.append(new_tool.id)
+        database.bots.save(bot)
+    else:
+        tool = database.tools.find_one_by_id(ObjectId(new_tool.id))
+        if tool is None:
+            raise HTTPException(status_code=404, detail="Tool not found")
+        tool.name = new_tool.name
+        tool.bot_description = new_tool.bot_description
+        tool.user_variables = new_tool.user_variables
+        database.tools.save(tool)
     return pm.MessageResponse(message="Tool updated successfully!")
 
 
@@ -45,9 +52,10 @@ def delete_tool(tool_id: str, username: str, bot_id: str) -> pm.MessageResponse:
     tool = database.tools.find_one_by_id(ObjectId(tool_id))
     if tool is None:
         raise HTTPException(status_code=404, detail="Tool not found")
-    bot = database.bots.find_one_by_id(ObjectId(bot_id))
 
     database.tools.delete(tool)
+    bot = database.bots.find_one_by_id(ObjectId(bot_id))
     bot.tools.remove(ObjectId(tool_id))
+    database.bots.save(bot)
 
     return pm.MessageResponse(message="Tool deleted successfully!")

@@ -1,6 +1,8 @@
 """Tool for sending sms to a phone number using twillio.""" ""
 
 
+from typing import Optional
+
 from langchain.utilities.twilio import TwilioAPIWrapper
 from pybars import Compiler
 from pydantic import BaseModel, create_model
@@ -30,7 +32,9 @@ class TwilloTool(ToolTemplate):
 
         return ArgsSchema
 
-    def __init__(self, user_variables: list[dict] = []):
+    def __init__(
+        self, user_variables: list[dict] = [], bot_description: Optional["str"] = None
+    ) -> None:
         """Initialize the tool using the user variables with TwilioAPIWrapper."""
         super().__init__(user_variables)
         self.twilio = TwilioAPIWrapper(

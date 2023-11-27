@@ -4,7 +4,8 @@ from newspaper import Article
 
 
 def scrape(url: str) -> str:
-    """Scrape an article from the web.
+    """
+    Scrape an article from the web.
 
     Args:
         url (str): url of the article to scrape

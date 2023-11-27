@@ -6,7 +6,7 @@ import pydantic_models as pm
 from app.app import app
 from fastapi.openapi.utils import get_openapi
 
-from .routes import bots, chat, conversations, docs, prompts, sources, tools
+from .routes import bots, chat, conversations, docs, model, prompts, sources, tools
 
 app.include_router(bots.router)
 app.include_router(prompts.router)
@@ -15,6 +15,7 @@ app.include_router(conversations.router)
 app.include_router(chat.router)
 app.include_router(docs.router)
 app.include_router(tools.router)
+app.include_router(model.router)
 
 
 @app.get("/health_check", response_model=pm.HealthCheckResponse)

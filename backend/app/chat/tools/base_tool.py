@@ -12,12 +12,14 @@ class ToolTemplate(ABC):
 
     name: str
     user_description: str
+    bot_description: str
 
     user_variables: list[UserVariable] = []
 
-    def __init__(self, user_variables: list[dict] = []):
+    def __init__(self, user_variables: list[dict] = [], bot_description: str = None):
         """Initialize the tool using the user variables."""
         self.user_variables = user_variables
+        self.bot_description = bot_description or self.bot_description
         self._create_user_variables_dict()
 
     def _create_user_variables_dict(self) -> None:
@@ -34,7 +36,7 @@ class ToolTemplate(ABC):
     def tool_description(self) -> str:
         """Return the tool description for llm in form tool_name(arg1:type, arg2:type) - tool_description."""
         args = self.args_schema.__fields__
-        return f"{self.name}({', '.join([a.name +':'+str(a._type_display()) for a in args.values()])}) - {self.description}"
+        return f"{self.name}({', '.join([a.name +':'+str(a._type_display()) for a in args.values()])}) - {self.bot_description}"
 
     @abstractmethod
     def run(self, **kwargs: dict) -> Any:
@@ -46,7 +48,7 @@ class ToolTemplate(ABC):
         tool = StructuredTool.from_function(
             func=self.run,
             name=self.name,
-            description=self.description,
+            description=self.bot_description,
             args_schema=self.args_schema,
         )
         tool.description = self.tool_description
@@ -58,12 +60,7 @@ class ToolTemplate(ABC):
         """Return the template for the tool for the frontend."""
         return {
             "name": self.name,
-            "description": self.description,
             "user_variables": self.user_variables,
+            "bot_description": self.bot_description,
             "user_description": self.user_description,
         }
-
-    @property
-    def description(self) -> str:
-        """Return description of what the tool does for llm."""
-        raise NotImplementedError

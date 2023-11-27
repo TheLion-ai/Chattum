@@ -1,4 +1,4 @@
-"""Pydantic models for tools."""
+"""Pydantic models for LLMs."""
 from typing import Any, Optional
 
 from bson import ObjectId
@@ -12,16 +12,17 @@ class UserVariable(BaseModel):
     name: str = ""
     description: str = ""
     value: Any = None
-    form_type: Optional[str] = None
+    default_value: Any = None
+    form_type: str = "text"
+    available_values: Optional[list[Any]] = None
 
 
-class Tool(BaseModel):
-    """A tool for a bot."""
+class LLM(BaseModel):
+    """A model."""
 
     id: ObjectIdField = None
     name: str
     user_description: str = ""
-    bot_description: Optional[str] = None
     user_variables: list[UserVariable] = []
 
     class Config:

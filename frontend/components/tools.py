@@ -1,7 +1,7 @@
 """Compontents for tools."""
 import streamlit as st
 from backend_controller import (
-    create_new_tool,
+    create_or_edit_tool,
     delete_tool,
     get_available_tools,
     get_tools,
@@ -20,6 +20,7 @@ class ToolsPanel:
         self.available_tools_dict = {
             tool["name"]: tool for tool in self.available_tools
         }
+        # st.write(self.available_tools)
 
         self.tools = get_tools(self.bot_id)
         self.tools_dict = {tool["id"]: tool for tool in self.tools}
@@ -60,7 +61,11 @@ class ToolsPanel:
     def _display_tool_form(self, tool: dict, key: str = "tool_form") -> None:
         """Display the tool form."""
         tool_variables = tool["user_variables"]
-        st.write(tool["user_description"])
+        bot_description = st.text_input(
+            "Description of the tool for the bot",
+            value=tool.get("bot_description", ""),
+            key=f"{tool['id']}_bot_description",
+        )
         with st.form(key=key):
             for user_variable in tool_variables:
 
@@ -79,7 +84,14 @@ class ToolsPanel:
                     "Update tool", type="primary", use_container_width=True
                 )
                 if submit_button:
-                    create_new_tool(self.bot_id, tool["name"], tool_variables)
+                    st.write("submit")
+                    create_or_edit_tool(
+                        self.bot_id,
+                        tool["name"],
+                        bot_description,
+                        tool_variables,
+                        tool["id"],
+                    )
                     st.rerun()
             with col2:
                 delete_button = st.form_submit_button(
