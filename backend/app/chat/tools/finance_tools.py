@@ -2,8 +2,7 @@
 from langchain.utilities.alpha_vantage import AlphaVantageAPIWrapper
 from pydantic import BaseModel
 
-from backend.app.chat.tools.base_tool import ToolTemplate
-from backend.pydantic_models.tools import UserVariable
+from .base_tool import ToolTemplate, UserVariable
 
 
 class FinanceTool(ToolTemplate):
@@ -12,7 +11,9 @@ class FinanceTool(ToolTemplate):
     name: str = "Currency exchange Tool"
     user_description: str = "Use the AlphaVantageAPIWrapper to get currency exchange rates."
 
-    user_variables: list[UserVariable] = []
+    user_variables: list[UserVariable] = [
+        UserVariable(name="api_key", description="AlphaVantage API key", form_type="text")
+    ]
 
     @property
     def args_schema(self) -> BaseModel:
