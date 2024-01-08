@@ -1,8 +1,8 @@
 from flet import *
-from pages.bot_menu_view import BotMenuView
 
-from pages.bots_view import BotsView
-from simple_toast import Toast
+from pages.bot.bot_view import BotView
+from pages.bots.bots_view import BotsView 
+
 
 
 class ChattumApp(UserControl):
@@ -23,8 +23,8 @@ class ChattumApp(UserControl):
         troute = TemplateRoute(self.page.route)
         if troute.match("/bots"): 
             self.page.views.append(BotsView())
-        elif troute.match("/bot_menu/:bot_id"):
-            self.page.views.append(BotMenuView(troute.bot_id))
+        elif troute.match("/bot/:bot_id"):
+            self.page.views.append(BotView(troute.bot_id))
         else: 
             # TODO: 404, this page doesnt exist or sth
             pass
@@ -56,4 +56,4 @@ if __name__ == "__main__":
         page.update()
         app.initialize() 
 
-    app(target=main, view=WEB_BROWSER)
+    app(target=main, assets_dir="assets", view=WEB_BROWSER)
