@@ -1,5 +1,6 @@
 """Functions exchanging information from frontend with backend."""
-from typing import Annotated, Optional
+
+from typing import Annotated, Callable, Optional
 
 import requests
 import streamlit as st
@@ -7,46 +8,64 @@ from constants import BACKEND_URL, USERNAME
 from langchain.memory import ChatMessageHistory
 
 
-def get_bots() -> list[dict]:
+def endpoint(
+    success_message: str = None, error_message: str = None, progress_message: str = ""
+) -> Callable:
+    def inner_decorator(f: Callable) -> Callable:
+        def wrapped(*args: list, **kwargs: dict) -> dict | list | None:
+            try:
+                response = f(*args, **kwargs)
+                assert response.status_code == 200
+                if success_message:
+                    st.toast(success_message, icon="✅")
+                return response.json()
+            except Exception as e:
+                print(e)
+                if error_message:
+                    st.toast(error_message, icon="❌")
+                return None
+
+        return wrapped
+
+    return inner_decorator
+
+
+@endpoint(error_message="Error getting bots")
+def get_bots() -> requests.Response:
     """Get a list of available bots.
 
     Returns:
         list[dict]: a list of created bots.
     """
-    bots = requests.get(f"{BACKEND_URL}/{USERNAME}/bots").json()
-
-    return bots
+    return requests.get(f"{BACKEND_URL}/{USERNAME}/bots")
 
 
-def create_new_bot(bot_name: str) -> None:
+@endpoint(success_message="Bot created", error_message="Error creating bot")
+def create_new_bot(bot_name: str) -> requests.Response:
     """Create a new bot with a given name.
 
     Args:
         bot_name (str): a name for a new bot
     """
-    try:
-        response = requests.put(
-            f"{BACKEND_URL}/{USERNAME}/bots",
-            json={"name": bot_name, "username": USERNAME},
-        )
-        assert response.status_code == 200
-        st.success(f"Bot {bot_name} created")
-    except Exception as e:
-        st.warning(e)
+    response = requests.put(
+        f"{BACKEND_URL}/{USERNAME}/bots",
+        json={"name": bot_name, "username": USERNAME},
+    )
+    return response
 
 
-def get_sources(bot_id: str) -> list[dict]:
+@endpoint()
+def get_sources(bot_id: str) -> requests.Response:
     """Get a list of available source for the selected bot.
 
     Returns:
         list[dict]: a list of created sources for the bot.
     """
-    sources = requests.get(f"{BACKEND_URL}/{USERNAME}/bots/{bot_id}/sources").json()
-
-    return sources
+    return requests.get(f"{BACKEND_URL}/{USERNAME}/bots/{bot_id}/sources")
 
 
-def get_source(bot_id: str, source_id: str) -> dict:
+@endpoint()
+def get_source(bot_id: str, source_id: str) -> requests.Response:
     """Get a source with a given id.
 
     Args:
@@ -56,7 +75,7 @@ def get_source(bot_id: str, source_id: str) -> dict:
         dict: a source with a given id.
     """
     source = requests.get(f"{BACKEND_URL}/{USERNAME}/bots/{bot_id}/sources/{source_id}")
-    return source.json()
+    return source
 
 
 def get_source_file(bot_id: str, source_id: str) -> bytes:
@@ -74,110 +93,102 @@ def get_source_file(bot_id: str, source_id: str) -> bytes:
     return file
 
 
-def delete_source(bot_id: str, source_id: str) -> None:
+@endpoint(success_message="Source deleted", error_message="Error deleting source")
+def delete_source(bot_id: str, source_id: str) -> requests.Response:
     """Delete a source with a given id.
 
     Args:
         bot_id (str): id of the bot to which the source belongs
         source_id (str): id of the source to delete
     """
-    try:
-        response = requests.delete(
-            f"{BACKEND_URL}/{USERNAME}/bots/{bot_id}/sources/{source_id}",
-        )
-        assert response.status_code == 200
-        st.success(f"Source {source_id} deleted")
-    except Exception:
-        st.warning(response.text)
+    response = requests.delete(
+        f"{BACKEND_URL}/{USERNAME}/bots/{bot_id}/sources/{source_id}",
+    )
+    return response
 
 
+@endpoint(success_message="Source updated", error_message="Error updating source")
 def create_new_source(
-    source_name: str, source_type: str, bot_id: str, file: bytes = None, url: str = None
-) -> None:
+    source_name: str,
+    source_type: str,
+    bot_id: str,
+    file: bytes = None,
+    url: str = None,
+    source_id: str = None,
+) -> requests.Response:
     """Create a new source for the bot with a given name.
 
     Args:
         source_name (str): a name for a new source for the bot
     """
-    try:
-        if source_type == "url":
-            st.write("uploading url")
-            response = requests.put(
-                f"{BACKEND_URL}/{USERNAME}/bots/{bot_id}/sources",
-                params={
-                    "name": source_name,
-                    "source_type": source_type,
-                    "url": url,
-                },
-            )
-        else:
-            st.write("uploading file")
-            response = requests.put(
-                f"{BACKEND_URL}/{USERNAME}/bots/{bot_id}/sources",
-                params={
-                    "name": source_name,
-                    "source_type": source_type,
-                },
-                files={"file": file},  # type: ignore
-            )
-        assert response.status_code == 200
-        st.success(f"Source {source_name} added")
-    except Exception:
-        st.warning(f"Please provide a valid {source_type}")
-        st.warning(response.text)
-
-
-def create_new_prompt(prompt: str, bot_id: str) -> None:
-    """Create a new prompt based on text from text area."""
-    try:
+    if source_type == "url":
+        st.write("uploading url")
         response = requests.put(
-            f"{BACKEND_URL}/{USERNAME}/bots/{bot_id}/prompt", json={"prompt": prompt}
+            f"{BACKEND_URL}/{USERNAME}/bots/{bot_id}/sources",
+            params={
+                "name": source_name,
+                "source_type": source_type,
+                "url": url,
+                "source_id": source_id,
+            },
         )
-        if response.status_code == 200:
-            st.success("Prompt created", icon="👍")
-        else:
-            raise Exception(f"error: {response.status_code} {response.text}")
-    except Exception as e:
-        st.warning(e)
+    else:
+        st.write("uploading file")
+        response = requests.put(
+            f"{BACKEND_URL}/{USERNAME}/bots/{bot_id}/sources",
+            params={
+                "name": source_name,
+                "source_type": source_type,
+                "source_id": source_id,
+            },
+            files={"file": file},  # type: ignore
+        )
+    return response
 
 
-def get_prompt(bot_id: str) -> str:
+@endpoint(success_message="Prompt updated", error_message="Error updating prompt")
+def create_new_prompt(prompt: str, bot_id: str) -> requests.Response:
+    """Create a new prompt based on text from text area."""
+    response = requests.put(
+        f"{BACKEND_URL}/{USERNAME}/bots/{bot_id}/prompt", json={"prompt": prompt}
+    )
+    return response
+
+
+@endpoint(error_message="Error getting prompt")
+def get_prompt(bot_id: str) -> requests.Response:
     """Get the current prompt of a bot.
 
     Returns:
         str: bot's prompt.
     """
-    prompt = requests.get(f"{BACKEND_URL}/{USERNAME}/bots/{bot_id}/prompt").json()[
-        "prompt"
-    ]
+    prompt = requests.get(f"{BACKEND_URL}/{USERNAME}/bots/{bot_id}/prompt")
 
     return prompt
 
 
-def get_conversations(bot_id: str) -> list[dict]:
+@endpoint(error_message="Error getting conversations")
+def get_conversations(bot_id: str) -> requests.Response:
     """Get a list of conversations involving given bot."""
     conversations = requests.get(
         f"{BACKEND_URL}/{USERNAME}/bots/{bot_id}/conversations"
-    ).json()
+    )
     return conversations
 
 
-def get_conversation(bot_id: str, conversation_id: str) -> dict | None:  # type: ignore
+@endpoint(error_message="Error getting conversation")
+def get_conversation(bot_id: str, conversation_id: str) -> requests.Response:  # type: ignore
     """Get a conversation by id."""
     response = requests.get(
         f"{BACKEND_URL}/{USERNAME}/bots/{bot_id}/conversations/{conversation_id}"
     )
-    if response.status_code == 200:
-        return response.json()
-    elif response.status_code == 404:
-        return None
-    else:
-        raise Exception(f"error: {response.status_code} {response.text}")
+    return response
 
 
-def get_bot(bot_id: str) -> dict:
+@endpoint(error_message="Error getting bot")
+def get_bot(bot_id: str) -> requests.Response:
     """Get a bot by id."""
-    bot = requests.get(f"{BACKEND_URL}/{USERNAME}/bots/{bot_id}").json()
+    bot = requests.get(f"{BACKEND_URL}/{USERNAME}/bots/{bot_id}")
     return bot
 
 
@@ -190,7 +201,8 @@ def send_message(bot_id: str, conversation_id: str, message: str) -> tuple[str, 
     return response["message"], response["conversation_id"]
 
 
-def get_available_tools(bot_id: str) -> list[dict]:
+@endpoint(error_message="Error loading available tools")
+def get_available_tools(bot_id: str) -> requests.Response:
     """Get a list of available tools for the selected bot.
 
     Returns:
@@ -198,74 +210,72 @@ def get_available_tools(bot_id: str) -> list[dict]:
     """
     tools = requests.get(
         f"{BACKEND_URL}/{USERNAME}/bots/{bot_id}/tools/available_tools"
-    ).json()
-
+    )
     return tools
 
 
+@endpoint(success_message="Tool updated", error_message="Error updating tool")
 def create_or_edit_tool(
     bot_id: str,
     tool_name: str,
     bot_description: str,
     user_variables: list,
     tool_id: Optional[str] = None,
-) -> None:
+    name_for_bot: Optional[str] = None,
+) -> requests.Response:
     """Create a new tool for the bot with a given name and user variabes."""
-    print(tool_id)
 
     response = requests.put(
         f"{BACKEND_URL}/{USERNAME}/bots/{bot_id}/tools",
         json={
             "id": tool_id,
             "name": tool_name,
-            "bot_description": bot_description,
+            "description_for_bot": bot_description,
             "user_variables": user_variables,
+            "name_for_bot": name_for_bot,
         },
     )
-    if response.status_code == 200:
-        st.success(f"Tool {tool_name} added")
-    else:
-        st.danger(f"error: {response.status_code} {response.text}")
+    return response
 
 
-def get_tools(bot_id: str) -> list[dict]:
+@endpoint(error_message="Error getting tools")
+def get_tools(bot_id: str) -> requests.Response:
     """Get a list of available tools for the selected bot.
 
     Returns:
         list[dict]: a list of created tools for the bot.
     """
-    tools = requests.get(f"{BACKEND_URL}/{USERNAME}/bots/{bot_id}/tools").json()
-
-    return tools
+    return requests.get(f"{BACKEND_URL}/{USERNAME}/bots/{bot_id}/tools")
 
 
-def delete_tool(bot_id: str, tool_id: str) -> None:
+@endpoint(success_message="Tool deleted", error_message="Error deleting tool")
+def delete_tool(bot_id: str, tool_id: str) -> requests.Response:
     """Delete a tool with a given id."""
-    requests.delete(f"{BACKEND_URL}/{USERNAME}/bots/{bot_id}/tools/{tool_id}")
+    return requests.delete(f"{BACKEND_URL}/{USERNAME}/bots/{bot_id}/tools/{tool_id}")
 
 
-def get_model(bot_id: str) -> str:
+@endpoint(error_message="Error getting model")
+def get_model(bot_id: str) -> requests.Response:
     """Get the current model of the bot."""
-    model = requests.get(f"{BACKEND_URL}/{USERNAME}/bots/{bot_id}/model").json()
-    return model
+    return requests.get(f"{BACKEND_URL}/{USERNAME}/bots/{bot_id}/model")
 
 
-def get_available_models(bot_id: str) -> list[dict]:
+@endpoint(error_message="Error getting available models")
+def get_available_models(bot_id: str) -> requests.Response:
     """Get a list of available models.
 
     Returns:
         list[dict]: a list of available models.
     """
-    models = requests.get(
+    return requests.get(
         f"{BACKEND_URL}/{USERNAME}/bots/{bot_id}/model/available_models"
-    ).json()
-
-    return models
+    )
 
 
-def change_model(bot_id: str, model: dict) -> None:
+@endpoint(error_message="Error changing model")
+def change_model(bot_id: str, model: dict) -> requests.Response:
     """Change the current model of the bot."""
-    requests.put(
+    return requests.put(
         f"{BACKEND_URL}/{USERNAME}/bots/{bot_id}/model",
         json=model,
     )

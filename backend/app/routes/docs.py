@@ -1,4 +1,5 @@
 """Routes for the docs."""
+
 import copy
 
 from app.app import app

@@ -6,14 +6,12 @@ import pytest
 from bson import ObjectId
 
 
-def test_create_bot(test_client) -> None:
+def test_create_bot(test_client, model_template) -> None:
     """Creates bot for testing."""
     global bot_id
     global username
     username = "test_user"
-    response = test_client.put(
-        f"/{username}/bots", json={"name": "test_bot", "username": username}
-    )
+    response = test_client.put(f"/{username}/bots", json=model_template)
     bot_id = response.json()["bot_id"]
 
 

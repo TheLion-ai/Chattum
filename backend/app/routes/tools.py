@@ -14,6 +14,7 @@ router = APIRouter(prefix="/{username}/bots/{bot_id}/tools", tags=["tools"])
 @router.get("/available_tools", response_model=list[pm.Tool])
 def get_available_tools(username: str) -> list[pm.Tool]:
     """Get available tools and their templates."""
+    print([t.template for t in available_tools])
     return [pm.Tool(**t.template) for t in available_tools]
 
 

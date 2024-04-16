@@ -1,5 +1,5 @@
 import requests
-from langchain.llms import HuggingFaceHub
+from langchain_community.llms import HuggingFaceHub
 
 from .base_model import LLMTemplate, UserVariable
 

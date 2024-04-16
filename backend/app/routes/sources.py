@@ -1,4 +1,5 @@
 """Create source endpoints."""
+
 import os
 from typing import Annotated, Optional, Union
 
@@ -72,8 +73,8 @@ def add_source(
         if source is None:
             raise HTTPException(status_code=404, detail="Source not found")
         source.name = name
-        source.bot_id = ObjectId(bot_id)
-        source.username = username
+        # source.bot_id = ObjectId(bot_id)
+        # source.username = username
         source.source_type = source_type
 
         database.sources.save(source)

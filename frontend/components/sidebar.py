@@ -43,25 +43,8 @@ def hide_sidebar() -> None:
 
 def sidebar_controller(state: str = None) -> None:
     """Show hidden or expanded sidebar depending on the state."""
-    st.markdown(
-        """
-    <style>
-        section[data-testid="stSidebar"] {
-            width: 244px !important; # Set the width to your desired value
-        }
-    </style>
-    """,
-        unsafe_allow_html=True,
-    )
-    if state is None:
-        state = st.session_state.get("sidebar_state", "Hidden")
 
-    if state == "Expanded":
-        render_expanded_sidebar()
-
-    elif state == "Hidden":
+    if "bot_id" not in st.query_params:
         render_hidden_sidebar()
     else:
-        raise Exception(
-            f"State {state} recognized should be one of the following : [Exapnded, Hidden]"
-        )
+        render_expanded_sidebar()

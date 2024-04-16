@@ -1,14 +1,18 @@
 """Tests for the chat endpoints."""
 
+import os
 
-def test_create_bot(test_client) -> None:
+from dotenv import load_dotenv
+
+load_dotenv()
+
+
+def test_create_bot(test_client, model_template) -> None:
     """Creates bot for testing."""
     global bot_id
     global username
     username = "test_user"
-    bot_id = test_client.put(
-        f"/{username}/bots", json={"name": "test_bot", "username": username}
-    ).json()["bot_id"]
+    bot_id = test_client.put(f"/{username}/bots", json=model_template).json()["bot_id"]
 
 
 def test_put_prompt(test_client) -> None:

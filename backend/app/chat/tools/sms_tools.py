@@ -13,8 +13,11 @@ from .base_tool import ToolTemplate, UserVariable
 class TwilloTool(ToolTemplate):
     """Tool for sending sms to a phone number using twillio."""
 
-    name: str = "Send sms tool"
-    user_description: str = "sent sms to a phone number."
+    name: str = "Send SMS Tool"
+    description: str = "sent sms to a phone number."
+
+    name_for_bot: str = "send_sms"
+    description_for_bot: str = "use this tool to sent data to a server."
 
     user_variables: list[UserVariable] = [
         UserVariable(name="account_sid", description="Account SID", form_type="text"),
@@ -47,10 +50,3 @@ class TwilloTool(ToolTemplate):
         """Run the tool."""
         self.twilio.run(kwargs["message"], kwargs["to_number"])
         return "message sent"
-
-    @property
-    def description(
-        self,
-    ) -> str:
-        """Return the tool description for llm."""
-        return "use this tool to sent sms to a phone number."

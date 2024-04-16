@@ -1,16 +1,17 @@
 """ChromaDB controller used for managing ChromaDB databases."""
+
 import os
 from typing import Optional
 
 from app.file_storage import FileStorage
-from langchain.document_loaders import (
+from langchain.schema import Document
+from langchain_community.document_loaders import (
     PyPDFLoader,
     UnstructuredExcelLoader,
     UnstructuredFileLoader,
 )
-from langchain.embeddings import OpenAIEmbeddings
-from langchain.schema import Document
-from langchain.vectorstores import Chroma
+from langchain_community.embeddings import OpenAIEmbeddings
+from langchain_community.vectorstores import Chroma
 from pydantic_models import Source
 
 

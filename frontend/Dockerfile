@@ -1,15 +1,21 @@
-FROM python:3.10-buster as base
+FROM python:3.10-buster as requirements-stage
+
+WORKDIR /tmp
+
+RUN pip install poetry==1.6.1
+
+COPY ./pyproject.toml ./poetry.lock* /tmp/
+
+RUN poetry export -f requirements.txt --output requirements.txt --without-hashes
+
+FROM python:3.10-buster
 
 WORKDIR /frontend
-RUN pip install poetry
 
-COPY pyproject.toml poetry.lock /frontend/
+COPY --from=requirements-stage /tmp/requirements.txt /frontend/requirements.txt
 
-RUN poetry export --without-hashes --format=requirements.txt > requirements.txt
-RUN pip install -r requirements.txt
-
+RUN pip install --no-cache-dir --upgrade -r /frontend/requirements.txt
 
 COPY . /frontend
 
-
-CMD streamlit run main.py
+CMD ["streamlit", "run", "🤖_bots.py"]

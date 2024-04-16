@@ -1,5 +1,7 @@
 """This module contains the SourcesGrid class which is used to display and select from available sources or create a new one."""
 
+from io import BytesIO
+
 import streamlit as st
 import streamlit.components.v1 as components
 from backend_controller import (
@@ -49,13 +51,14 @@ class SourcesGrid:
                     if source_type == "url":
                         url = st.text_input("URL")
                         source_file = None
+                    elif source_type == "txt":
+                        text = st.text_area("Text", key="text")
                     else:
                         source_file = st.file_uploader("File")
                         url = None
 
-                    st.session_state.disabled = source_name != ""  # or (
-                    #     source_type == "url" and url == ""
-                    # ) or (source_type != "url" and source_file is None)
+                    st.session_state.disabled = source_name != ""
+
                     submit = st.form_submit_button("Add", type="secondary")
                     if submit:
                         if source_name.replace(" ", "") == "" or (
@@ -72,11 +75,15 @@ class SourcesGrid:
                                     url=url,
                                 )
                             else:
+                                if source_type == "txt":
+                                    file = BytesIO(text.encode("utf-8"))
+                                else:
+                                    file = source_file.getvalue()  # type: ignore
                                 create_new_source(
                                     source_name,
                                     source_type,
                                     self.bot_id,
-                                    file=source_file.getvalue(),  # type: ignore
+                                    file=file,  # type: ignore
                                     url=None,
                                 )
                         self.sources = get_sources(self.bot_id)["sources"]
@@ -104,10 +111,29 @@ class SourcesGrid:
                         file_extension = "txt"
                     else:
                         file_extension = source["source_type"]
-                    st.download_button(
-                        "Download file",
-                        data=get_source_file(self.bot_id, source["id"]),
-                        file_name=f"{source['name']}.{file_extension}",
-                        mime=None,
-                        key=f"download_pdf_{source['id']}",
-                    )
+                    if source["source_type"] == "txt":
+                        text = get_source_file(self.bot_id, source["id"]).decode(
+                            "utf-8"
+                        )
+                        new_text = st.text_area("Text", text)
+                        if new_text != text:
+                            update_button = st.button(
+                                "Update", key=f"update_{source['id']}"
+                            )
+                            if update_button:
+                                file = BytesIO(new_text.encode("utf-8"))
+                                create_new_source(
+                                    source["name"],
+                                    source["source_type"],
+                                    self.bot_id,
+                                    file=file,
+                                    source_id=source["id"],
+                                )
+                    else:
+                        st.download_button(
+                            "Download file",
+                            data=get_source_file(self.bot_id, source["id"]),
+                            file_name=f"{source['name']}.{file_extension}",
+                            mime=None,
+                            key=f"download_pdf_{source['id']}",
+                        )

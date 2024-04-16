@@ -1,35 +1,96 @@
 """Chat engine."""
+
+import json
 from abc import ABC, abstractmethod
 from typing import Any, List
 
 from app.chat.prompts.templates import react_json
 from app.chat.prompts.templates.react import conversation_with_tools
-from langchain import ConversationChain, LLMChain, OpenAI
-from langchain.agents import AgentExecutor
+from langchain.agents import AgentExecutor, create_openai_tools_agent
 from langchain.agents.format_scratchpad import format_log_to_str
 from langchain.agents.output_parsers import (
     JSONAgentOutputParser,
     ReActSingleInputOutputParser,
 )
-from langchain.chat_models import ChatOpenAI
+from langchain.agents.output_parsers.tools import ToolAgentAction
+from langchain.chains import ConversationChain, LLMChain
 from langchain.llms.base import BaseLLM
 from langchain.memory import ConversationBufferMemory
 from langchain.memory.chat_memory import BaseChatMemory
 from langchain.memory.chat_message_histories.in_memory import ChatMessageHistory
-from langchain.prompts import (
+from langchain.schema import SystemMessage, messages_from_dict, messages_to_dict
+from langchain.tools.render import render_text_description
+from langchain_community.chat_models import ChatOpenAI
+from langchain_community.llms import OpenAI
+from langchain_core.messages import AIMessage, HumanMessage
+from langchain_core.prompts import (
     BasePromptTemplate,
     ChatPromptTemplate,
     HumanMessagePromptTemplate,
+    MessagesPlaceholder,
+    PromptTemplate,
     SystemMessagePromptTemplate,
 )
-from langchain.prompts.chat import PromptTemplate
-from langchain.schema import (
-    HumanMessage,
-    SystemMessage,
-    messages_from_dict,
-    messages_to_dict,
-)
-from langchain.tools.render import render_text_description
+
+
+class NewLangChainEngine:
+    def __init__(
+        self,
+        user_prompt: str,
+        llm: BaseLLM,
+        messages: list[dict] = [],
+        tools: list = [],
+    ) -> None:
+        self.llm = llm
+        self.prompt = self._create_prompt(user_prompt)
+        self.messages = self._load_memory(messages)
+        agent = create_openai_tools_agent(self.llm, tools, self.prompt)
+
+        self.agent_executor = AgentExecutor(
+            agent=agent, tools=tools, verbose=True, return_intermediate_steps=True
+        )
+
+    def _create_prompt(self, user_prompt: str) -> BasePromptTemplate:
+        return ChatPromptTemplate.from_messages(
+            [
+                (
+                    "system",
+                    user_prompt,
+                ),
+                MessagesPlaceholder(variable_name="messages"),
+                MessagesPlaceholder(variable_name="agent_scratchpad"),
+            ]
+        )
+
+    def _load_memory(self, messages: list[dict]) -> ConversationBufferMemory:
+        return messages_from_dict(messages)
+
+    def _get_tool_calls(self, response: dict) -> list[dict]:
+        tool_calls = []
+
+        for intermediate_step in response["intermediate_steps"]:
+            print(type(intermediate_step[0]))
+            if type(intermediate_step[0]) == ToolAgentAction:
+                tool_calls.append(
+                    {
+                        "name": intermediate_step[0].tool,
+                        "args": intermediate_step[0].tool_input,
+                        "id": intermediate_step[0].tool_call_id,
+                    }
+                )
+        return tool_calls
+
+    def chat(self, message: str) -> str:
+        self.messages.append(HumanMessage(content=message))
+        response = self.agent_executor.invoke({"messages": self.messages})
+        tool_calls = self._get_tool_calls(response)
+        self.messages.append(
+            AIMessage(content=response["output"], tool_calls=tool_calls)
+        )
+        return response["output"]
+
+    def export_messages(self) -> list[dict]:
+        return messages_to_dict(self.messages)
 
 
 class BaseChatEngine(ABC):

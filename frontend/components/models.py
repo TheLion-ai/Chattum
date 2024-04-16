@@ -92,4 +92,3 @@ class ModelPanel:
                 if submit_button:
                     change_model(self.bot_id, model)
                     pass
-                    st.rerun()

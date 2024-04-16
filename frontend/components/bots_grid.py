@@ -2,8 +2,7 @@
 
 import streamlit as st
 from backend_controller import create_new_bot, get_bots
-
-# from .utils import query_params
+from utils import query_params
 
 
 class BotsGrid:
@@ -20,8 +19,9 @@ class BotsGrid:
         self._display_bots(search_bar)
 
     def _select_bot(self, bot_id: str) -> None:
-        st.session_state.current_bot = bot_id
-        st.experimental_set_query_params(bot_id=bot_id)
+        st.session_state.bot_id = bot_id
+        st.session_state.sidebar_state = "Expanded"
+        st.query_params["bot_id"] = bot_id
 
     def _display_new_bot_card(self) -> None:
         col1, _, _ = st.columns(3)
@@ -53,12 +53,16 @@ class BotsGrid:
                     st.markdown(f"### {bot['name']}")
                     st.text(bot["prompt"])
                     st.form_submit_button(
-                        "Selected"
-                        if st.session_state.get("current_bot", None) == bot["id"]
-                        else "Select",
-                        type="primary"
-                        if st.session_state.get("current_bot", None) == bot["id"]
-                        else "secondary",
+                        (
+                            "Selected"
+                            if query_params.get_form_url("bot_id") == bot["id"]
+                            else "Select"
+                        ),
+                        type=(
+                            "primary"
+                            if query_params.get_form_url("bot_id") == bot["id"]
+                            else "secondary"
+                        ),
                         on_click=self._select_bot,
                         args=([bot["id"]]),
                     )

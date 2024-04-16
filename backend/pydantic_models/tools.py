@@ -1,4 +1,5 @@
 """Pydantic models for tools."""
+
 from typing import Any, Optional
 
 from bson import ObjectId
@@ -20,9 +21,10 @@ class Tool(BaseModel):
 
     id: ObjectIdField = None
     name: str
-    user_description: str = ""
-    bot_description: Optional[str] = None
+    description: str = ""
     user_variables: list[UserVariable] = []
+    description_for_bot: Optional[str] = None
+    name_for_bot: Optional[str] = None
 
     class Config:
         """The ObjectIdField creates an bson ObjectId value, so its necessary to setup the json encoding"."""

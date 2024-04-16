@@ -1,4 +1,5 @@
 """Tests for tools."""
+
 import json
 
 import requests
@@ -6,7 +7,7 @@ import requests
 tools_templates = {
     "Post Tool": {
         "User Variables": {
-            "url": "https://webhook.site/e0912999-b47d-4f48-8dd4-b68af0d42955",
+            "url": "",
             "body": """{
                     "username" : "{{username}}",
                     "favorite_color" : "{{favorite_color}}"
@@ -74,14 +75,12 @@ def delete_all_tools(test_client):
     assert bot_tools == []
 
 
-def test_create_bot(test_client) -> None:
+def test_create_bot(test_client, model_template) -> None:
     """Creates bot for testing."""
     global username
     global bot_id
     username = "test_user"
-    bot_id = test_client.put(
-        f"/{username}/bots", json={"name": "test_bot", "username": "test_user"}
-    ).json()["bot_id"]
+    bot_id = test_client.put(f"/{username}/bots", json=model_template).json()["bot_id"]
 
 
 def test_get_available_tools(test_client):
@@ -96,10 +95,15 @@ def test_get_available_tools(test_client):
 
 def test_post_tool(test_client):
     """Test the post tool."""
+
+    token_id = requests.post("https://webhook.site/token").json()["uuid"]
+    url = "https://webhook.site/" + token_id
+
+    tool_template = tools_templates["Post Tool"]
+    tool_template["User Variables"]["url"] = url
     common_tool_test(test_client, "Post Tool", tools_templates["Post Tool"])
 
     # Check if the request was sent to the server
-    token_id = "e0912999-b47d-4f48-8dd4-b68af0d42955"
     r = requests.get(
         "https://webhook.site/token/" + token_id + "/requests?sorting=newest"
     )

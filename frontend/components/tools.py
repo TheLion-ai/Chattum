@@ -1,4 +1,5 @@
 """Compontents for tools."""
+
 import streamlit as st
 from backend_controller import (
     create_or_edit_tool,
@@ -25,7 +26,7 @@ class ToolsPanel:
         self.tools = get_tools(self.bot_id)
         self.tools_dict = {tool["id"]: tool for tool in self.tools}
 
-        self._selected_tool_id = query_params.get_form_url("tool_id")
+        self._selected_tool_id = query_params.get_from_url_or_state("tool_id")
         self._selected_tool = self.tools_dict.get(self._selected_tool_id, None)
 
     def __call__(self) -> None:
@@ -61,9 +62,15 @@ class ToolsPanel:
     def _display_tool_form(self, tool: dict, key: str = "tool_form") -> None:
         """Display the tool form."""
         tool_variables = tool["user_variables"]
+        name_for_bot = st.text_input(
+            "Name of the tool for the bot",
+            value=tool.get("name_for_bot", ""),
+            key=f"{tool['id']}_name_for_bot",
+        )
+
         bot_description = st.text_input(
             "Description of the tool for the bot",
-            value=tool.get("bot_description", ""),
+            value=tool.get("description_for_bot", ""),
             key=f"{tool['id']}_bot_description",
         )
         with st.form(key=key):
@@ -91,6 +98,7 @@ class ToolsPanel:
                         bot_description,
                         tool_variables,
                         tool["id"],
+                        name_for_bot=name_for_bot,
                     )
                     st.rerun()
             with col2:

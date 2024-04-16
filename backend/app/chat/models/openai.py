@@ -1,5 +1,6 @@
 """OpenAI models."""
-from langchain.chat_models import ChatOpenAI
+
+from langchain_community.chat_models import ChatOpenAI
 
 from .base_model import LLMTemplate, UserVariable
 
@@ -16,8 +17,15 @@ class ChatOpenAIModel(LLMTemplate):
         UserVariable(
             name="model",
             description="name of the model",
-            form_type="text",
+            form_type="dropdown",
             default_value="gpt-3.5-turbo",
+            available_values=[
+                "gpt-4-turbo",
+                "gpt-4",
+                "gpt-4-32k",
+                "gpt-3.5-turbo",
+                "gpt-3.5-turbo-1106",
+            ],
         ),
         UserVariable(
             name="openai_api_key", description="your OpenAI API key", form_type="text"

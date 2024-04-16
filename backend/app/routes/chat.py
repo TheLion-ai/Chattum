@@ -2,7 +2,7 @@
 
 import pydantic_models as pm
 from app.app import chroma_controller, database
-from app.chat.chat_engine import ChatGPTEngine, GPTEngine, ReactEngine, ReactJsonEngine
+from app.chat.chat_engine import ChatGPTEngine, GPTEngine, NewLangChainEngine
 from app.chat.models import available_models_dict
 from app.chat.tools import available_tools_dict
 from app.chat.tools.document_search import SearchDocumentTool
@@ -28,7 +28,7 @@ def load_tools(bot_id: str) -> list[StructuredTool]:
     for tool in bot_tools:
         loaded_tools.append(
             available_tools_dict[tool.name](
-                tool.user_variables, tool.bot_description
+                tool.user_variables, tool.description_for_bot, tool.name_for_bot
             ).as_tool()
         )
     return loaded_tools
@@ -65,13 +65,16 @@ def chat(
         )
 
     if len(bot_tools) > 0 and llm.supports_tools:
-        chat_engine = ReactJsonEngine(
+        chat_engine = NewLangChainEngine(
             user_prompt=bot.prompt,
             messages=conversation.messages,
             tools=bot_tools,
             llm=llm.as_llm(),
         )
     else:
+        # chat_engine = GripTapeEngine(
+        #     user_prompt=bot.prompt, messages=conversation.messages, llm=llm.as_llm()
+        # )
         if llm.model_type == "llm":
             chat_engine = GPTEngine(
                 user_prompt=bot.prompt, messages=conversation.messages, llm=llm.as_llm()

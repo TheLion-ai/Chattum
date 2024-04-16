@@ -1,4 +1,5 @@
 """Tools for sending requests to a url."""
+
 import json
 
 import requests
@@ -12,8 +13,10 @@ class PostTool(ToolTemplate):
     """Tool for sending post request to a url."""
 
     name: str = "Post Tool"
-    user_description: str = "use this tool to sent data to a server."
-    bot_description: str = "use this tool to sent data to a server."
+    description: str = "use this tool to sent data to a server."
+
+    name_for_bot: str = "post"
+    description_for_bot: str = "use this tool to sent data to a server."
 
     user_variables: list[UserVariable] = [
         UserVariable(
@@ -32,11 +35,16 @@ class PostTool(ToolTemplate):
             **json.loads(self.compiler.whitespace_control(self.variables_dict["body"])),
         )
 
-    def __init__(self, user_variables: list[dict], bot_description: str = None) -> None:
+    def __init__(
+        self,
+        user_variables: list[dict] = [],
+        description_for_bot: str = None,
+        name_for_bot: str = None,
+    ) -> None:
         """Initialize the tool."""
-        super().__init__(user_variables, bot_description)
+        super().__init__(user_variables, description_for_bot, name_for_bot)
         self.compiler = Compiler()
-        self.bot_description = bot_description or self.bot_description
+        self.bot_description = description_for_bot or self.description_for_bot
         self.body_template = self.compiler.compile(self.variables_dict["body"])
 
     def run(self, **kwargs: dict) -> str:
@@ -45,17 +53,15 @@ class PostTool(ToolTemplate):
         response = requests.post(json=json_body, url=self.variables_dict["url"])
         return response.text
 
-    @property
-    def description(self) -> str:
-        """Return the tool description for llm."""
-        return "use this tool to sent data to a server."
-
 
 class GetTool(ToolTemplate):
     """Tool for getting data from a url."""
 
     name: str = "Get Tool"
-    user_description: str = "use this tool to get data to a server."
+    description: str = "use this tool to get data to a server."
+
+    name_for_bot: str = "get"
+    description_for_bot: str = "use this tool to get data to a server."
 
     user_variables: list[UserVariable] = [
         UserVariable(
@@ -66,8 +72,6 @@ class GetTool(ToolTemplate):
         ),
     ]
 
-    bot_description: str = "use this tool to get data to a server."
-
     @property
     def args_schema(self) -> BaseModel:
         """Return the args schema for langchain."""
@@ -76,9 +80,14 @@ class GetTool(ToolTemplate):
             **json.loads(self.compiler.whitespace_control(self.variables_dict["body"])),
         )
 
-    def __init__(self, user_variables: list[dict], bot_description: str = None) -> None:
+    def __init__(
+        self,
+        user_variables: list[dict] = [],
+        description_for_bot: str = None,
+        name_for_bot: str = None,
+    ) -> None:
         """Initialize the tool."""
-        super().__init__(user_variables, bot_description)
+        super().__init__(user_variables, description_for_bot, name_for_bot)
         self.compiler = Compiler()
         self.body_template = self.compiler.compile(self.variables_dict["body"])
 

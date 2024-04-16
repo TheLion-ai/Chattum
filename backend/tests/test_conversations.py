@@ -1,17 +1,16 @@
 """Test conversations endpoints."""
+
 import pytest
 from langchain.memory import ChatMessageHistory
 from langchain.schema import messages_to_dict
 
 
-def test_create_bot(test_client) -> None:
+def test_create_bot(test_client, model_template) -> None:
     """Set up the test client."""
     global username
     global bot_id
     username = "test_user"
-    bot_id = test_client.put(
-        "/{username}/bots", json={"name": "test_bot", "username": "test_user"}
-    ).json()["bot_id"]
+    bot_id = test_client.put("/{username}/bots", json=model_template).json()["bot_id"]
 
 
 def test_put_and_get(test_client) -> None:
