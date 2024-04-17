@@ -29,6 +29,8 @@ services:
       - deploy_network
     volumes:
       - ./frontend:/frontend
+    env_file:
+      - .env
   mongo:
     image: mongo
     restart: always

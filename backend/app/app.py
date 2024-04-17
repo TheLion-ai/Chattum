@@ -1,12 +1,13 @@
 # mypy: ignore-errors
 """create app instance."""
+import logging
 from contextlib import asynccontextmanager
 
 from app.chroma import ChromaController
 from app.database import Database, get_mongo_client
 from app.file_storage import FileStorage, get_s3_client
 from app.logger import init_logger
-from fastapi import FastAPI
+from fastapi import FastAPI, Request, Response
 
 database = Database()
 file_storage = FileStorage()
@@ -37,4 +38,26 @@ async def lifespan(app: FastAPI) -> None:
 
 
 app = FastAPI(lifespan=lifespan, docs_url=None)
-init_logger(app)
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
+
+
+@app.middleware("http")
+async def api_logging(request: Request, call_next):
+    response = await call_next(request)
+
+    response_body = b""
+    async for chunk in response.body_iterator:
+        response_body += chunk
+    log_message = {
+        "host": request.url.hostname,
+        "endpoint": request.url.path,
+        "response": response_body.decode(),
+    }
+    logger.debug(log_message)
+    return Response(
+        content=response_body,
+        status_code=response.status_code,
+        headers=dict(response.headers),
+        media_type=response.media_type,
+    )

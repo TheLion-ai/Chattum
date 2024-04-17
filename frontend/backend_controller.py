@@ -15,14 +15,17 @@ def endpoint(
         def wrapped(*args: list, **kwargs: dict) -> dict | list | None:
             try:
                 response = f(*args, **kwargs)
-                assert response.status_code == 200
+                if not response.status_code == 200:
+                    raise Exception(response.json())
                 if success_message:
                     st.toast(success_message, icon="✅")
                 return response.json()
             except Exception as e:
                 print(e)
-                if error_message:
-                    st.toast(error_message, icon="❌")
+                error_message = error_message or "Error"  # noqa: F823
+                if "response" in locals():
+                    error_message += f": {response.json()}"
+                st.toast(error_message, icon="❌")
                 return None
 
         return wrapped
