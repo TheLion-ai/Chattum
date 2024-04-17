@@ -1,6 +1,7 @@
 """This module contains the sidebar controller class which is used to control the sidebar stat."""
 
 import streamlit as st
+from streamlit_extras.app_logo import add_logo
 
 st.session_state.sidebar_state = "Hidden"
 
@@ -25,7 +26,15 @@ def render_expanded_sidebar() -> None:
         <style>
         [data-testid="stSidebar"]{
             visibility: visible;
+
         }
+        [data-testid="stSidebarNav"] {
+            background-image: url(https://i.ibb.co/8PswYTB/Chattum-600x600.png);
+            background-repeat: no-repeat;
+            background-position: 30px 10px;
+            background-size: 220px;
+            }
+        </style>
         """,
         unsafe_allow_html=True,
     )

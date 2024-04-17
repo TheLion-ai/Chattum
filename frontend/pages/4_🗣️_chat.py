@@ -16,10 +16,7 @@ sidebar_controller()
 
 if "conversation_id" not in st.session_state:
     st.session_state.conversation_id = ObjectId()
-
-st.session_state["conversation"] = get_conversation(
-    bot_id, st.session_state.conversation_id
-)
+    st.session_state["conversation"] = []
 
 col_1, col_2 = st.columns([4, 2])
 with col_1:
@@ -30,9 +27,7 @@ with col_2:
     )
     if clear_button:
         st.session_state.conversation_id = ObjectId()
-        st.session_state["conversation"] = get_conversation(
-            bot_id, st.session_state.conversation_id
-        )
+        st.session_state["conversation"] = []
 
 chat_history_container = st.container()
 input_container = st.container()
@@ -48,15 +43,20 @@ with input_container:
         input_container.empty()
         chat_history_container.empty()
         with st.spinner("Thinking..."):
-            response, conversation_id = send_message(
+            response = send_message(
                 bot_id,
                 st.session_state.conversation_id,
                 user_input,
             )
-            st.session_state.conversation_id = conversation_id
-            st.session_state["conversation"] = get_conversation(
-                bot_id, st.session_state.conversation_id
-            )
+            if response is not None:
+                message, conversation_id = (
+                    response["message"],
+                    response["conversation_id"],
+                )
+                st.session_state.conversation_id = conversation_id
+                st.session_state["conversation"] = get_conversation(
+                    bot_id, st.session_state.conversation_id
+                )
 
 if st.session_state["conversation"]:
     with chat_history_container:

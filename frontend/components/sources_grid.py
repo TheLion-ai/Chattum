@@ -43,7 +43,7 @@ class SourcesGrid:
         """Display a card for creating new sources."""
         with st.container():
             with st.expander("Add new source", expanded=False):
-                source_type = st.selectbox("File", ["pdf", "url", "pdf", "xls", "txt"])
+                source_type = st.selectbox("File", ["url", "pdf", "xls", "txt"])
                 with st.form(clear_on_submit=True, key="File submit"):
                     source_name = st.text_input(
                         "Name",

@@ -1,5 +1,6 @@
 """Create source endpoints."""
 
+import logging
 import os
 from typing import Annotated, Optional, Union
 
@@ -58,6 +59,16 @@ def add_source(
     if bot is None:
         raise HTTPException(status_code=404, detail="Bot not found")
 
+    if file is not None:
+        file_storage.upload_source(file, source_id, source_type, bot_id)
+    if url is not None:
+        try:
+            file = scrape(url)
+        except Exception as e:
+            logging.error(e)
+            raise HTTPException(status_code=400, detail="Error scraping url")
+        file_storage.upload_source(file, source_id, source_type, bot_id)
+
     if source_id is None:
         source = pm.Source(
             name=name,
@@ -81,12 +92,6 @@ def add_source(
     if source_id not in bot.sources:
         bot.sources.append(source_id)
         database.bots.save(bot)
-
-    if file is not None:
-        file_storage.upload_source(file, source_id, source_type, bot_id)
-    if url is not None:
-        file = scrape(url)
-        file_storage.upload_source(file, source_id, source_type, bot_id)
 
     chroma_controller.update_source(bot_id, source)
     return pm.CreateSourceResponse(

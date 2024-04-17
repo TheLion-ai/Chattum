@@ -22,7 +22,7 @@ def endpoint(
                 return response.json()
             except Exception as e:
                 print(e)
-                error_message = error_message or "Error"  # noqa: F823
+                error_message = "Error"  # noqa: F823
                 if "response" in locals():
                     error_message += f": {response.json()}"
                 st.toast(error_message, icon="❌")
@@ -51,7 +51,7 @@ def create_new_bot(bot_name: str) -> requests.Response:
         bot_name (str): a name for a new bot
     """
     response = requests.put(
-        f"{BACKEND_URL}/{USERNAME}/bots",
+        f"{BACKEND_URL}/{USERNAME}/bots/",
         json={"name": bot_name, "username": USERNAME},
     )
     return response
@@ -124,10 +124,10 @@ def create_new_source(
     Args:
         source_name (str): a name for a new source for the bot
     """
+    # st.write(file)
     if source_type == "url":
-        st.write("uploading url")
         response = requests.put(
-            f"{BACKEND_URL}/{USERNAME}/bots/{bot_id}/sources",
+            f"{BACKEND_URL}/{USERNAME}/bots/{bot_id}/sources/",
             params={
                 "name": source_name,
                 "source_type": source_type,
@@ -136,9 +136,8 @@ def create_new_source(
             },
         )
     else:
-        st.write("uploading file")
         response = requests.put(
-            f"{BACKEND_URL}/{USERNAME}/bots/{bot_id}/sources",
+            f"{BACKEND_URL}/{USERNAME}/bots/{bot_id}/sources/",
             params={
                 "name": source_name,
                 "source_type": source_type,
@@ -153,7 +152,7 @@ def create_new_source(
 def create_new_prompt(prompt: str, bot_id: str) -> requests.Response:
     """Create a new prompt based on text from text area."""
     response = requests.put(
-        f"{BACKEND_URL}/{USERNAME}/bots/{bot_id}/prompt", json={"prompt": prompt}
+        f"{BACKEND_URL}/{USERNAME}/bots/{bot_id}/prompt/", json={"prompt": prompt}
     )
     return response
 
@@ -195,13 +194,13 @@ def get_bot(bot_id: str) -> requests.Response:
     return bot
 
 
-def send_message(bot_id: str, conversation_id: str, message: str) -> tuple[str, str]:
+@endpoint(error_message="Error in conversation")
+def send_message(bot_id: str, conversation_id: str, message: str) -> requests.Response:
     """Send a message to a bot and get a response."""
-    response = requests.post(
+    return requests.post(
         f"{BACKEND_URL}/{USERNAME}/bots/{bot_id}/chat",
         json={"message": message, "conversation_id": str(conversation_id)},
-    ).json()
-    return response["message"], response["conversation_id"]
+    )
 
 
 @endpoint(error_message="Error loading available tools")
@@ -229,7 +228,7 @@ def create_or_edit_tool(
     """Create a new tool for the bot with a given name and user variabes."""
 
     response = requests.put(
-        f"{BACKEND_URL}/{USERNAME}/bots/{bot_id}/tools",
+        f"{BACKEND_URL}/{USERNAME}/bots/{bot_id}/tools/",
         json={
             "id": tool_id,
             "name": tool_name,
@@ -279,6 +278,6 @@ def get_available_models(bot_id: str) -> requests.Response:
 def change_model(bot_id: str, model: dict) -> requests.Response:
     """Change the current model of the bot."""
     return requests.put(
-        f"{BACKEND_URL}/{USERNAME}/bots/{bot_id}/model",
+        f"{BACKEND_URL}/{USERNAME}/bots/{bot_id}/model/",
         json=model,
     )

@@ -1,6 +1,10 @@
 [theme]
-primaryColor="#49E8FF"
-backgroundColor="#000000"
-secondaryBackgroundColor="#111111"
-textColor="#FFFFFF"
-font="sans serif"
+primaryColor="#2993fa"
+backgroundColor="#ffffff"
+secondaryBackgroundColor="#f3f4f8"
+textColor="#2B2D38"
+[browser]
+gatherUsageStats = false
+[server]
+enableXsrfProtection = false
+enableCORS = false

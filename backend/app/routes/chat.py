@@ -13,7 +13,7 @@ from app.routes.conversations import (
     put_conversations,
 )
 from bson import ObjectId
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 from langchain.tools import StructuredTool
 
 router = APIRouter(prefix="/{username}/bots/{bot_id}/chat", tags=["chat"])
@@ -53,7 +53,11 @@ def chat(
 
     else:
         conversation = pm.Conversation(bot_id=bot_id, messages=[])
-
+    if bot.model is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Bot model not found. Select a model in the bot settings.",
+        )
     llm = available_models_dict[bot.model.name](bot.model.user_variables)
 
     bot_database = chroma_controller.get_database(bot_id)

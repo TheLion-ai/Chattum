@@ -30,8 +30,8 @@ def put_tool(new_tool: pm.Tool, username: str, bot_id: str) -> pm.MessageRespons
         tool = database.tools.find_one_by_id(ObjectId(new_tool.id))
         if tool is None:
             raise HTTPException(status_code=404, detail="Tool not found")
-        tool.name = new_tool.name
-        tool.bot_description = new_tool.bot_description
+        tool.name_for_bot = new_tool.name_for_bot
+        tool.description_for_bot = new_tool.description_for_bot
         tool.user_variables = new_tool.user_variables
         database.tools.save(tool)
     return pm.MessageResponse(message="Tool updated successfully!")
