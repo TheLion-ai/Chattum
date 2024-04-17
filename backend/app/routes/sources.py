@@ -80,6 +80,9 @@ def add_source(
     if source_id not in bot.sources:
         bot.sources.append(source_id)
 
+    database.sources.save(source)
+    database.bots.save(bot)
+
     if file is not None:
         logging.info("Uploading source file with id %s", source_id)
         file_storage.upload_source(file, source_id, source_type, bot_id)
@@ -90,9 +93,6 @@ def add_source(
             logging.error(e)
             raise HTTPException(status_code=400, detail="Error scraping url")
         file_storage.upload_source(file, source_id, source_type, bot_id)
-
-    database.sources.save(source)
-    database.bots.save(bot)
 
     chroma_controller.update_source(bot_id, source)
     return pm.CreateSourceResponse(
