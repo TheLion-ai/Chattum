@@ -59,16 +59,6 @@ def add_source(
     if bot is None:
         raise HTTPException(status_code=404, detail="Bot not found")
 
-    if file is not None:
-        file_storage.upload_source(file, source_id, source_type, bot_id)
-    if url is not None:
-        try:
-            file = scrape(url)
-        except Exception as e:
-            logging.error(e)
-            raise HTTPException(status_code=400, detail="Error scraping url")
-        file_storage.upload_source(file, source_id, source_type, bot_id)
-
     if source_id is None:
         source = pm.Source(
             name=name,
@@ -77,7 +67,6 @@ def add_source(
             source_type=source_type,
         )
 
-        database.sources.save(source)
         source_id = source.id
     else:
         source = database.sources.find_one_by_id(ObjectId(source_id))
@@ -88,10 +77,22 @@ def add_source(
         # source.username = username
         source.source_type = source_type
 
-        database.sources.save(source)
     if source_id not in bot.sources:
         bot.sources.append(source_id)
-        database.bots.save(bot)
+
+    if file is not None:
+        logging.info("Uploading source file with id %s", source_id)
+        file_storage.upload_source(file, source_id, source_type, bot_id)
+    if url is not None:
+        try:
+            file = scrape(url)
+        except Exception as e:
+            logging.error(e)
+            raise HTTPException(status_code=400, detail="Error scraping url")
+        file_storage.upload_source(file, source_id, source_type, bot_id)
+
+    database.sources.save(source)
+    database.bots.save(bot)
 
     chroma_controller.update_source(bot_id, source)
     return pm.CreateSourceResponse(
