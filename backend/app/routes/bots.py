@@ -10,7 +10,7 @@ from fastapi import APIRouter, HTTPException
 router = APIRouter(prefix="/{username}/bots", tags=["bots"])
 
 
-@router.get("/", response_model=list[pm.Bot])
+@router.get("", response_model=list[pm.Bot])
 def bots_get(username: str) -> list[pm.Bot]:
     """Get bots by username."""
     user_bots = list(database.bots.find_by({"username": username}))
@@ -18,7 +18,7 @@ def bots_get(username: str) -> list[pm.Bot]:
     return user_bots
 
 
-@router.put("/", response_model=pm.CreateBotResponse)
+@router.put("", response_model=pm.CreateBotResponse)
 def bots_put(bot: pm.Bot, username: str) -> pm.CreateBotResponse:
     """Create a bot with the given name and username."""
     database.bots.save(bot)

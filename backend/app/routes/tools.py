@@ -18,7 +18,7 @@ def get_available_tools(username: str) -> list[pm.Tool]:
     return [pm.Tool(**t.template) for t in available_tools]
 
 
-@router.put("/", response_model=pm.MessageResponse)
+@router.put("", response_model=pm.MessageResponse)
 def put_tool(new_tool: pm.Tool, username: str, bot_id: str) -> pm.MessageResponse:
     """Create a tool with the given name and username."""
     bot = database.bots.find_one_by_id(ObjectId(bot_id))
@@ -37,7 +37,7 @@ def put_tool(new_tool: pm.Tool, username: str, bot_id: str) -> pm.MessageRespons
     return pm.MessageResponse(message="Tool updated successfully!")
 
 
-@router.get("/", response_model=list[pm.Tool])
+@router.get("", response_model=list[pm.Tool])
 def get_tools(username: str, bot_id: str) -> list[pm.Tool]:
     """Get tools by username."""
     bot = database.bots.find_one_by_id(ObjectId(bot_id))
