@@ -44,6 +44,7 @@ logger = logging.getLogger(__name__)
 
 @app.middleware("http")
 async def api_logging(request: Request, call_next):
+    request_body = await request.body()
     response = await call_next(request)
 
     response_body = b""
@@ -53,6 +54,11 @@ async def api_logging(request: Request, call_next):
         "host": request.url.hostname,
         "endpoint": request.url.path,
         "response": response_body.decode(),
+        "status_code": response.status_code,
+        "method": request.method,
+        "query_params": request.query_params,
+        "headers": dict(request.headers),
+        "request_body": request_body.decode(),
     }
     logger.debug(log_message)
     return Response(
