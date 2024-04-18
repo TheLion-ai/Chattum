@@ -19,6 +19,7 @@ streamlit-option-menu = "^0.3.6"
 streamlit-modal = "^0.1.0"
 streamlit-ace = "^0.1.1"
 validators = "^0.28.0"
+streamlit-date-picker = "^0.0.2b6"
 
 
 [build-system]

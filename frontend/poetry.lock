@@ -2362,6 +2362,20 @@ files = [
 streamlit = ">=0.63"
 
 [[package]]
+name = "streamlit-date-picker"
+version = "0.0.2b6"
+description = "this is date picker for streamlit"
+optional = false
+python-versions = ">=3.10"
+files = [
+    {file = "streamlit-date-picker-0.0.2b6.tar.gz", hash = "sha256:0511ff54fc2277ca5bfeb0a5f21f8140a6cf81ef4426a3ed9903f64c80d9aeec"},
+    {file = "streamlit_date_picker-0.0.2b6-py3-none-any.whl", hash = "sha256:325120f16e793e5ce4d5edc6d2696715c956012ec61ff46832be0cc380e44173"},
+]
+
+[package.dependencies]
+streamlit = ">=1.27.0"
+
+[[package]]
 name = "streamlit-embedcode"
 version = "0.1.2"
 description = "Streamlit component for embedded code snippets"
@@ -2789,4 +2803,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "2e7163e28a360c1059b2974a43684527568dbfa0d2c4983b8a253c6eac1bee63"
+content-hash = "c70d27f3261dfd2163acc21db01fb200eeffc9d66210bd171c2a9c14220422fd"
