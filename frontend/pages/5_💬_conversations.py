@@ -13,6 +13,11 @@ from streamlit_date_picker import PickerType, Unit, date_picker, date_range_pick
 from utils import query_params
 from utils.page_config import ensure_bot_selected
 
+st.set_page_config(
+    page_title="Conversations | Chattum",
+    page_icon="💬",
+)
+
 bot_id = query_params.get_from_url_or_state("bot_id")
 conversation_id = query_params.get_from_url_or_state("conversation_id")
 timezone = pytz.timezone("Europe/Warsaw")

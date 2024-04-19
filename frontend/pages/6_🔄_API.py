@@ -1,10 +1,16 @@
 """Api for communication with the bot with the frontend."""
 
+import streamlit as st
 import streamlit.components.v1 as components
 from components.sidebar import sidebar_controller
 from constants import EXTERNAL_BACKEND_URL, USERNAME
 from utils import query_params
 from utils.page_config import ensure_bot_selected
+
+st.set_page_config(
+    page_title="API | Chattum",
+    page_icon="🔄",
+)
 
 bot_id = query_params.get_from_url_or_state("bot_id")
 
