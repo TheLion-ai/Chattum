@@ -16,6 +16,7 @@ from utils.page_config import ensure_bot_selected
 st.set_page_config(
     page_title="Conversations | Chattum",
     page_icon="💬",
+    layout="wide",
 )
 
 bot_id = query_params.get_from_url_or_state("bot_id")

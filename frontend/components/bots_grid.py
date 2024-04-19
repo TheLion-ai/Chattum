@@ -51,7 +51,8 @@ class BotsGrid:
                 with st.form(key=f"bot-{idx}"):
                     # with st.expander(bot["name"], expanded=True):
                     st.markdown(f"### {bot['name']}")
-                    st.text(bot["prompt"])
+                    if bot["prompt"] is not None and bot["prompt"] != "":
+                        st.text(bot["prompt"][:300] + "...")
                     st.form_submit_button(
                         (
                             "Selected"
