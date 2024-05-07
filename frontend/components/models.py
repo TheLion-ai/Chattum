@@ -76,6 +76,19 @@ class ModelPanel:
                     user_variable["value"] = st.text_input(
                         user_variable["name"], value=value, label_visibility="collapsed"
                     )
+                elif user_variable["form_type"] == "secret":
+                    st.write("Secret")
+                    value = (
+                        user_variable.get("value")
+                        or user_variable.get("default_value")
+                        or ""
+                    )
+                    user_variable["value"] = st.text_input(
+                        user_variable["name"],
+                        value=value,
+                        label_visibility="collapsed",
+                        type="password",
+                    )
                 elif user_variable["form_type"] == "float":
                     value = user_variable.get("value")
                     if value is None:

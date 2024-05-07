@@ -107,15 +107,15 @@ class SourcesGrid:
                         st.experimental_rerun()
                     st.write(f"ID: {source['id']}")
                     st.write(f"Type: {source['source_type']}")
-                    if source["source_type"] == "url":
-                        file_extension = "txt"
-                    else:
-                        file_extension = source["source_type"]
-                    if source["source_type"] == "txt":
+
+                    file_extension = source["source_type"]
+                    if source["source_type"] == "txt" or source["source_type"] == "url":
                         text = get_source_file(self.bot_id, source["id"]).decode(
                             "utf-8"
                         )
-                        new_text = st.text_area("Text", text)
+                        new_text = st.text_area(
+                            "Text", text, key=f"text_{source['id']}"
+                        )
                         if new_text != text:
                             update_button = st.button(
                                 "Update", key=f"update_{source['id']}"

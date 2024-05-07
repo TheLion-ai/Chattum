@@ -28,7 +28,7 @@ class ChatOpenAIModel(LLMTemplate):
             ],
         ),
         UserVariable(
-            name="openai_api_key", description="your OpenAI API key", form_type="text"
+            name="openai_api_key", description="your OpenAI API key", form_type="secret"
         ),
         # UserVariable(name="stream", description="???", form_type="text"),
         # UserVariable(name="n", description="???", form_type="text"),

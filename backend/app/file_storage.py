@@ -1,4 +1,5 @@
 """Module for storing files using s3 compatible storage."""
+
 # mypy: ignore-errors
 import os
 import tempfile
@@ -22,6 +23,7 @@ class FileStorage:
         self, file: bytes, id: str, source_type: str, bot_id: str
     ) -> None:
         """Upload a source file to the storage."""
+        source_type = source_type if source_type != "url" else "txt"
         self.client.put_object(
             Bucket=self.bucket_name,
             Key=f"sources/{bot_id}/{id}.{source_type}",
@@ -30,6 +32,7 @@ class FileStorage:
 
     def download_source(self, id: str, source_type: str, bot_id: str) -> str:
         """Get a source file from the storage."""
+        source_type = source_type if source_type != "url" else "txt"
         fd, path = tempfile.mkstemp(suffix=f".{source_type}")
         with os.fdopen(fd, "wb") as tmp:
             self.client.download_fileobj(
@@ -39,6 +42,7 @@ class FileStorage:
 
     def delete_source(self, id: str, source_type: str, bot_id: str) -> None:
         """Delete a source file from the storage."""
+        source_type = source_type if source_type != "url" else "txt"
         self.client.delete_object(
             Bucket=self.bucket_name,
             Key=f"sources/{bot_id}/{id}.{source_type}",

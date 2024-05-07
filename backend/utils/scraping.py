@@ -1,5 +1,6 @@
 """Utility functions for scraping articles from the web."""
 
+from langchain_community.document_loaders import WebBaseLoader
 from newspaper import Article
 
 
@@ -13,7 +14,6 @@ def scrape(url: str) -> str:
     Returns:
         str: text of the article
     """
-    article = Article(url)
-    article.download()
-    article.parse()
-    return article.text.encode("utf-8")
+    loader = WebBaseLoader(url)
+    data = loader.load()
+    return data[0].page_content
