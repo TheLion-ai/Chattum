@@ -29,7 +29,7 @@ def render_expanded_sidebar() -> None:
 
         }
         [data-testid="stSidebarNav"] {
-            background-image: url(https://i.ibb.co/8PswYTB/Chattum-600x600.png);
+            background-image: url(https://i.ibb.co/vQN1gfp/logo.png);
             background-repeat: no-repeat;
             background-position: 30px 10px;
             background-size: 220px;

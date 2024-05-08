@@ -83,7 +83,9 @@ class ToolsPanel:
                 elif user_variable["form_type"] == "editor":
                     st.write(user_variable["name"])
                     user_variable["value"] = st_ace(
-                        language="handlebars", value=user_variable.get("value", "")
+                        language="handlebars",
+                        value=user_variable.get("value", ""),
+                        theme="twilight",
                     )
             col1, _, col2 = st.columns([2, 3, 2])
             with col1:

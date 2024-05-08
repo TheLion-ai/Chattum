@@ -1,8 +1,9 @@
 [theme]
-primaryColor="#2993fa"
-backgroundColor="#ffffff"
-secondaryBackgroundColor="#f3f4f8"
-textColor="#2B2D38"
+primaryColor="#8be9fd"
+backgroundColor="#0E0D11"
+secondaryBackgroundColor="#131317"
+textColor="#FFF"
+font="sans serif"
 [browser]
 gatherUsageStats = false
 [server]
