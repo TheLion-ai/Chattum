@@ -11,7 +11,7 @@ from components.sidebar import sidebar_controller
 from streamlit_chat import message
 from streamlit_date_picker import PickerType, Unit, date_picker, date_range_picker
 from utils import query_params
-from utils.page_config import ensure_bot_selected
+from utils.page_config import ensure_bot_or_workflow_selected
 
 st.set_page_config(
     page_title="Conversations | Chattum",
@@ -23,7 +23,7 @@ bot_id = query_params.get_from_url_or_state("bot_id")
 conversation_id = query_params.get_from_url_or_state("conversation_id")
 timezone = pytz.timezone("Europe/Warsaw")
 
-ensure_bot_selected()
+ensure_bot_or_workflow_selected()
 sidebar_controller()
 
 

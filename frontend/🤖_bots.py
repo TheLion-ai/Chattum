@@ -9,6 +9,7 @@ from utils import query_params, set_streamlit_page_config_once
 set_streamlit_page_config_once()
 current_bot = query_params.get_form_url("bot_id")
 
+
 # pages = {
 #     "Settings": {
 #         "icon": "gear",

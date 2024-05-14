@@ -24,6 +24,12 @@ class CreateBotResponse(BaseModel):
     bot_id: str
 
 
+class CreateWorkflowResponse(BaseModel):
+    """Response model for the create workflow endpoint."""
+
+    message: str
+    workflow_id: str
+
 class PromptResponse(BaseModel):
     """Response model for the create prompt endpoint."""
 

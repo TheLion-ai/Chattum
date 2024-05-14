@@ -21,6 +21,8 @@ def get_available_models() -> list[pm.LLM]:
 def get_model(bot_id: str) -> Optional[pm.LLM]:
     """Get model by username."""
     bot = database.bots.find_one_by_id(ObjectId(bot_id))
+    if bot.model is None:
+        bot = database.workflows.find_one_by_id(ObjectId(bot_id))
     return bot.model
 
 

@@ -43,6 +43,16 @@ def get_bots() -> requests.Response:
     return requests.get(f"{BACKEND_URL}/{USERNAME}/bots")
 
 
+@endpoint(error_message="Error getting workflows")
+def get_workflows() -> requests.Response:
+    """Get a list of available workflows.
+
+    Returns:
+        list[dict]: a list of created workflows.
+    """
+    return requests.get(f"{BACKEND_URL}/{USERNAME}/workflows")
+
+
 @endpoint(success_message="Bot created", error_message="Error creating bot")
 def create_new_bot(bot_name: str) -> requests.Response:
     """Create a new bot with a given name.
@@ -53,6 +63,22 @@ def create_new_bot(bot_name: str) -> requests.Response:
     response = requests.put(
         f"{BACKEND_URL}/{USERNAME}/bots",
         json={"name": bot_name, "username": USERNAME},
+    )
+    return response
+
+
+@endpoint(success_message="Workflow created", error_message="Error creating workflow")
+def create_new_workflow(workflow_name: str, workflow_task: str, workflow_classes: list[str]) -> requests.Response:
+    """Create a new workflow with a given name and task.
+
+    Args:
+        workflow_name (str): a name for a new workflow
+        workflow_task (str): a task for the new workflow
+        workflow_classes (list[str]): a list of classes for the new workflow
+    """
+    response = requests.put(
+        f"{BACKEND_URL}/{USERNAME}/workflows",
+        json={"name": workflow_name, "task": workflow_task, "username": USERNAME, "classes": workflow_classes}
     )
     return response
 
@@ -191,8 +217,13 @@ def get_conversation(bot_id: str, conversation_id: str) -> requests.Response:  #
 @endpoint(error_message="Error getting bot")
 def get_bot(bot_id: str) -> requests.Response:
     """Get a bot by id."""
-    bot = requests.get(f"{BACKEND_URL}/{USERNAME}/bots/{bot_id}")
-    return bot
+    return requests.get(f"{BACKEND_URL}/{USERNAME}/bots/{bot_id}")
+
+
+@endpoint(error_message="Error getting workflow")
+def get_workflow(workflow_id: str) -> requests.Response:
+    """Get a workflow by id."""
+    return requests.get(f"{BACKEND_URL}/{USERNAME}/workflows/{workflow_id}")
 
 
 @endpoint(error_message="Error in conversation")
@@ -259,7 +290,7 @@ def delete_tool(bot_id: str, tool_id: str) -> requests.Response:
 
 @endpoint(error_message="Error getting model")
 def get_model(bot_id: str) -> requests.Response:
-    """Get the current model of the bot."""
+    """Get the current model of the bot or workflow."""
     return requests.get(f"{BACKEND_URL}/{USERNAME}/bots/{bot_id}/model")
 
 
@@ -281,4 +312,19 @@ def change_model(bot_id: str, model: dict) -> requests.Response:
     return requests.put(
         f"{BACKEND_URL}/{USERNAME}/bots/{bot_id}/model",
         json=model,
+    )
+
+@endpoint(error_message="Error getting workflow")
+def get_workflow(workflow_id: str) -> requests.Response:
+    """Get a workflow by id."""
+    return requests.get(f"{BACKEND_URL}/{USERNAME}/workflows/{workflow_id}")
+
+
+@endpoint(error_message="Error changing instructions")
+def change_instructions(workflow_id: str, instructions: str, classes: list[str]) -> requests.Response:
+    """Change the instructions and classes of the workflow."""
+    return requests.put(
+        f"{BACKEND_URL}/{USERNAME}/workflows/{workflow_id}/instructions",
+        json={"instructions": instructions,
+              "classes": classes},
     )
