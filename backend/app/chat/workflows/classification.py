@@ -119,12 +119,11 @@ class ClassificationWorkflow:
         ]
 
     def _exctract_label(self, response):
-        for token, logprob in zip(
-            response.response_metadata["logprobs"]["tokens"],
-            response.response_metadata["logprobs"]["token_logprobs"],
-        ):
-            if token in self.idx2class:
-                return self.idx2class[token], np.exp(logprob)
+        for token_info in response.response_metadata["logprobs"]["content"]:
+            token = token_info["token"]
+            logprob = token_info["logprob"]
+            if token.strip() in self.idx2class:  # use strip() to remove leading/trailing whitespace
+                return self.idx2class[token.strip()], np.exp(logprob)
         else:
             print("No valid label found in response")
             print(response.content)

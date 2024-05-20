@@ -103,10 +103,9 @@ def change_model(workflow_id: str, model: pm.LLM) -> dict:
 
 
 @router.post("/{workflow_id}/run")
-def run_workflow(workflow_id: str, username: str, message: str):
+def run_workflow(workflow_id: str, username: str, message: pm.ClassificationInput):
     """Run the workflow."""
     workflow: pm.Workflow = get_workflow(workflow_id, username)
-
     llm = available_models_dict[workflow.model.name](
         workflow.model.user_variables
     ).as_llm()
