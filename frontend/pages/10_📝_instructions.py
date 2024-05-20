@@ -1,13 +1,21 @@
 """Settings page."""
 
+import copy
+
 import streamlit as st
-from backend_controller import get_available_models, get_model, get_workflow, change_instructions
+from backend_controller import (
+    change_instructions,
+    create_or_edit_workflow,
+    get_available_models,
+    get_model,
+    get_workflow,
+)
 from components.models import ModelPanel
 from components.sidebar import sidebar_controller
+from streamlit_ace import st_ace
+from streamlit_tags import st_tags
 from utils import query_params
 from utils.page_config import ensure_bot_or_workflow_selected
-from streamlit_tags import st_tags
-from streamlit_ace import st_ace
 
 st.set_page_config(
     page_title="Settings | Chattum",
@@ -25,17 +33,29 @@ st.title("Instructions")
 # st.write(get_bot(workflow_id))
 
 workflow = get_workflow(workflow_id)
+edited_workflow = copy.deepcopy(workflow)
 # st.write(workflow)
 
-keywords = st_tags(
-    label='#### Enter classes names:',
-    text='Press enter to add more',
-    value=workflow.get('classes', []),
-    suggestions=['cat', 'dog', 'parrot', 'fish'],
-    maxtags = 10,
-    key='classification_keywords')
+edited_workflow["classes"] = st_tags(
+    label="#### Classes",
+    text="Press enter to add more",
+    value=workflow.get("classes", []),
+    suggestions=["cat", "dog", "parrot", "fish"],
+    maxtags=10,
+    key="classification_keywords",
+)
+st.write("#### Additional instructions:")
+edited_workflow["instructions"] = st_ace(
+    value=workflow.get("instructions", ""), language="markdown", auto_update=True
+)
+if edited_workflow["classes"] == workflow["classes"]:
+    st.write("#### Class thresholds:")
+    for class_name, threshold in workflow.get("class_thresholds", {}).items():
+        edited_workflow["class_thresholds"][class_name] = st.number_input(
+            value=threshold, label=class_name, key=class_name
+        )
 
-instructions = st_ace(value=workflow.get('instructions', ''), language="markdown", auto_update=True)
 if st.button("Save"):
-    change_instructions(workflow_id, instructions, keywords)
-
+    create_or_edit_workflow(edited_workflow)
+    st.experimental_rerun()
+    # change_instructions(workflow_id, instructions, keywords)

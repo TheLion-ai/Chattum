@@ -1,8 +1,15 @@
-from jinja2 import Environment
-from langchain_core.messages import HumanMessage, AIMessage, SystemMessage
-import numpy as np
 import asyncio
+
+import numpy as np
+from jinja2 import Environment
+from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
 from sklearn.calibration import CalibratedClassifierCV
+from sklearn.metrics import (
+    auc,
+    classification_report,
+    precision_recall_curve,
+    roc_curve,
+)
 
 
 class ClassificationWorkflow:
@@ -101,9 +108,6 @@ class ClassificationWorkflow:
         one_hot[idx] = prob
         return one_hot
 
-    async def _predict_async(self, text: str):
-        return self._predict(text)
-
     def _construct_message(self, text: str):
         human_prompt = self.env.from_string(self.human_prompt_template).render(
             labels=self.classes, data=text, instructions=self.instructions
@@ -132,3 +136,35 @@ class ClassificationWorkflow:
     async def _predict_async(self, text: str):
         messages = self._construct_message(text)
         return await self.llm.ainvoke(messages)
+
+
+def evaluate_classification(
+    workflow: ClassificationWorkflow, x: list[str], y: list[str]
+) -> dict:
+    y = workflow.encode_labels(y)
+    y_one_hot = np.zeros((len(y), len(workflow.classes)))
+    for i, class_index in enumerate(y):
+        y_one_hot[i, class_index] = 1
+
+    probs = workflow.predict_proba(x)
+    y_pred = np.argmax(probs, axis=1)
+
+    metrics = classification_report(
+        y, y_pred, target_names=workflow.classes, output_dict=True
+    )
+    for i in range(len(workflow.classes)):
+        class_name = workflow.idx2class[str(i)]
+        fpr, tpr, _ = roc_curve(y_one_hot[:, i], probs[:, i])
+
+        metrics[class_name]["fpr"] = list(fpr)
+        metrics[class_name]["tpr"] = list(tpr)
+        metrics[class_name]["roc_auc"] = auc(fpr, tpr)
+
+        precision, recall, thresholds = precision_recall_curve(
+            y_one_hot[:, i], probs[:, i]
+        )
+        metrics[class_name]["precisions"] = list(precision)
+        metrics[class_name]["recalls"] = list(recall)
+        metrics[class_name]["p_r_thresholds"] = list(np.around(thresholds, 3))
+
+    return metrics

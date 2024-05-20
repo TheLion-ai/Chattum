@@ -20,5 +20,5 @@ def set_streamlit_page_config_once() -> None:
 
 
 def ensure_bot_or_workflow_selected() -> None:
-    if not("bot_id" in st.query_params or "workflow_id" in st.query_params):
+    if not ("bot_id" in st.query_params or "workflow_id" in st.query_params):
         st.switch_page("🤖_bots.py")

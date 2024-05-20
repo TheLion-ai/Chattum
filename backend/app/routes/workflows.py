@@ -1,12 +1,16 @@
+import pickle
 from typing import Union
+
 import numpy as np
 import pydantic_models as pm
 from app.app import database
-from app.chat.workflows.classification import ClassificationWorkflow
+from app.chat.models import available_models_dict
+from app.chat.workflows.classification import (
+    ClassificationWorkflow,
+    evaluate_classification,
+)
 from bson import ObjectId
 from fastapi import APIRouter, HTTPException
-from app.chat.models import available_models_dict
-import pickle
 
 router = APIRouter(prefix="/{username}/workflows", tags=["workflows"])
 
@@ -24,6 +28,9 @@ def workflows_get(username: str) -> list[pm.Workflow]:
 @router.put("", response_model=pm.CreateWorkflowResponse)
 def workflows_put(workflow: pm.Workflow, username: str) -> pm.CreateWorkflowResponse:
     """Create a workflow with the given name, username."""
+    existing_workflow = database.workflows.find_one_by_id(workflow.id)
+    if existing_workflow is None or existing_workflow.classes != workflow.classes:
+        workflow.class_thresholds = {c: 0 for c in workflow.classes}
     database.workflows.save(workflow)
     return pm.CreateWorkflowResponse(
         message="Workflow created successfully!", workflow_id=str(workflow.id)
@@ -36,6 +43,7 @@ def get_workflow(workflow_id: str, username: str) -> Union[pm.Workflow, None]:
     workflow = database.workflows.find_one_by_id(ObjectId(workflow_id))
     if workflow is None:
         raise HTTPException(status_code=404, detail="Workflow not found")
+    workflow.calibrators = None
     return workflow
 
 
@@ -60,7 +68,9 @@ def delete_workflow(workflow_id: str, username: str) -> pm.MessageResponse:
     "/{workflow_id}/instructions",
     responses={400: {"description": "Error changing instructions"}},
 )
-def change_instructions(workflow_id: str, workflow_settings: pm.WorkflowSettings):
+def change_instructions(
+    workflow_id: str, workflow_settings: pm.WorkflowSettings
+) -> dict:
     """Change the instructions and classes of the workflow."""
     workflow = database.workflows.find_one_by_id(ObjectId(workflow_id))
     print(workflow)
@@ -79,7 +89,7 @@ def change_instructions(workflow_id: str, workflow_settings: pm.WorkflowSettings
     "/{workflow_id}/model",
     responses={400: {"description": "Error changing model"}},
 )
-def change_model(workflow_id: str, model: pm.LLM):
+def change_model(workflow_id: str, model: pm.LLM) -> dict:
     """Change the model of the workflow."""
     workflow = database.workflows.find_one_by_id(ObjectId(workflow_id))
     if workflow is None:
@@ -147,3 +157,21 @@ def calibrate_workflow(workflow_id: str, username: str, x: list[str], y: list[st
             status_code=400, detail="Task not supported for calibration"
         )
     return pm.MessageResponse(message="Workflow calibrated successfully!")
+
+
+@router.post("/{workflow_id}/evaluate")
+def evaluate_workflow(workflow_id: str, username: str, x: list[str], y: list[str]):
+    workflow: pm.Workflow = get_workflow(workflow_id, username)
+
+    llm = available_models_dict[workflow.model.name](
+        workflow.model.user_variables
+    ).as_llm()
+    if workflow.task.lower() == "classification":
+        classification_workflow = ClassificationWorkflow(
+            classes=workflow.classes,
+            instructions=workflow.instructions,
+            llm=llm,
+        )
+        metrics = evaluate_classification(classification_workflow, x, y)
+
+        return metrics
