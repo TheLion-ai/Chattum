@@ -1,20 +1,19 @@
 """This module contains the sidebar controller class which is used to control the sidebar stat."""
 
 import streamlit as st
-from streamlit_extras.app_logo import add_logo
-from st_pages import show_pages, hide_pages
 from constants import BOT_PAGES, WORKFLOW_PAGES
+from st_pages import hide_pages, show_pages
+from streamlit_extras.app_logo import add_logo
 
 st.session_state.sidebar_state = "Hidden"
 
 
-
-def show_bot_pages():
+def show_bot_pages() -> None:
     hide_pages(WORKFLOW_PAGES)
     show_pages(BOT_PAGES)
 
 
-def show_workflow_pages():
+def show_workflow_pages() -> None:
     hide_pages(BOT_PAGES)
     show_pages(WORKFLOW_PAGES)
 
@@ -56,7 +55,6 @@ def render_expanded_sidebar() -> None:
         """,
         unsafe_allow_html=True,
     )
-
 
 
 def expand_sidebar() -> None:

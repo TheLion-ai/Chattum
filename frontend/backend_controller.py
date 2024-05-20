@@ -1,5 +1,6 @@
 """Functions exchanging information from frontend with backend."""
 
+import time
 from typing import Annotated, Callable, Optional
 
 import requests
@@ -338,18 +339,25 @@ def change_workflow_model(workflow_id: str, model: dict) -> requests.Response:
         json=model,
     )
 
+
 @endpoint(error_message="Error calibrating model", success_message="Model calibrated")
-def calibrate_workflow_model(workflow_id: str, x: list, y:list) -> requests.Response:
+def calibrate_workflow_model(workflow_id: str, x: list, y: list) -> requests.Response:
     """Calibrate the model of the workflow."""
     return requests.post(
         f"{BACKEND_URL}/{USERNAME}/workflows/{workflow_id}/calibrate",
         json={"x": x, "y": y},
     )
 
-@endpoint(error_message="Error getting workflow")
-def get_workflow(workflow_id: str) -> requests.Response:
-    """Get a workflow by id."""
-    return requests.get(f"{BACKEND_URL}/{USERNAME}/workflows/{workflow_id}")
+
+@endpoint(
+    error_message="Evaluating workflow", success_message="Model evaluation finished"
+)
+def evaluate_workflow(workflow_id: str, x: list, y: list) -> requests.Response:
+    """Calibrate the model of the workflow."""
+    return requests.post(
+        f"{BACKEND_URL}/{USERNAME}/workflows/{workflow_id}/evaluate",
+        json={"x": x, "y": y},
+    )
 
 
 @endpoint(error_message="Error changing instructions")
@@ -360,4 +368,12 @@ def change_instructions(
     return requests.put(
         f"{BACKEND_URL}/{USERNAME}/workflows/{workflow_id}/instructions",
         json={"instructions": instructions, "classes": classes},
+    )
+
+
+@endpoint(error_message="Error editing workflow", success_message="Workflow changed")
+def create_or_edit_workflow(workflow: dict):
+    return requests.put(
+        f"{BACKEND_URL}/{USERNAME}/workflows",
+        json=workflow,
     )

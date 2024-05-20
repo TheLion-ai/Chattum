@@ -5,11 +5,11 @@ from functools import lru_cache
 from typing import Optional
 
 from pydantic_models.bots import Bot
-from pydantic_models.workflows import Workflow
 from pydantic_models.conversations import Conversation
 from pydantic_models.models import LLM
 from pydantic_models.sources import Source
 from pydantic_models.tools import Tool
+from pydantic_models.workflows import Workflow
 from pydantic_mongo import AbstractRepository
 from pymongo import MongoClient
 

@@ -23,6 +23,7 @@ streamlit-date-picker = "^0.0.2b6"
 streamlit-tags = "^1.2.8"
 openpyxl = "^3.1.2"
 st-pages = "^0.4.5"
+plotly = "^5.22.0"
 
 
 [build-system]

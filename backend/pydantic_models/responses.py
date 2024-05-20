@@ -30,6 +30,7 @@ class CreateWorkflowResponse(BaseModel):
     message: str
     workflow_id: str
 
+
 class PromptResponse(BaseModel):
     """Response model for the create prompt endpoint."""
 

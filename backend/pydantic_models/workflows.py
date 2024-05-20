@@ -1,10 +1,11 @@
 """Pydantic models for bots."""
 
-from bson import ObjectId, Binary
+from typing import List, Optional
+
+from bson import Binary, ObjectId
 from pydantic import BaseModel
 from pydantic_models.models import LLM
 from pydantic_mongo import ObjectIdField
-from typing import List, Optional
 
 
 class Workflow(BaseModel):
@@ -17,6 +18,7 @@ class Workflow(BaseModel):
     model: LLM = None  # model for the workflow
     calibrators: Optional[Binary] = None  # sklearn model
     classes: Optional[List[str]] = None
+    class_thresholds: Optional[dict[str, float]] = None
     instructions: Optional[str] = None
 
     class Config:

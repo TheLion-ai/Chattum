@@ -3,15 +3,14 @@ from typing import Any
 import streamlit as st
 from backend_controller import (
     change_model,
-    get_available_models,
-    get_bot,
-    get_model,
     change_workflow_model,
+    get_available_models,
+    get_model,
 )
 
 
 class ModelPanel:
-    def __init__(self, bot_id: str = None, workflow_id=None) -> None:
+    def __init__(self, bot_id: str = None, workflow_id: str = None) -> None:
         self.bot_id = bot_id
         self.workflow_id = workflow_id
 
