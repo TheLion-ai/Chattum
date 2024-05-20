@@ -12,14 +12,20 @@ st.set_page_config(
     page_icon="🔄",
 )
 
-bot_id = query_params.get_from_url_or_state("bot_id")
-workflow_id = query_params.get_from_url_or_state("workflow_id")
+# default = None, TODO change to empty string, currently it is not working
+bot_id = query_params.get_from_url_or_state("bot_id") or "None"
+workflow_id = query_params.get_from_url_or_state("workflow_id") or "None"
 
 ensure_bot_or_workflow_selected()
 sidebar_controller()
+query_params = ""
+if bot_id:
+    query_params += f"?bot_id={bot_id}"
+if workflow_id:
+    query_params += f"&workflow_id={workflow_id}" if query_params else f"?workflow_id={workflow_id}"
 
 components.iframe(
-    f"{EXTERNAL_BACKEND_URL}/docs/{USERNAME}/{bot_id}",
+    f"{EXTERNAL_BACKEND_URL}/docs/{USERNAME}{query_params}",
     height=1200,
     scrolling=True,
 )
