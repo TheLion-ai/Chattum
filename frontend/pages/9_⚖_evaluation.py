@@ -7,6 +7,7 @@ import streamlit as st
 from backend_controller import evaluate_workflow, get_workflow
 from components.sidebar import sidebar_controller
 from components.workflows import ClassificationEvaluation
+from streamlit.runtime.uploaded_file_manager import UploadedFile
 from streamlit_extras.metric_cards import style_metric_cards
 from utils import query_params
 from utils.page_config import ensure_bot_or_workflow_selected
@@ -17,7 +18,7 @@ st.set_page_config(
 )
 
 
-def read_file(uploaded_file) -> pd.DataFrame:
+def read_file(uploaded_file: UploadedFile) -> pd.DataFrame:
     if uploaded_file is not None:
         file_details = uploaded_file.name
         if ".csv" in file_details:
@@ -37,6 +38,9 @@ ensure_bot_or_workflow_selected()
 sidebar_controller()
 
 workflow = get_workflow(workflow_id)
+if workflow["task"].lower() != "classification":
+    st.error("Evaluation is only supported for classification workflows.")
+    st.stop()
 
 style_metric_cards()
 

@@ -21,9 +21,16 @@ class BotsGrid:
 
     def __call__(self) -> None:
         """Create a view with available bots and a card for creating new bots."""
-        self._display_new_bot_or_workflow_card()
-        search_bar = st.text_input("Search")
-        self._create_workflow_from_state()
+        if (
+            st.session_state.get("creating_workflow", False) is False
+            and st.session_state.get("creating_bot", False) is False
+        ):
+            self._display_new_bot_or_workflow_card()
+        elif st.session_state.get("creating_workflow", False):
+            self.process_workflow_creation()
+        elif st.session_state.get("creating_bot", False):
+            self.process_bot_creation()
+        search_bar = st.text_input("Search", on_change=self._display_bots_and_workflows)
         self._display_bots_and_workflows(search_bar)
 
     def _select_bot(self, bot_id: str) -> None:
@@ -44,79 +51,126 @@ class BotsGrid:
         if "bot_id" in st.query_params:
             del st.query_params.bot_id
 
-    def _create_workflow_from_state(self) -> None:
-        # check if there are aready set parameters for workflow creation
-        if "workflow_params" in st.session_state:
-            params = st.session_state.workflow_params
-            create_new_workflow(
-                params["workflow_name"],
-                params["workflow_task"],
-                params["workflow_classes"],
+    def process_bot_creation(self) -> None:
+        with st.container(border=True):
+            bot_name = st.text_input(
+                "Bot name"
+            )  # TODO validator to ensure the name is not en empty string
+
+            col1, _, col2 = st.columns([1, 3, 1])
+            with col1:
+                if st.button("Create bot"):
+                    create_new_bot(bot_name)
+                    st.session_state.creating_bot = False
+                    st.rerun()
+            with col2:
+                if st.button("Cancel", use_container_width=True):
+                    st.session_state.creating_bot = False
+                    st.rerun()
+
+    def process_workflow_creation(self) -> None:
+        with st.container(border=True):
+            if "new_workflow" not in st.session_state:
+                st.session_state.new_workflow = {
+                    "name": "",
+                    "task": "",
+                    "entities": [],
+                    "classes": None,
+                    "instructions": None,
+                }
+            st.session_state.new_workflow["name"] = st.text_input(
+                "Workflow name", value=st.session_state.new_workflow.get("name", "")
             )
-            del st.session_state["workflow_params"]
-
-    def process_workflow_creation(self, workflow_name: str) -> None:
-        self._workflow_dialog(workflow_name)
-
-    @st.experimental_dialog("Create new workflow task")
-    def _workflow_dialog(self, workflow_name: str) -> None:
-        workflow_task = st.selectbox(
-            "Select task", ("Classification", "Extraction", "Generation")
-        )
-        if "classification_classes" not in st.session_state:
-            st.session_state.classification_classes = []
-        if workflow_task == "Classification":
-            keywords = st_tags(
-                label="# Enter classes names:",
-                text="Press enter to add more",
-                value=["Class 1", "Class 2"],
-                suggestions=["cat", "dog", "parrot", "fish"],
-                maxtags=10,
-                key="classification_keywords",
+            st.session_state.new_workflow["task"] = st.selectbox(
+                "Select task",
+                ("Classification", "Extraction"),
+                index=(
+                    0
+                    if st.session_state.new_workflow.get("task", "") == "Classification"
+                    else 1
+                ),
             )
-        else:
-            keywords = []
 
-        # the following only creates the workflow params in session state
-        # due to the: https://github.com/streamlit/streamlit/issues/3223
-        # the toast with response casues "Bad message format: setIn cannot
-        # be called on an ElementNode" if the dialog is opened
-        if st.button("Create workflow"):
-            self.create_new_workflow_params(workflow_name, workflow_task, keywords)
-            st.rerun()
+            if st.session_state.new_workflow["task"] == "Classification":
+                st.session_state.new_workflow["classes"] = st_tags(
+                    label="Enter classes names:",
+                    text="Press enter to add more",
+                    suggestions=["cat", "dog", "parrot", "fish"],
+                    maxtags=10,
+                    value=st.session_state.new_workflow.get("classes", []),
+                    key="classification_keywords",
+                )
+            else:
+                with st.container(border=True):
+                    for i in range(len(st.session_state.new_workflow["entities"])):
+                        col1, col2, col3 = st.columns([3, 3, 1])
+                        with col1:
+                            st.session_state.new_workflow["entities"][i][
+                                0
+                            ] = st.text_input(
+                                "Entity name",
+                                key=f"entity_name_{i}",
+                                label_visibility="collapsed",
+                                placeholder="Entity name",
+                                value=st.session_state.new_workflow["entities"][i][0],
+                            )
+                        with col2:
+                            st.session_state.new_workflow["entities"][i][
+                                1
+                            ] = st.text_input(
+                                "Entity type",
+                                key=f"entity_type_{i}",
+                                label_visibility="collapsed",
+                                placeholder="Type e.g. date, location, etc.",
+                                value=st.session_state.new_workflow["entities"][i][1],
+                            )
+                        with col3:
+                            if st.button(
+                                "Remove", use_container_width=True, key=f"remove_{i}"
+                            ):
+                                del st.session_state.new_workflow["entities"][i]
+                                st.rerun()
+                    _, col2, _ = st.columns([2, 3, 2])
+                    with col2:
+                        if st.button(
+                            "Add entity", key="add_entity", use_container_width=True
+                        ):
+                            st.session_state.new_workflow["entities"].append(["", ""])
+                            st.rerun()
+            st.session_state.new_workflow["instructions"] = st.text_area(
+                "Additional instructions (optional)"
+            )
 
-    def create_new_workflow_params(
-        self, workflow_name: str, workflow_task: str, keywords: list[str]
-    ) -> None:
-        st.session_state.workflow_params = {
-            "workflow_name": workflow_name,
-            "workflow_task": workflow_task,
-            "workflow_classes": keywords,
-        }
-
-    def _save_classes(self, classes: list[str]) -> None:
-        st.session_state.classification_classes = classes
+            col1, _, col2 = st.columns([1, 3, 1])
+            with col1:
+                if st.button("Create workflow"):
+                    create_new_workflow(st.session_state.new_workflow)
+                    del st.session_state.new_workflow
+                    st.session_state.creating_workflow = False
+                    st.rerun()
+            with col2:
+                if st.button("Cancel", use_container_width=True):
+                    del st.session_state.new_workflow
+                    st.session_state.creating_workflow = False
+                    st.rerun()
 
     def _display_new_bot_or_workflow_card(self) -> None:
         col1, col2, _ = st.columns(3)
         with col1:
-            with st.expander("Create a new bot", expanded=False):
-                bot_name = st.text_input(
-                    "Bot name"
-                )  # TODO validator to ensure the name is not en empty string
-                st.button(
-                    "Create",
-                    on_click=create_new_bot,
-                    args=([bot_name]),
-                    key="create_bot",
-                )
-        with col2:
-            with st.expander("Create a new workflow", expanded=False):
-                workflow_name = st.text_input("Workflow name")
+            st.button(
+                "Create a new bot",
+                on_click=lambda: query_params.set_to_url_and_state(creating_bot=True),
+                use_container_width=True,
+            )
 
-                create_classes = st.button("Create workflow", key="create_workflow")
-                if create_classes:
-                    self.process_workflow_creation(workflow_name)
+        with col2:
+            st.button(
+                "Create a new workflow",
+                on_click=lambda: query_params.set_to_url_and_state(
+                    creating_workflow=True
+                ),
+                use_container_width=True,
+            )
         st.write("")
 
     def _display_bots_and_workflows(self, search: str) -> None:

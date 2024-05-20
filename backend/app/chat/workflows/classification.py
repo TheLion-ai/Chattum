@@ -2,6 +2,8 @@ import asyncio
 
 import numpy as np
 from jinja2 import Environment
+from langchain.llms.base import BaseLLM
+from langchain_community.chat_models import ChatOpenAI
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
 from sklearn.calibration import CalibratedClassifierCV
 from sklearn.metrics import (
@@ -13,7 +15,13 @@ from sklearn.metrics import (
 
 
 class ClassificationWorkflow:
-    def __init__(self, classes, instructions=None, llm=None, calibrators=None):
+    def __init__(
+        self,
+        classes: list[str],
+        llm: BaseLLM,
+        instructions: str = None,
+        calibrators: list = None,
+    ):
         self.classes = classes
         self.instructions = instructions
         self.llm = llm.bind(logprobs=True)
@@ -55,7 +63,7 @@ class ClassificationWorkflow:
         """
         self.ai_prompt = "The best label for the data is Label"
 
-    def encode_labels(self, labels):
+    def encode_labels(self, labels: list[str]) -> list[int]:
         result = []
         for label in labels:
             try:
@@ -64,12 +72,12 @@ class ClassificationWorkflow:
                 raise ValueError(f"Label {label} not found in workflow classes")
         return result
 
-    def calibrate(self, x, y):
+    def calibrate(self, x: list, y: list) -> None:
         calibrated_clf = CalibratedClassifierCV(self, method="isotonic", cv="prefit")
         calibrated_clf.fit(x, y)
         self.calibrators = calibrated_clf.calibrated_classifiers_[0].calibrators
 
-    def predict(self, text: str):
+    def predict(self, text: str) -> tuple:
         messages = self._construct_message(text)
         response = self._predict(messages)
         result = self._exctract_label(response)
@@ -82,16 +90,15 @@ class ClassificationWorkflow:
         else:
             return result
 
-    async def predict_async(self, text: str):
+    async def predict_async(self, text: str) -> tuple:
         try:
-            messages = self._construct_message(text)
-            response = await self._predict_async(messages)
+            response = await self._predict_async(text)
             return self._exctract_label(response)
         except Exception as e:
             print(f"Error: {e}")
             return None, 0.0
 
-    def predict_proba(self, texts: list[str]):
+    def predict_proba(self, texts: list[str]) -> np.ndarray:
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
         tasks = [self._predict_async(text) for text in texts]
@@ -99,16 +106,16 @@ class ClassificationWorkflow:
         labels = [self._exctract_label(result) for result in results]
         return np.array([self._to_one_hot(label, prob) for label, prob in labels])
 
-    def fit(self, X, y):
+    def fit(self, X: list, y: list) -> None:
         pass
 
-    def _to_one_hot(self, label: str, prob: float):
+    def _to_one_hot(self, label: str, prob: float) -> np.ndarray:
         idx = self.class2idx[label]
         one_hot = np.zeros(len(self.classes))
         one_hot[idx] = prob
         return one_hot
 
-    def _construct_message(self, text: str):
+    def _construct_message(self, text: str) -> list:
         human_prompt = self.env.from_string(self.human_prompt_template).render(
             labels=self.classes, data=text, instructions=self.instructions
         )
@@ -118,21 +125,36 @@ class ClassificationWorkflow:
             AIMessage(self.ai_prompt),
         ]
 
-    def _exctract_label(self, response):
-        for token_info in response.response_metadata["logprobs"]["content"]:
-            token = token_info["token"]
-            logprob = token_info["logprob"]
-            if token.strip() in self.idx2class:  # use strip() to remove leading/trailing whitespace
-                return self.idx2class[token.strip()], np.exp(logprob)
+    def _exctract_label(self, response: AIMessage) -> tuple:
+
+        if "content" in response.response_metadata["logprobs"]:
+            tokens = [
+                token["token"]
+                for token in response.response_metadata["logprobs"]["content"]
+            ]
+            logprobs = [
+                token["logprob"]
+                for token in response.response_metadata["logprobs"]["content"]
+            ]
+        else:
+            tokens = response.response_metadata["logprobs"]["tokens"]
+            logprobs = response.response_metadata["logprobs"]["token_logprobs"]
+
+        for token, logprob in zip(
+            tokens,
+            logprobs,
+        ):
+            if token in self.idx2class:
+                return self.idx2class[token], np.exp(logprob)
         else:
             print("No valid label found in response")
             print(response.content)
             raise ValueError("No valid label found in response")
 
-    def _predict(self, messages: list):
+    def _predict(self, messages: list) -> AIMessage:
         return self.llm.invoke(messages)
 
-    async def _predict_async(self, text: str):
+    async def _predict_async(self, text: str) -> AIMessage:
         messages = self._construct_message(text)
         return await self.llm.ainvoke(messages)
 
@@ -140,16 +162,17 @@ class ClassificationWorkflow:
 def evaluate_classification(
     workflow: ClassificationWorkflow, x: list[str], y: list[str]
 ) -> dict:
-    y = workflow.encode_labels(y)
-    y_one_hot = np.zeros((len(y), len(workflow.classes)))
-    for i, class_index in enumerate(y):
+    y_encoded = workflow.encode_labels(y)
+    y_one_hot = np.zeros((len(y_encoded), len(workflow.classes)))
+    for i, class_index in enumerate(y_encoded):
         y_one_hot[i, class_index] = 1
 
     probs = workflow.predict_proba(x)
+
     y_pred = np.argmax(probs, axis=1)
 
     metrics = classification_report(
-        y, y_pred, target_names=workflow.classes, output_dict=True
+        y_encoded, y_pred, target_names=workflow.classes, output_dict=True
     )
     for i in range(len(workflow.classes)):
         class_name = workflow.idx2class[str(i)]

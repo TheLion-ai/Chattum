@@ -42,7 +42,7 @@ class ChatInput(BaseModel):
     def set_conversation_id(cls, v: ObjectId | None) -> ObjectId:
         """When conversation_id is None then create a new conversation."""
         return v or ObjectId()
-    
+
 
 class ClassificationInput(BaseModel):
     """Request model for the classification endpoint."""

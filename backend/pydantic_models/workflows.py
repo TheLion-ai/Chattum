@@ -17,7 +17,8 @@ class Workflow(BaseModel):
     task: str = ""  # task of the workflow
     model: LLM = None  # model for the workflow
     calibrators: Optional[Binary] = None  # sklearn model
-    classes: Optional[List[str]] = None
+    classes: Optional[List[str]] = None  # for classification tasks
+    entities: Optional[List[tuple[str, str]]] = None  # for entity recognition tasks
     class_thresholds: Optional[dict[str, float]] = None
     instructions: Optional[str] = None
 

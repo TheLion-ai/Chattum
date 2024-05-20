@@ -22,7 +22,9 @@ query_params = ""
 if bot_id:
     query_params += f"?bot_id={bot_id}"
 if workflow_id:
-    query_params += f"&workflow_id={workflow_id}" if query_params else f"?workflow_id={workflow_id}"
+    query_params += (
+        f"&workflow_id={workflow_id}" if query_params else f"?workflow_id={workflow_id}"
+    )
 
 components.iframe(
     f"{EXTERNAL_BACKEND_URL}/docs/{USERNAME}{query_params}",

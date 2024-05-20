@@ -1,10 +1,13 @@
 import streamlit as st
-from backend_controller import run_prediction, get_model, get_workflow, change_instructions
-from utils.page_config import ensure_bot_or_workflow_selected
+from backend_controller import (
+    change_instructions,
+    get_model,
+    get_workflow,
+    run_prediction,
+)
 from components.sidebar import sidebar_controller
 from utils import query_params
-
-
+from utils.page_config import ensure_bot_or_workflow_selected
 
 st.set_page_config(
     page_title="Predict | Chattum",
@@ -30,11 +33,7 @@ with input_container:
     if message:
         input_container.empty()
         with st.spinner("Thinking..."):
-            response = run_prediction(
-                workflow_id,
-                message)
+            response = run_prediction(workflow_id, message)
             if response is not None:
-                out_message= (
-                    response,
-                )
-                st.write(out_message)
+                out_message = (response,)
+                st.json(out_message)

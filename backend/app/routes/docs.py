@@ -1,17 +1,19 @@
 """Routes for the docs."""
 
 import copy
+from typing import Optional
 
 from app.app import app, database
 from fastapi import APIRouter
 from fastapi.openapi.docs import get_swagger_ui_html
 from fastapi.openapi.utils import get_openapi
-from typing import Optional
 
 router = APIRouter()
 
 
-def add_example_to_param(spec: dict, param_name: str, example: str) -> None:
+def add_example_to_param(
+    spec: dict, param_name: str, example: Optional[str] = None
+) -> None:
     """Add an example to a parameter in the OpenAPI spec."""
     if isinstance(spec, dict):
         for key, value in spec.items():
@@ -31,10 +33,9 @@ def add_example_to_param(spec: dict, param_name: str, example: str) -> None:
 
 
 @router.get("/custom_openapi/{username}", include_in_schema=False)
-async def get_openapi_json(username: str,
-                           bot_id: Optional[str],
-                           workflow_id: Optional[str]
-                           ) -> dict:
+async def get_openapi_json(
+    username: str, bot_id: Optional[str], workflow_id: Optional[str]
+) -> dict:
     """Get the OpenAPI spec with examples filled in."""
     custom_openapi = copy.deepcopy(app.openapi())
     add_example_to_param(custom_openapi, "username", username)
@@ -46,40 +47,44 @@ async def get_openapi_json(username: str,
     ] = f"Chattum API. Example are filled automatically with the username: {username} and bot_id: {bot_id}"
 
     # default keywords
-    keywords = set(['default', 'tools'])
-    if bot_id != 'None':
-        bot_keywords = set([
-            'bots',
-            'conversations',
-            'model',
-            'prompts',
-            'sources',
-            'chat',
-        ])
+    keywords = set(["default"])
+    if bot_id != "None":
+        bot_keywords = set(
+            ["bots", "conversations", "model", "prompts", "sources", "chat", "tools"]
+        )
         keywords = keywords.union(bot_keywords)
-    if workflow_id != 'None':
-        workflow_keywords = set([
-            'workflows',
-            'model'
-        ])
+    if workflow_id != "None":
+        workflow_keywords = set(["workflows", "model"])
         keywords = keywords.union(workflow_keywords)
 
     # remove paths that are not needed
-    custom_openapi["paths"] = {path: data for path, data in custom_openapi["paths"].items() 
-                      if any(keyword in data.get(method, {}).get('tags', ['default'])  # default has no tags
-                          for method in data.keys() 
-                          for keyword in keywords)}
+    custom_openapi["paths"] = {
+        path: data
+        for path, data in custom_openapi["paths"].items()
+        if any(
+            keyword
+            in data.get(method, {}).get("tags", ["default"])  # default has no tags
+            for method in data.keys()
+            for keyword in keywords
+        )
+    }
     return custom_openapi
 
 
 @router.get("/docs/{username}", include_in_schema=False)
-async def custom_swagger_ui_html(username: str, bot_id: Optional[str] = None, workflow_id: Optional[str] = None) -> str:
+async def custom_swagger_ui_html(
+    username: str, bot_id: Optional[str] = None, workflow_id: Optional[str] = None
+) -> str:
     """Get the Swagger UI HTML with examples filled in."""
     query_params = ""
     if bot_id:
         query_params += f"?bot_id={bot_id}"
     if workflow_id:
-        query_params += f"&workflow_id={workflow_id}" if query_params else f"?workflow_id={workflow_id}"
+        query_params += (
+            f"&workflow_id={workflow_id}"
+            if query_params
+            else f"?workflow_id={workflow_id}"
+        )
     return get_swagger_ui_html(
         openapi_url=f"/custom_openapi/{username}{query_params}",
         title=app.title + " - Swagger UI",

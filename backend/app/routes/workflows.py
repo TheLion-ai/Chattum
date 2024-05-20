@@ -9,6 +9,7 @@ from app.chat.workflows.classification import (
     ClassificationWorkflow,
     evaluate_classification,
 )
+from app.chat.workflows.extraction import ExtractionWorkflow
 from bson import ObjectId
 from fastapi import APIRouter, HTTPException
 
@@ -29,7 +30,9 @@ def workflows_get(username: str) -> list[pm.Workflow]:
 def workflows_put(workflow: pm.Workflow, username: str) -> pm.CreateWorkflowResponse:
     """Create a workflow with the given name, username."""
     existing_workflow = database.workflows.find_one_by_id(workflow.id)
-    if existing_workflow is None or existing_workflow.classes != workflow.classes:
+    if (
+        existing_workflow is None or existing_workflow.classes != workflow.classes
+    ) and workflow.task.lower() == "classification":
         workflow.class_thresholds = {c: 0 for c in workflow.classes}
     database.workflows.save(workflow)
     return pm.CreateWorkflowResponse(
@@ -103,9 +106,15 @@ def change_model(workflow_id: str, model: pm.LLM) -> dict:
 
 
 @router.post("/{workflow_id}/run")
-def run_workflow(workflow_id: str, username: str, message: pm.ClassificationInput):
+def run_workflow(
+    workflow_id: str, username: str, message: pm.ClassificationInput
+) -> tuple[str, float] | list[tuple[str, float]]:
     """Run the workflow."""
     workflow: pm.Workflow = get_workflow(workflow_id, username)
+    if workflow.model is None:
+        raise HTTPException(
+            status_code=400, detail="Select a model for the workflow first."
+        )
     llm = available_models_dict[workflow.model.name](
         workflow.model.user_variables
     ).as_llm()
@@ -120,11 +129,20 @@ def run_workflow(workflow_id: str, username: str, message: pm.ClassificationInpu
             calibrators=calibrators,
         )
         result = classification_workflow.predict(message)
+    elif workflow.task.lower() == "extraction":
+        extraction_workflow = ExtractionWorkflow(
+            entities=workflow.entities,
+            instructions=workflow.instructions,
+            llm=llm,
+        )
+        result = extraction_workflow.predict(message)
     return result
 
 
 @router.post("/{workflow_id}/calibrate")
-def calibrate_workflow(workflow_id: str, username: str, x: list[str], y: list[str]):
+def calibrate_workflow(
+    workflow_id: str, username: str, x: list[str], y: list[str]
+) -> pm.MessageResponse:
     """Calibrate the workflow."""
     workflow: pm.Workflow = get_workflow(workflow_id, username)
 
@@ -159,18 +177,24 @@ def calibrate_workflow(workflow_id: str, username: str, x: list[str], y: list[st
 
 
 @router.post("/{workflow_id}/evaluate")
-def evaluate_workflow(workflow_id: str, username: str, x: list[str], y: list[str]):
+def evaluate_workflow(
+    workflow_id: str, username: str, x: list[str], y: list[str]
+) -> dict:
     workflow: pm.Workflow = get_workflow(workflow_id, username)
 
     llm = available_models_dict[workflow.model.name](
         workflow.model.user_variables
     ).as_llm()
-    if workflow.task.lower() == "classification":
-        classification_workflow = ClassificationWorkflow(
-            classes=workflow.classes,
-            instructions=workflow.instructions,
-            llm=llm,
+    if workflow.task.lower() != "classification":
+        raise HTTPException(
+            status_code=400,
+            detail="Evaluation is only supported for classification workflows.",
         )
-        metrics = evaluate_classification(classification_workflow, x, y)
+    classification_workflow = ClassificationWorkflow(
+        classes=workflow.classes,
+        instructions=workflow.instructions,
+        llm=llm,
+    )
+    metrics = evaluate_classification(classification_workflow, x, y)
 
-        return metrics
+    return metrics

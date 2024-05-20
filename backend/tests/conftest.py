@@ -33,7 +33,7 @@ def model_template():
         "name": "test_bot",
         "username": "test_user",
         "model": {
-            "name": "ChatGPT",
+            "name": "GPT",
             "id": None,
             "user_description": "OpenAI chat model",
             "user_variables": [

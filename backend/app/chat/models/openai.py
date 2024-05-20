@@ -8,7 +8,7 @@ from .base_model import LLMTemplate, UserVariable
 class ChatOpenAIModel(LLMTemplate):
     """LLM created by OpenAI."""
 
-    name: str = "ChatGPT"
+    name: str = "GPT"
     user_description = "OpenAI chat model"
     model_type: str = "chat"
     supports_tools: bool = True

@@ -136,7 +136,7 @@ else:
             st.altair_chart(line_chart, use_container_width=True)
         with col2:
             # Count tool usage in conversations
-            tool_usage = {}
+            tool_usage: dict = {}
             for conversation in conversations:
                 for bot_message in conversation["messages"]:
                     if "tool_calls" in bot_message["data"]:

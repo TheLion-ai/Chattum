@@ -69,24 +69,11 @@ def create_new_bot(bot_name: str) -> requests.Response:
 
 
 @endpoint(success_message="Workflow created", error_message="Error creating workflow")
-def create_new_workflow(
-    workflow_name: str, workflow_task: str, workflow_classes: list[str]
-) -> requests.Response:
-    """Create a new workflow with a given name and task.
-
-    Args:
-        workflow_name (str): a name for a new workflow
-        workflow_task (str): a task for the new workflow
-        workflow_classes (list[str]): a list of classes for the new workflow
-    """
+def create_new_workflow(workflow: dict) -> requests.Response:
+    """Create a new workflow with a given name and task."""
     response = requests.put(
         f"{BACKEND_URL}/{USERNAME}/workflows",
-        json={
-            "name": workflow_name,
-            "task": workflow_task,
-            "username": USERNAME,
-            "classes": workflow_classes,
-        },
+        json=workflow | {"username": USERNAME},
     )
     return response
 
@@ -244,11 +231,12 @@ def send_message(bot_id: str, conversation_id: str, message: str) -> requests.Re
 
 
 @endpoint(error_message="Error in prediction")
-def run_prediction(workflow_id: str, message: str) -> dict:
+def run_prediction(workflow_id: str, message: str) -> requests.Response:
     """Run a prediction for a given message."""
     return requests.post(
         f"{BACKEND_URL}/{USERNAME}/workflows/{workflow_id}/run",
-        json={"username": USERNAME, "message": message})
+        json={"username": USERNAME, "message": message},
+    )
 
 
 @endpoint(error_message="Error loading available tools")
@@ -372,7 +360,7 @@ def change_instructions(
 
 
 @endpoint(error_message="Error editing workflow", success_message="Workflow changed")
-def create_or_edit_workflow(workflow: dict):
+def create_or_edit_workflow(workflow: dict) -> requests.Response:
     return requests.put(
         f"{BACKEND_URL}/{USERNAME}/workflows",
         json=workflow,
