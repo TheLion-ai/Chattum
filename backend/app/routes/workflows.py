@@ -1,9 +1,12 @@
 from typing import Union
-
+import numpy as np
 import pydantic_models as pm
 from app.app import database
+from app.chat.workflows.classification import ClassificationWorkflow
 from bson import ObjectId
 from fastapi import APIRouter, HTTPException
+from app.chat.models import available_models_dict
+import pickle
 
 router = APIRouter(prefix="/{username}/workflows", tags=["workflows"])
 
@@ -12,6 +15,8 @@ router = APIRouter(prefix="/{username}/workflows", tags=["workflows"])
 def workflows_get(username: str) -> list[pm.Workflow]:
     """Get workflows by username."""
     user_workflows = list(database.workflows.find_by({"username": username}))
+    for workflow in user_workflows:
+        workflow.calibrators = None
 
     return user_workflows
 
@@ -20,7 +25,9 @@ def workflows_get(username: str) -> list[pm.Workflow]:
 def workflows_put(workflow: pm.Workflow, username: str) -> pm.CreateWorkflowResponse:
     """Create a workflow with the given name, username."""
     database.workflows.save(workflow)
-    return pm.CreateWorkflowResponse(message="Workflow created successfully!", workflow_id=str(workflow.id))
+    return pm.CreateWorkflowResponse(
+        message="Workflow created successfully!", workflow_id=str(workflow.id)
+    )
 
 
 @router.get("/{workflow_id}")
@@ -49,7 +56,10 @@ def delete_workflow(workflow_id: str, username: str) -> pm.MessageResponse:
     return pm.MessageResponse(message="Workflow deleted successfully!")
 
 
-@router.put("/{workflow_id}/instructions", responses={400: {"description": "Error changing instructions"}})
+@router.put(
+    "/{workflow_id}/instructions",
+    responses={400: {"description": "Error changing instructions"}},
+)
 def change_instructions(workflow_id: str, workflow_settings: pm.WorkflowSettings):
     """Change the instructions and classes of the workflow."""
     workflow = database.workflows.find_one_by_id(ObjectId(workflow_id))
@@ -63,3 +73,77 @@ def change_instructions(workflow_id: str, workflow_settings: pm.WorkflowSettings
     database.workflows.save(workflow)
 
     return {"message": "Instructions updated successfully!"}
+
+
+@router.put(
+    "/{workflow_id}/model",
+    responses={400: {"description": "Error changing model"}},
+)
+def change_model(workflow_id: str, model: pm.LLM):
+    """Change the model of the workflow."""
+    workflow = database.workflows.find_one_by_id(ObjectId(workflow_id))
+    if workflow is None:
+        raise HTTPException(status_code=404, detail="Workflow not found")
+
+    workflow.model = model
+
+    database.workflows.save(workflow)
+
+    return {"message": "Model updated successfully!"}
+
+
+@router.post("/{workflow_id}/run")
+def run_workflow(workflow_id: str, username: str, message: str):
+    """Run the workflow."""
+    workflow: pm.Workflow = get_workflow(workflow_id, username)
+
+    llm = available_models_dict[workflow.model.name](
+        workflow.model.user_variables
+    ).as_llm()
+
+    calibrators = pickle.loads(workflow.calibrators) if workflow.calibrators else None
+
+    if workflow.task.lower() == "classification":
+        classification_workflow = ClassificationWorkflow(
+            classes=workflow.classes,
+            instructions=workflow.instructions,
+            llm=llm,
+            calibrators=calibrators,
+        )
+        result = classification_workflow.predict(message)
+    return result
+
+
+@router.post("/{workflow_id}/calibrate")
+def calibrate_workflow(workflow_id: str, username: str, x: list[str], y: list[str]):
+    """Calibrate the workflow."""
+    workflow: pm.Workflow = get_workflow(workflow_id, username)
+
+    llm = available_models_dict[workflow.model.name](
+        workflow.model.user_variables
+    ).as_llm()
+
+    if workflow.task.lower() == "classification":
+        classification_workflow = ClassificationWorkflow(
+            classes=workflow.classes,
+            instructions=workflow.instructions,
+            llm=llm,
+        )
+        try:
+            y = classification_workflow.encode_labels(y)
+        except ValueError as e:
+            raise HTTPException(status_code=400, detail=str(e))
+        # convert to one hot
+        one_hot_y = np.zeros((len(y), len(classification_workflow.classes)))
+        for i, class_index in enumerate(y):
+            one_hot_y[i, class_index] = 1
+
+        classification_workflow.calibrate(x, one_hot_y)
+        workflow.calibrators = pickle.dumps(classification_workflow.calibrators)
+        database.workflows.save(workflow)
+
+    else:
+        return HTTPException(
+            status_code=400, detail="Task not supported for calibration"
+        )
+    return pm.MessageResponse(message="Workflow calibrated successfully!")

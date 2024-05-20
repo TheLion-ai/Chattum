@@ -1,12 +1,19 @@
 from typing import Any
 
 import streamlit as st
-from backend_controller import change_model, get_available_models, get_bot, get_model
+from backend_controller import (
+    change_model,
+    get_available_models,
+    get_bot,
+    get_model,
+    change_workflow_model,
+)
 
 
 class ModelPanel:
-    def __init__(self, bot_id: str) -> None:
+    def __init__(self, bot_id: str = None, workflow_id=None) -> None:
         self.bot_id = bot_id
+        self.workflow_id = workflow_id
 
         self.model = get_model(self.bot_id)
 
@@ -103,5 +110,8 @@ class ModelPanel:
                     "Update model", type="primary", use_container_width=True
                 )
                 if submit_button:
-                    change_model(self.bot_id, model)
+                    if self.bot_id is not None:
+                        change_model(self.bot_id, model)
+                    elif self.workflow_id is not None:
+                        change_workflow_model(self.workflow_id, model)
                     pass

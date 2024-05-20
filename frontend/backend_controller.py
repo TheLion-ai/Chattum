@@ -68,7 +68,9 @@ def create_new_bot(bot_name: str) -> requests.Response:
 
 
 @endpoint(success_message="Workflow created", error_message="Error creating workflow")
-def create_new_workflow(workflow_name: str, workflow_task: str, workflow_classes: list[str]) -> requests.Response:
+def create_new_workflow(
+    workflow_name: str, workflow_task: str, workflow_classes: list[str]
+) -> requests.Response:
     """Create a new workflow with a given name and task.
 
     Args:
@@ -78,7 +80,12 @@ def create_new_workflow(workflow_name: str, workflow_task: str, workflow_classes
     """
     response = requests.put(
         f"{BACKEND_URL}/{USERNAME}/workflows",
-        json={"name": workflow_name, "task": workflow_task, "username": USERNAME, "classes": workflow_classes}
+        json={
+            "name": workflow_name,
+            "task": workflow_task,
+            "username": USERNAME,
+            "classes": workflow_classes,
+        },
     )
     return response
 
@@ -314,6 +321,23 @@ def change_model(bot_id: str, model: dict) -> requests.Response:
         json=model,
     )
 
+
+@endpoint(error_message="Error changing model")
+def change_workflow_model(workflow_id: str, model: dict) -> requests.Response:
+    """Change the current model of the workflow."""
+    return requests.put(
+        f"{BACKEND_URL}/{USERNAME}/workflows/{workflow_id}/model",
+        json=model,
+    )
+
+@endpoint(error_message="Error calibrating model", success_message="Model calibrated")
+def calibrate_workflow_model(workflow_id: str, x: list, y:list) -> requests.Response:
+    """Calibrate the model of the workflow."""
+    return requests.post(
+        f"{BACKEND_URL}/{USERNAME}/workflows/{workflow_id}/calibrate",
+        json={"x": x, "y": y},
+    )
+
 @endpoint(error_message="Error getting workflow")
 def get_workflow(workflow_id: str) -> requests.Response:
     """Get a workflow by id."""
@@ -321,10 +345,11 @@ def get_workflow(workflow_id: str) -> requests.Response:
 
 
 @endpoint(error_message="Error changing instructions")
-def change_instructions(workflow_id: str, instructions: str, classes: list[str]) -> requests.Response:
+def change_instructions(
+    workflow_id: str, instructions: str, classes: list[str]
+) -> requests.Response:
     """Change the instructions and classes of the workflow."""
     return requests.put(
         f"{BACKEND_URL}/{USERNAME}/workflows/{workflow_id}/instructions",
-        json={"instructions": instructions,
-              "classes": classes},
+        json={"instructions": instructions, "classes": classes},
     )
