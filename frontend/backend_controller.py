@@ -242,6 +242,14 @@ def send_message(bot_id: str, conversation_id: str, message: str) -> requests.Re
     )
 
 
+@endpoint(error_message="Error in prediction")
+def run_prediction(workflow_id: str, message: str) -> dict:
+    """Run a prediction for a given message."""
+    return requests.post(
+        f"{BACKEND_URL}/{USERNAME}/workflows/{workflow_id}/run",
+        json={"username": USERNAME, "message": message})
+
+
 @endpoint(error_message="Error loading available tools")
 def get_available_tools(bot_id: str) -> requests.Response:
     """Get a list of available tools for the selected bot.
