@@ -118,7 +118,8 @@ S3_BUCKET = <bucket_name> #choose anything e.g "chattum"
 S3_ACCESS_KEY = <s3_access_key> #choose anything
 S3_SECRET_KEY= <s3_access_key> #choose anything
 
-OPENAI_API_KEY = <your_api_key> #paste from OpenAI website
+OPENAI_API_KEY = <your_api_key> #for embeddings
+API_KEY = <api_key> "choose anything, used for API protection"
 
 ```
 ### :gear: Running the aplication
