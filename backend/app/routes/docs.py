@@ -50,11 +50,20 @@ async def get_openapi_json(
     keywords = set(["default"])
     if bot_id != "None":
         bot_keywords = set(
-            ["bots", "conversations", "model", "prompts", "sources", "chat", "tools"]
+            [
+                "bots",
+                "conversations",
+                "model",
+                "prompts",
+                "sources",
+                "chat",
+                "tools",
+                "models",
+            ]
         )
         keywords = keywords.union(bot_keywords)
     if workflow_id != "None":
-        workflow_keywords = set(["workflows", "model"])
+        workflow_keywords = set(["workflows", "models"])
         keywords = keywords.union(workflow_keywords)
 
     # remove paths that are not needed

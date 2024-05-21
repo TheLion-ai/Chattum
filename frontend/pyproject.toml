@@ -24,6 +24,7 @@ streamlit-tags = "^1.2.8"
 openpyxl = "^3.1.2"
 st-pages = "^0.4.5"
 plotly = "^5.22.0"
+streamlit-authenticator = "^0.3.2"
 
 
 [build-system]

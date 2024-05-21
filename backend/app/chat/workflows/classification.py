@@ -12,6 +12,7 @@ from sklearn.metrics import (
     precision_recall_curve,
     roc_curve,
 )
+from sklearn.calibration import calibration_curve
 
 
 class ClassificationWorkflow:
@@ -127,7 +128,10 @@ class ClassificationWorkflow:
 
     def _exctract_label(self, response: AIMessage) -> tuple:
 
-        if "content" in response.response_metadata["logprobs"]:
+        if (
+            "content" in response.response_metadata["logprobs"]
+            and response.response_metadata["logprobs"]["content"] is not None
+        ):
             tokens = [
                 token["token"]
                 for token in response.response_metadata["logprobs"]["content"]
@@ -176,17 +180,25 @@ def evaluate_classification(
     )
     for i in range(len(workflow.classes)):
         class_name = workflow.idx2class[str(i)]
+        # Compute ROC curve and ROC area for each class
         fpr, tpr, _ = roc_curve(y_one_hot[:, i], probs[:, i])
 
         metrics[class_name]["fpr"] = list(fpr)
         metrics[class_name]["tpr"] = list(tpr)
         metrics[class_name]["roc_auc"] = auc(fpr, tpr)
-
+        # Compute precision-recall curve
         precision, recall, thresholds = precision_recall_curve(
             y_one_hot[:, i], probs[:, i]
         )
         metrics[class_name]["precisions"] = list(precision)
         metrics[class_name]["recalls"] = list(recall)
         metrics[class_name]["p_r_thresholds"] = list(np.around(thresholds, 3))
+        # # Compute calibration curve
+        # prob_true, prob_pred = calibration_curve(
+        #     y[:, class_index],
+        #     y_pred[:, class_index],
+        #     n_bins=10,
+        # )
+        # plt.plot(prob_pred, prob_true, label=f"Class {class_index}")
 
     return metrics

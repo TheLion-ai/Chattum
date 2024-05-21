@@ -11,6 +11,7 @@ from streamlit.runtime.uploaded_file_manager import UploadedFile
 from streamlit_extras.metric_cards import style_metric_cards
 from utils import query_params
 from utils.page_config import ensure_bot_or_workflow_selected
+from components.authentication import protect_page
 
 st.set_page_config(
     page_title="Evaluation | Chattum",
@@ -36,6 +37,8 @@ processing_type = query_params.get_from_url_or_state("processing_type")
 
 ensure_bot_or_workflow_selected()
 sidebar_controller()
+protect_page()
+
 
 workflow = get_workflow(workflow_id)
 if workflow["task"].lower() != "classification":

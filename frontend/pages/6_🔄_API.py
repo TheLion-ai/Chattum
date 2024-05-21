@@ -3,9 +3,10 @@
 import streamlit as st
 import streamlit.components.v1 as components
 from components.sidebar import sidebar_controller
-from constants import EXTERNAL_BACKEND_URL, USERNAME
+from constants import EXTERNAL_BACKEND_URL, USERNAME, API_KEY
 from utils import query_params
 from utils.page_config import ensure_bot_or_workflow_selected
+from components.authentication import protect_page
 
 st.set_page_config(
     page_title="API | Chattum",
@@ -18,6 +19,8 @@ workflow_id = query_params.get_from_url_or_state("workflow_id") or "None"
 
 ensure_bot_or_workflow_selected()
 sidebar_controller()
+protect_page()
+
 query_params = ""
 if bot_id:
     query_params += f"?bot_id={bot_id}"
@@ -25,7 +28,8 @@ if workflow_id:
     query_params += (
         f"&workflow_id={workflow_id}" if query_params else f"?workflow_id={workflow_id}"
     )
-
+with st.container(border=True):
+    st.markdown(f"**API key**: `{API_KEY}`")
 components.iframe(
     f"{EXTERNAL_BACKEND_URL}/docs/{USERNAME}{query_params}",
     height=1200,

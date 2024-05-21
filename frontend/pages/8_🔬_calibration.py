@@ -10,6 +10,7 @@ from components.workflows import ClassificationEvaluation
 from streamlit.runtime.uploaded_file_manager import UploadedFile
 from utils import query_params
 from utils.page_config import ensure_bot_or_workflow_selected
+from components.authentication import protect_page
 
 
 def read_file(uploaded_file: UploadedFile) -> pd.DataFrame:
@@ -36,6 +37,7 @@ processing_type = query_params.get_from_url_or_state("processing_type")
 
 ensure_bot_or_workflow_selected()
 sidebar_controller()
+protect_page()
 
 workflow = get_workflow(workflow_id)
 if workflow["task"].lower() != "classification":
@@ -68,8 +70,8 @@ with st.container():
         with col3:
             calibrate_button = st.button("Calibrate", use_container_width=True)
         if calibrate_button:
-            x = df[option1].tolist()[:10]
-            y = df[option2].tolist()[:10]
+            x = df[option1].tolist()[:100]
+            y = df[option2].tolist()[:100]
             with st.spinner("Calibrating..."):
                 calibrate_workflow_model(workflow_id, x, y)
             st.toast("Callibration finished, running evaluation", icon="ℹ️")

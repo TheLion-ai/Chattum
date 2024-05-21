@@ -12,6 +12,8 @@ from fastapi import APIRouter, File, Form, HTTPException, UploadFile
 from fastapi.responses import FileResponse
 from starlette.background import BackgroundTasks
 from utils.scraping import scrape
+from app.security import check_key
+from fastapi import Depends
 
 
 def remove_file(path: str) -> None:
@@ -23,7 +25,7 @@ router = APIRouter(prefix="/{username}/bots/{bot_id}/sources", tags=["sources"])
 
 
 @router.get("", response_model=pm.SourceResponse)
-def get_sources(bot_id: str, username: str) -> list[pm.Source]:
+def get_sources(bot_id: str, username: str, auth=Depends(check_key)) -> list[pm.Source]:
     """Get sources of bot by id."""
     bot = get_bot(bot_id, username)
     bot_sources = bot.sources
@@ -48,6 +50,7 @@ def add_source(
     file: Annotated[bytes, File()] = None,
     url: str = None,
     source_id: str = None,
+    auth=Depends(check_key),
 ) -> pm.CreateSourceResponse:
     """Add source to bot by id."""
     if file is None and url is None:
@@ -100,7 +103,9 @@ def add_source(
 
 
 @router.get("/{source_id}", response_model=pm.Source)
-def get_source(bot_id: str, source_id: str, username: str) -> pm.Source:
+def get_source(
+    bot_id: str, source_id: str, username: str, auth=Depends(check_key)
+) -> pm.Source:
     """Get source of bot by id."""
     source = database.sources.find_one_by_id(ObjectId(source_id))
     if source is None:
@@ -110,7 +115,11 @@ def get_source(bot_id: str, source_id: str, username: str) -> pm.Source:
 
 @router.get("/{source_id}/file", response_model=pm.Source)
 def get_source_file(
-    bot_id: str, source_id: str, username: str, background_tasks: BackgroundTasks
+    bot_id: str,
+    source_id: str,
+    username: str,
+    background_tasks: BackgroundTasks,
+    auth=Depends(check_key),
 ) -> FileResponse:
     """Get source of bot by id."""
     source = database.sources.find_one_by_id(ObjectId(source_id))
@@ -122,7 +131,9 @@ def get_source_file(
 
 
 @router.delete("/{source_id}", response_model=pm.MessageResponse)
-def delete_source(bot_id: str, source_id: str, username: str) -> pm.MessageResponse:
+def delete_source(
+    bot_id: str, source_id: str, username: str, auth=Depends(check_key)
+) -> pm.MessageResponse:
     """Delete source of bot by id."""
     source = get_source(bot_id, source_id, username)
 

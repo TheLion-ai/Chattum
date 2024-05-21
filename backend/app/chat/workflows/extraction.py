@@ -72,10 +72,26 @@ class ExtractionWorkflow:
         extracted_text: str = ""
         probs: list = []
 
+        if (
+            "content" in response.response_metadata["logprobs"]
+            and response.response_metadata["logprobs"]["content"] is not None
+        ):
+            tokens = [
+                token["token"]
+                for token in response.response_metadata["logprobs"]["content"]
+            ]
+            logprobs = [
+                token["logprob"]
+                for token in response.response_metadata["logprobs"]["content"]
+            ]
+        else:
+            tokens = response.response_metadata["logprobs"]["tokens"]
+            logprobs = response.response_metadata["logprobs"]["token_logprobs"]
+
         for i, (token, logprob) in enumerate(
             zip(
-                response.response_metadata["logprobs"]["tokens"],
-                response.response_metadata["logprobs"]["token_logprobs"],
+                tokens,
+                logprobs,
             )
         ):
             if token == "%":

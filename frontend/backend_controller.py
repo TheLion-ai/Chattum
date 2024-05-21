@@ -5,7 +5,7 @@ from typing import Annotated, Callable, Optional
 
 import requests
 import streamlit as st
-from constants import BACKEND_URL, USERNAME
+from constants import BACKEND_URL, USERNAME, API_KEY
 from langchain.memory import ChatMessageHistory
 
 
@@ -41,7 +41,9 @@ def get_bots() -> requests.Response:
     Returns:
         list[dict]: a list of created bots.
     """
-    return requests.get(f"{BACKEND_URL}/{USERNAME}/bots")
+    return requests.get(
+        f"{BACKEND_URL}/{USERNAME}/bots", headers={"X-API-Key": API_KEY}
+    )
 
 
 @endpoint(error_message="Error getting workflows")
@@ -51,7 +53,9 @@ def get_workflows() -> requests.Response:
     Returns:
         list[dict]: a list of created workflows.
     """
-    return requests.get(f"{BACKEND_URL}/{USERNAME}/workflows")
+    return requests.get(
+        f"{BACKEND_URL}/{USERNAME}/workflows", headers={"X-API-Key": API_KEY}
+    )
 
 
 @endpoint(success_message="Bot created", error_message="Error creating bot")
@@ -64,6 +68,7 @@ def create_new_bot(bot_name: str) -> requests.Response:
     response = requests.put(
         f"{BACKEND_URL}/{USERNAME}/bots",
         json={"name": bot_name, "username": USERNAME},
+        headers={"X-API-Key": API_KEY},
     )
     return response
 
@@ -74,6 +79,7 @@ def create_new_workflow(workflow: dict) -> requests.Response:
     response = requests.put(
         f"{BACKEND_URL}/{USERNAME}/workflows",
         json=workflow | {"username": USERNAME},
+        headers={"X-API-Key": API_KEY},
     )
     return response
 
@@ -85,7 +91,10 @@ def get_sources(bot_id: str) -> requests.Response:
     Returns:
         list[dict]: a list of created sources for the bot.
     """
-    return requests.get(f"{BACKEND_URL}/{USERNAME}/bots/{bot_id}/sources")
+    return requests.get(
+        f"{BACKEND_URL}/{USERNAME}/bots/{bot_id}/sources",
+        headers={"X-API-Key": API_KEY},
+    )
 
 
 @endpoint()
@@ -98,7 +107,10 @@ def get_source(bot_id: str, source_id: str) -> requests.Response:
     Returns:
         dict: a source with a given id.
     """
-    source = requests.get(f"{BACKEND_URL}/{USERNAME}/bots/{bot_id}/sources/{source_id}")
+    source = requests.get(
+        f"{BACKEND_URL}/{USERNAME}/bots/{bot_id}/sources/{source_id}",
+        headers={"X-API-Key": API_KEY},
+    )
     return source
 
 
@@ -112,7 +124,8 @@ def get_source_file(bot_id: str, source_id: str) -> bytes:
         bytes: a source file with a given id.
     """
     file = requests.get(
-        f"{BACKEND_URL}/{USERNAME}/bots/{bot_id}/sources/{source_id}/file"
+        f"{BACKEND_URL}/{USERNAME}/bots/{bot_id}/sources/{source_id}/file",
+        headers={"X-API-Key": API_KEY},
     ).content
     return file
 
@@ -127,6 +140,7 @@ def delete_source(bot_id: str, source_id: str) -> requests.Response:
     """
     response = requests.delete(
         f"{BACKEND_URL}/{USERNAME}/bots/{bot_id}/sources/{source_id}",
+        headers={"X-API-Key": API_KEY},
     )
     return response
 
@@ -155,6 +169,7 @@ def create_new_source(
                 "url": url,
                 "source_id": source_id,
             },
+            headers={"X-API-Key": API_KEY},
         )
     else:
         response = requests.put(
@@ -165,6 +180,7 @@ def create_new_source(
                 "source_id": source_id,
             },
             files={"file": file},  # type: ignore
+            headers={"X-API-Key": API_KEY},
         )
     return response
 
@@ -175,6 +191,7 @@ def create_new_prompt(prompt: str, bot_id: str) -> requests.Response:
     response = requests.put(
         f"{BACKEND_URL}/{USERNAME}/bots/{bot_id}/prompt",
         json={"prompt": prompt},
+        headers={"X-API-Key": API_KEY},
     )
     return response
 
@@ -186,7 +203,9 @@ def get_prompt(bot_id: str) -> requests.Response:
     Returns:
         str: bot's prompt.
     """
-    prompt = requests.get(f"{BACKEND_URL}/{USERNAME}/bots/{bot_id}/prompt")
+    prompt = requests.get(
+        f"{BACKEND_URL}/{USERNAME}/bots/{bot_id}/prompt", headers={"X-API-Key": API_KEY}
+    )
 
     return prompt
 
@@ -195,7 +214,8 @@ def get_prompt(bot_id: str) -> requests.Response:
 def get_conversations(bot_id: str) -> requests.Response:
     """Get a list of conversations involving given bot."""
     conversations = requests.get(
-        f"{BACKEND_URL}/{USERNAME}/bots/{bot_id}/conversations"
+        f"{BACKEND_URL}/{USERNAME}/bots/{bot_id}/conversations",
+        headers={"X-API-Key": API_KEY},
     )
     return conversations
 
@@ -204,7 +224,8 @@ def get_conversations(bot_id: str) -> requests.Response:
 def get_conversation(bot_id: str, conversation_id: str) -> requests.Response:  # type: ignore
     """Get a conversation by id."""
     response = requests.get(
-        f"{BACKEND_URL}/{USERNAME}/bots/{bot_id}/conversations/{conversation_id}"
+        f"{BACKEND_URL}/{USERNAME}/bots/{bot_id}/conversations/{conversation_id}",
+        headers={"X-API-Key": API_KEY},
     )
     return response
 
@@ -212,13 +233,18 @@ def get_conversation(bot_id: str, conversation_id: str) -> requests.Response:  #
 @endpoint(error_message="Error getting bot")
 def get_bot(bot_id: str) -> requests.Response:
     """Get a bot by id."""
-    return requests.get(f"{BACKEND_URL}/{USERNAME}/bots/{bot_id}")
+    return requests.get(
+        f"{BACKEND_URL}/{USERNAME}/bots/{bot_id}", headers={"X-API-Key": API_KEY}
+    )
 
 
 @endpoint(error_message="Error getting workflow")
 def get_workflow(workflow_id: str) -> requests.Response:
     """Get a workflow by id."""
-    return requests.get(f"{BACKEND_URL}/{USERNAME}/workflows/{workflow_id}")
+    return requests.get(
+        f"{BACKEND_URL}/{USERNAME}/workflows/{workflow_id}",
+        headers={"X-API-Key": API_KEY},
+    )
 
 
 @endpoint(error_message="Error in conversation")
@@ -227,6 +253,7 @@ def send_message(bot_id: str, conversation_id: str, message: str) -> requests.Re
     return requests.post(
         f"{BACKEND_URL}/{USERNAME}/bots/{bot_id}/chat",
         json={"message": message, "conversation_id": str(conversation_id)},
+        headers={"X-API-Key": API_KEY},
     )
 
 
@@ -236,6 +263,7 @@ def run_prediction(workflow_id: str, message: str) -> requests.Response:
     return requests.post(
         f"{BACKEND_URL}/{USERNAME}/workflows/{workflow_id}/run",
         json={"username": USERNAME, "message": message},
+        headers={"X-API-Key": API_KEY},
     )
 
 
@@ -247,7 +275,8 @@ def get_available_tools(bot_id: str) -> requests.Response:
         list[dict]: a list of created tools for the bot.
     """
     tools = requests.get(
-        f"{BACKEND_URL}/{USERNAME}/bots/{bot_id}/tools/available_tools"
+        f"{BACKEND_URL}/{USERNAME}/bots/{bot_id}/tools/available_tools",
+        headers={"X-API-Key": API_KEY},
     )
     return tools
 
@@ -272,6 +301,7 @@ def create_or_edit_tool(
             "user_variables": user_variables,
             "name_for_bot": name_for_bot,
         },
+        headers={"X-API-Key": API_KEY},
     )
     return response
 
@@ -283,19 +313,26 @@ def get_tools(bot_id: str) -> requests.Response:
     Returns:
         list[dict]: a list of created tools for the bot.
     """
-    return requests.get(f"{BACKEND_URL}/{USERNAME}/bots/{bot_id}/tools")
+    return requests.get(
+        f"{BACKEND_URL}/{USERNAME}/bots/{bot_id}/tools", headers={"X-API-Key": API_KEY}
+    )
 
 
 @endpoint(success_message="Tool deleted", error_message="Error deleting tool")
 def delete_tool(bot_id: str, tool_id: str) -> requests.Response:
     """Delete a tool with a given id."""
-    return requests.delete(f"{BACKEND_URL}/{USERNAME}/bots/{bot_id}/tools/{tool_id}")
+    return requests.delete(
+        f"{BACKEND_URL}/{USERNAME}/bots/{bot_id}/tools/{tool_id}",
+        headers={"X-API-Key": API_KEY},
+    )
 
 
 @endpoint(error_message="Error getting model")
 def get_model(bot_id: str) -> requests.Response:
     """Get the current model of the bot or workflow."""
-    return requests.get(f"{BACKEND_URL}/{USERNAME}/bots/{bot_id}/model")
+    return requests.get(
+        f"{BACKEND_URL}/{USERNAME}/bots/{bot_id}/model", headers={"X-API-Key": API_KEY}
+    )
 
 
 @endpoint(error_message="Error getting available models")
@@ -306,7 +343,8 @@ def get_available_models(bot_id: str) -> requests.Response:
         list[dict]: a list of available models.
     """
     return requests.get(
-        f"{BACKEND_URL}/{USERNAME}/bots/{bot_id}/model/available_models"
+        f"{BACKEND_URL}/{USERNAME}/bots/{bot_id}/model/available_models",
+        headers={"X-API-Key": API_KEY},
     )
 
 
@@ -316,6 +354,7 @@ def change_model(bot_id: str, model: dict) -> requests.Response:
     return requests.put(
         f"{BACKEND_URL}/{USERNAME}/bots/{bot_id}/model",
         json=model,
+        headers={"X-API-Key": API_KEY},
     )
 
 
@@ -325,6 +364,7 @@ def change_workflow_model(workflow_id: str, model: dict) -> requests.Response:
     return requests.put(
         f"{BACKEND_URL}/{USERNAME}/workflows/{workflow_id}/model",
         json=model,
+        headers={"X-API-Key": API_KEY},
     )
 
 
@@ -334,6 +374,7 @@ def calibrate_workflow_model(workflow_id: str, x: list, y: list) -> requests.Res
     return requests.post(
         f"{BACKEND_URL}/{USERNAME}/workflows/{workflow_id}/calibrate",
         json={"x": x, "y": y},
+        headers={"X-API-Key": API_KEY},
     )
 
 
@@ -345,6 +386,7 @@ def evaluate_workflow(workflow_id: str, x: list, y: list) -> requests.Response:
     return requests.post(
         f"{BACKEND_URL}/{USERNAME}/workflows/{workflow_id}/evaluate",
         json={"x": x, "y": y},
+        headers={"X-API-Key": API_KEY},
     )
 
 
@@ -356,6 +398,7 @@ def change_instructions(
     return requests.put(
         f"{BACKEND_URL}/{USERNAME}/workflows/{workflow_id}/instructions",
         json={"instructions": instructions, "classes": classes},
+        headers={"X-API-Key": API_KEY},
     )
 
 
@@ -364,4 +407,5 @@ def create_or_edit_workflow(workflow: dict) -> requests.Response:
     return requests.put(
         f"{BACKEND_URL}/{USERNAME}/workflows",
         json=workflow,
+        headers={"X-API-Key": API_KEY},
     )

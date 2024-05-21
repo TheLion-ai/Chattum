@@ -12,12 +12,14 @@ from app.chat.workflows.classification import (
 from app.chat.workflows.extraction import ExtractionWorkflow
 from bson import ObjectId
 from fastapi import APIRouter, HTTPException
+from app.security import check_key
+from fastapi import Depends
 
 router = APIRouter(prefix="/{username}/workflows", tags=["workflows"])
 
 
 @router.get("", response_model=list[pm.Workflow])
-def workflows_get(username: str) -> list[pm.Workflow]:
+def workflows_get(username: str, auth=Depends(check_key)) -> list[pm.Workflow]:
     """Get workflows by username."""
     user_workflows = list(database.workflows.find_by({"username": username}))
     for workflow in user_workflows:
@@ -27,7 +29,9 @@ def workflows_get(username: str) -> list[pm.Workflow]:
 
 
 @router.put("", response_model=pm.CreateWorkflowResponse)
-def workflows_put(workflow: pm.Workflow, username: str) -> pm.CreateWorkflowResponse:
+def workflows_put(
+    workflow: pm.Workflow, username: str, auth=Depends(check_key)
+) -> pm.CreateWorkflowResponse:
     """Create a workflow with the given name, username."""
     existing_workflow = database.workflows.find_one_by_id(workflow.id)
     if (
@@ -41,7 +45,9 @@ def workflows_put(workflow: pm.Workflow, username: str) -> pm.CreateWorkflowResp
 
 
 @router.get("/{workflow_id}")
-def get_workflow(workflow_id: str, username: str) -> Union[pm.Workflow, None]:
+def get_workflow(
+    workflow_id: str, username: str, auth=Depends(check_key)
+) -> Union[pm.Workflow, None]:
     """Get workflow by id."""
     workflow = database.workflows.find_one_by_id(ObjectId(workflow_id))
     if workflow is None:
@@ -51,7 +57,9 @@ def get_workflow(workflow_id: str, username: str) -> Union[pm.Workflow, None]:
 
 
 @router.delete("/{workflow_id}")
-def delete_workflow(workflow_id: str, username: str) -> pm.MessageResponse:
+def delete_workflow(
+    workflow_id: str, username: str, auth=Depends(check_key)
+) -> pm.MessageResponse:
     """Delete workflow by id."""
     workflow = get_workflow(workflow_id, username)
     database.workflows.delete(workflow)
@@ -72,7 +80,7 @@ def delete_workflow(workflow_id: str, username: str) -> pm.MessageResponse:
     responses={400: {"description": "Error changing instructions"}},
 )
 def change_instructions(
-    workflow_id: str, workflow_settings: pm.WorkflowSettings
+    workflow_id: str, workflow_settings: pm.WorkflowSettings, auth=Depends(check_key)
 ) -> dict:
     """Change the instructions and classes of the workflow."""
     workflow = database.workflows.find_one_by_id(ObjectId(workflow_id))
@@ -92,7 +100,7 @@ def change_instructions(
     "/{workflow_id}/model",
     responses={400: {"description": "Error changing model"}},
 )
-def change_model(workflow_id: str, model: pm.LLM) -> dict:
+def change_model(workflow_id: str, model: pm.LLM, auth=Depends(check_key)) -> dict:
     """Change the model of the workflow."""
     workflow = database.workflows.find_one_by_id(ObjectId(workflow_id))
     if workflow is None:
@@ -107,8 +115,11 @@ def change_model(workflow_id: str, model: pm.LLM) -> dict:
 
 @router.post("/{workflow_id}/run")
 def run_workflow(
-    workflow_id: str, username: str, message: pm.ClassificationInput
-) -> tuple[str, float] | list[tuple[str, float]]:
+    workflow_id: str,
+    username: str,
+    message: pm.ClassificationInput,
+    auth=Depends(check_key),
+) -> tuple[str, float] | list[tuple[str, str, float]]:
     """Run the workflow."""
     workflow: pm.Workflow = get_workflow(workflow_id, username)
     if workflow.model is None:
@@ -129,6 +140,8 @@ def run_workflow(
             calibrators=calibrators,
         )
         result = classification_workflow.predict(message)
+        if result[1] < workflow.class_thresholds[result[0]]:
+            return "None", 0.0
     elif workflow.task.lower() == "extraction":
         extraction_workflow = ExtractionWorkflow(
             entities=workflow.entities,
@@ -141,7 +154,7 @@ def run_workflow(
 
 @router.post("/{workflow_id}/calibrate")
 def calibrate_workflow(
-    workflow_id: str, username: str, x: list[str], y: list[str]
+    workflow_id: str, username: str, x: list[str], y: list[str], auth=Depends(check_key)
 ) -> pm.MessageResponse:
     """Calibrate the workflow."""
     workflow: pm.Workflow = get_workflow(workflow_id, username)
@@ -178,7 +191,7 @@ def calibrate_workflow(
 
 @router.post("/{workflow_id}/evaluate")
 def evaluate_workflow(
-    workflow_id: str, username: str, x: list[str], y: list[str]
+    workflow_id: str, username: str, x: list[str], y: list[str], auth=Depends(check_key)
 ) -> dict:
     workflow: pm.Workflow = get_workflow(workflow_id, username)
 

@@ -4,17 +4,19 @@ import pytest
 from bson import ObjectId
 
 
-def test_create_bot(test_client, model_template) -> None:
+def test_create_bot(test_client, model_template, api_key) -> None:
     """Creates bot for testing."""
     global username
     global bot_id
     username = "test_user"
-    bot_id = test_client.put(f"/{username}/bots", json=model_template).json()["bot_id"]
+    bot_id = test_client.put(
+        f"/{username}/bots", json=model_template, headers={"X-API-Key": api_key}
+    ).json()["bot_id"]
 
 
-def test_get_bots(test_client, model_template) -> None:
+def test_get_bots(test_client, model_template, api_key) -> None:
     """Test the get bots endpoint."""
-    response = test_client.get(f"/{username}/bots")
+    response = test_client.get(f"/{username}/bots", headers={"X-API-Key": api_key})
     assert response.status_code == 200
     assert response.json() == [
         {
@@ -27,17 +29,19 @@ def test_get_bots(test_client, model_template) -> None:
     ]
 
 
-def test_get_bots_not_found(test_client) -> None:
+def test_get_bots_not_found(test_client, api_key) -> None:
     """Test the get bots endpoint with a user that does not exist."""
     fake_username = "fake_user"
-    response = test_client.get(f"/{fake_username}/bots")
+    response = test_client.get(f"/{fake_username}/bots", headers={"X-API-Key": api_key})
     assert response.status_code == 200
     assert response.json() == []
 
 
-def test_get_bot(test_client, model_template) -> None:
+def test_get_bot(test_client, model_template, api_key) -> None:
     """Test the get bot endpoint."""
-    response = test_client.get(f"/{username}/bots/{bot_id}")
+    response = test_client.get(
+        f"/{username}/bots/{bot_id}", headers={"X-API-Key": api_key}
+    )
     assert response.status_code == 200
     assert (
         response.json()
@@ -51,15 +55,19 @@ def test_get_bot(test_client, model_template) -> None:
     )
 
 
-def test_get_bot_not_found(test_client) -> None:
+def test_get_bot_not_found(test_client, api_key) -> None:
     """Test the get bot endpoint with a bot that does not exist."""
     fake_id = ObjectId("123456789012345678901234")
-    response = test_client.get(f"/{username}/bots/{fake_id}")
+    response = test_client.get(
+        f"/{username}/bots/{fake_id}", headers={"X-API-Key": api_key}
+    )
     assert response.status_code == 404
 
 
-def test_delete_bot(test_client) -> None:
+def test_delete_bot(test_client, api_key) -> None:
     """Test the delete bot endpoint."""
-    response = test_client.delete(f"/{username}/bots/{bot_id}")
+    response = test_client.delete(
+        f"/{username}/bots/{bot_id}", headers={"X-API-Key": api_key}
+    )
     assert response.status_code == 200
     assert response.json() == {"message": "Bot deleted successfully!"}

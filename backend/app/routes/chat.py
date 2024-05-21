@@ -15,6 +15,8 @@ from app.routes.conversations import (
 from bson import ObjectId
 from fastapi import APIRouter, HTTPException
 from langchain.tools import StructuredTool
+from app.security import check_key
+from fastapi import Depends
 
 router = APIRouter(prefix="/{username}/bots/{bot_id}/chat", tags=["chat"])
 
