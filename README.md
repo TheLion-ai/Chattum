@@ -31,7 +31,7 @@ Maybe you can mention me or this repo in the acknowledgements too
 </p>
 
 <h4>
-    <a href="https://www.youtube.com/watch?v=subykW5mQ1M">View Demo</a>
+    <a href="https://www.youtube.com/watch?v=BuqH4uodK54">View Demo</a>
   <span> · </span>
     <a href="https://github.com/TheLion-ai/Chattum/issues/">Report Bug</a>
   <span> · </span>
