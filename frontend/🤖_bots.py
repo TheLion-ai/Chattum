@@ -12,7 +12,7 @@ sidebar_controller()
 st.info(
     """\n
     This is a shared demo for all judges. Login 'demo' and password is 'demo' \n
-    If the login screen doesn't appear refresh the streamlit app. \n
+    If the login screen doesn't appear return the streamlit app (in hamburger menu top right). \n
     Ass this demo is not secure so we advise against using your own api keys" \n
     Please see exmaple bots to copy our API keys that are created just for this demo and have usage limits
     """
