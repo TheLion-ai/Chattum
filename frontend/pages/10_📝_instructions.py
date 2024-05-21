@@ -50,10 +50,12 @@ edited_workflow["instructions"] = st_ace(
 )
 if edited_workflow["classes"] == workflow["classes"]:
     st.write("#### Class thresholds:")
-    for class_name, threshold in workflow.get("class_thresholds", {}).items():
-        edited_workflow["class_thresholds"][class_name] = st.number_input(
-            value=threshold, label=class_name, key=class_name
-        )
+    class_thresholds = workflow.get("class_thresholds") if workflow else None
+    if class_thresholds is not None:
+        for class_name, threshold in class_thresholds.items():
+            edited_workflow["class_thresholds"][class_name] = st.number_input(
+                value=threshold, label=class_name, key=class_name
+            )
 
 if st.button("Save"):
     create_or_edit_workflow(edited_workflow)
