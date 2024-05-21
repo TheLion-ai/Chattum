@@ -6,9 +6,20 @@ import pydantic_models as pm
 from app.app import app
 from fastapi.openapi.utils import get_openapi
 
-from .routes import bots, chat, conversations, docs, model, prompts, sources, tools
+from .routes import (
+    bots,
+    chat,
+    conversations,
+    docs,
+    model,
+    prompts,
+    sources,
+    tools,
+    workflows,
+)
 
 app.include_router(bots.router)
+app.include_router(workflows.router)
 app.include_router(prompts.router)
 app.include_router(sources.router)
 app.include_router(conversations.router)

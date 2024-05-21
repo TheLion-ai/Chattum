@@ -9,6 +9,7 @@ from pydantic_models.conversations import Conversation
 from pydantic_models.models import LLM
 from pydantic_models.sources import Source
 from pydantic_models.tools import Tool
+from pydantic_models.workflows import Workflow
 from pydantic_mongo import AbstractRepository
 from pymongo import MongoClient
 
@@ -20,6 +21,15 @@ class BotsRepository(AbstractRepository[Bot]):
         """Meta class for the repository."""
 
         collection_name = "bots"
+
+
+class WorkflowsRepository(AbstractRepository[Workflow]):
+    """Repository for workflows."""
+
+    class Meta:
+        """Meta class for the repository."""
+
+        collection_name = "workflows"
 
 
 class ToolsRepository(AbstractRepository[Tool]):
@@ -63,6 +73,7 @@ class Database:
     """Database class."""
 
     bots: Optional[BotsRepository] = None
+    workflows: Optional[WorkflowsRepository] = None
     sources: Optional[SourcesRepository] = None
     conversations: Optional[ConversationsRepository] = None
     tools: Optional[ToolsRepository] = None
@@ -71,6 +82,7 @@ class Database:
     def init_repositories(self, mongo_client: MongoClient) -> None:
         """Create a database repositories from a mongo client."""
         self.bots = BotsRepository(mongo_client["bots"])
+        self.workflows = WorkflowsRepository(mongo_client["bots"])
         self.sources = SourcesRepository(mongo_client["bots"])
         self.conversations = ConversationsRepository(mongo_client["bots"])
         self.tools = ToolsRepository(mongo_client["bots"])

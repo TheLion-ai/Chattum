@@ -3,7 +3,7 @@
 
 from typing import Optional
 
-from langchain.utilities.twilio import TwilioAPIWrapper
+from langchain_community.utilities import TwilioAPIWrapper
 from pybars import Compiler
 from pydantic import BaseModel, create_model
 

@@ -7,19 +7,23 @@ from app.app import database
 from app.chat.tools import available_tools
 from bson import ObjectId
 from fastapi import APIRouter, HTTPException
+from app.security import check_key
+from fastapi import Depends
 
 router = APIRouter(prefix="/{username}/bots/{bot_id}/tools", tags=["tools"])
 
 
 @router.get("/available_tools", response_model=list[pm.Tool])
-def get_available_tools(username: str) -> list[pm.Tool]:
+def get_available_tools(username: str, auth=Depends(check_key)) -> list[pm.Tool]:
     """Get available tools and their templates."""
     print([t.template for t in available_tools])
     return [pm.Tool(**t.template) for t in available_tools]
 
 
 @router.put("", response_model=pm.MessageResponse)
-def put_tool(new_tool: pm.Tool, username: str, bot_id: str) -> pm.MessageResponse:
+def put_tool(
+    new_tool: pm.Tool, username: str, bot_id: str, auth=Depends(check_key)
+) -> pm.MessageResponse:
     """Create a tool with the given name and username."""
     bot = database.bots.find_one_by_id(ObjectId(bot_id))
     if new_tool.id is None:
@@ -38,7 +42,7 @@ def put_tool(new_tool: pm.Tool, username: str, bot_id: str) -> pm.MessageRespons
 
 
 @router.get("", response_model=list[pm.Tool])
-def get_tools(username: str, bot_id: str) -> list[pm.Tool]:
+def get_tools(username: str, bot_id: str, auth=Depends(check_key)) -> list[pm.Tool]:
     """Get tools by username."""
     bot = database.bots.find_one_by_id(ObjectId(bot_id))
     bot_tools = bot.tools
@@ -48,7 +52,9 @@ def get_tools(username: str, bot_id: str) -> list[pm.Tool]:
 
 
 @router.delete("/{tool_id}", response_model=pm.MessageResponse)
-def delete_tool(tool_id: str, username: str, bot_id: str) -> pm.MessageResponse:
+def delete_tool(
+    tool_id: str, username: str, bot_id: str, auth=Depends(check_key)
+) -> pm.MessageResponse:
     """Delete tool by id."""
     tool = database.tools.find_one_by_id(ObjectId(tool_id))
     if tool is None:

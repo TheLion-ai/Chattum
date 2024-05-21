@@ -53,7 +53,7 @@ async def api_logging(request: Request, call_next):
     log_message = {
         "host": request.url.hostname,
         "endpoint": request.url.path,
-        "response": response_body.decode(errors="ignore"),
+        # "response": response_body.decode(errors="ignore"),
         "status_code": response.status_code,
         "method": request.method,
         "query_params": request.query_params,

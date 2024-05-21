@@ -1,0 +1,26 @@
+cookie:
+  expiry_days: 30
+  key: some_signature_key
+  name: some_cookie_name
+credentials:
+  usernames:
+    demo:
+      email: demo@demo.com
+      logged_in: false
+      name: chattum
+      password: $2b$12$pkUeE8NIPyvNts6d2s98MOf5ETUHKLyTQymG2J1i/zS.q.vD4r/rC
+    jsmith:
+      email: jsmith@gmail.com
+      failed_login_attempts: 0
+      logged_in: false
+      name: John Smith
+      password: $2b$12$EdEDdDNkVye47KPyOPOFfukFH5EBwdJNQXJnKjam6MF1XzPF0okrO
+    rbriggs:
+      email: rbriggs@gmail.com
+      failed_login_attempts: 0
+      logged_in: false
+      name: Rebecca Briggs
+      password: $2b$12$/MbVyojHOqI5vyv1.xx0fOJ4b0AqdU.yNAI1gIVa5hkia5dMNVuJ6
+pre-authorized:
+  emails:
+  - melsby@gmail.com

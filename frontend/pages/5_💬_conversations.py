@@ -11,7 +11,8 @@ from components.sidebar import sidebar_controller
 from streamlit_chat import message
 from streamlit_date_picker import PickerType, Unit, date_picker, date_range_picker
 from utils import query_params
-from utils.page_config import ensure_bot_selected
+from utils.page_config import ensure_bot_or_workflow_selected
+from components.authentication import protect_page
 
 st.set_page_config(
     page_title="Conversations | Chattum",
@@ -23,8 +24,9 @@ bot_id = query_params.get_from_url_or_state("bot_id")
 conversation_id = query_params.get_from_url_or_state("conversation_id")
 timezone = pytz.timezone("Europe/Warsaw")
 
-ensure_bot_selected()
+ensure_bot_or_workflow_selected()
 sidebar_controller()
+protect_page()
 
 
 conversations = get_conversations(bot_id)
@@ -100,8 +102,18 @@ else:
                     < hour_end
                 )
                 # Append the count to the DataFrame
-                conversation_counts = conversation_counts.append(
-                    {"Hour": current_hour.strftime("%d %b %Y %H:%M"), "Count": count},
+                conversation_counts = pd.concat(
+                    [
+                        conversation_counts,
+                        pd.DataFrame(
+                            [
+                                {
+                                    "Hour": current_hour.strftime("%d %b %Y %H:%M"),
+                                    "Count": count,
+                                }
+                            ]
+                        ),
+                    ],
                     ignore_index=True,
                 )
                 # Move to the next hour
@@ -110,14 +122,9 @@ else:
             # Plot the line chart
             import altair as alt
 
-            # Convert DataFrame to long format suitable for Altair
-            conversation_counts_long = conversation_counts.melt(
-                "Hour", var_name="category", value_name="Count"
-            )
-
             # Create a line chart using Altair
             line_chart = (
-                alt.Chart(conversation_counts_long)
+                alt.Chart(conversation_counts)
                 .mark_bar()
                 .encode(
                     x="Hour:T",
@@ -136,7 +143,7 @@ else:
             st.altair_chart(line_chart, use_container_width=True)
         with col2:
             # Count tool usage in conversations
-            tool_usage = {}
+            tool_usage: dict = {}
             for conversation in conversations:
                 for bot_message in conversation["messages"]:
                     if "tool_calls" in bot_message["data"]:

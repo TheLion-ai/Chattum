@@ -5,8 +5,12 @@ from typing import Optional
 import pydantic_models as pm
 from app.app import database
 from app.chat.models import available_models
+from app.security import check_key
 from bson import ObjectId
 from fastapi import APIRouter, HTTPException
+from fastapi.security import APIKeyHeader
+from fastapi import Security, HTTPException, status
+from fastapi import APIRouter, Depends
 
 router = APIRouter(prefix="/{username}/bots/{bot_id}/model", tags=["models"])
 
@@ -18,16 +22,25 @@ def get_available_models() -> list[pm.LLM]:
 
 
 @router.get("", response_model=Optional[pm.LLM])
-def get_model(bot_id: str) -> Optional[pm.LLM]:
+def get_model(bot_id: str, auth=Depends(check_key)) -> Optional[pm.LLM]:
     """Get model by username."""
     bot = database.bots.find_one_by_id(ObjectId(bot_id))
+    if bot is None:
+        bot = database.workflows.find_one_by_id(ObjectId(bot_id))
     return bot.model
 
 
 @router.put("", response_model=pm.MessageResponse)
-def modify_model(bot_id: str, llm: pm.LLM) -> None:
+def modify_model(bot_id: str, llm: pm.LLM, auth=Depends(check_key)) -> None:
     """Modify model by username."""
     bot = database.bots.find_one_by_id(ObjectId(bot_id))
-    bot.model = llm
-    database.bots.save(bot)
+    if bot is None:
+        workflow = database.workflows.find_one_by_id(ObjectId(bot_id))
+        if workflow is None:
+            return pm.MessageResponse(message="Bot or workflow not found!")
+        workflow.model = llm
+        database.workflows.save(workflow)
+    else:
+        bot.model = llm
+        database.bots.save(bot)
     return pm.MessageResponse(message="Model updated successfully!")
