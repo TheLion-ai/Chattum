@@ -4,10 +4,9 @@ from typing import Union
 
 import pydantic_models as pm
 from app.app import database
-from bson import ObjectId
-from fastapi import APIRouter, HTTPException
 from app.security import check_key
-from fastapi import Depends
+from bson import ObjectId
+from fastapi import APIRouter, Depends, HTTPException
 
 router = APIRouter(prefix="/{username}/bots", tags=["bots"])
 

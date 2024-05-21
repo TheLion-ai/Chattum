@@ -2,11 +2,11 @@
 
 import streamlit as st
 from backend_controller import get_available_models, get_bot, get_model
+from components.authentication import protect_page
 from components.models import ModelPanel
 from components.sidebar import sidebar_controller
 from utils import query_params
 from utils.page_config import ensure_bot_or_workflow_selected
-from components.authentication import protect_page
 
 st.set_page_config(
     page_title="Settings | Chattum",

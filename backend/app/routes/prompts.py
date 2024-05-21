@@ -3,9 +3,8 @@
 import pydantic_models as pm
 from app.app import database
 from app.routes.bots import get_bot
-from fastapi import APIRouter, HTTPException
 from app.security import check_key
-from fastapi import Depends
+from fastapi import APIRouter, Depends, HTTPException
 
 router = APIRouter(prefix="/{username}/bots/{bot_id}/prompt", tags=["prompts"])
 

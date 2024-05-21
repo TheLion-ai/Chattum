@@ -5,13 +5,13 @@ import plotly.express as px
 import plotly.figure_factory as ff
 import streamlit as st
 from backend_controller import evaluate_workflow, get_workflow
+from components.authentication import protect_page
 from components.sidebar import sidebar_controller
 from components.workflows import ClassificationEvaluation
 from streamlit.runtime.uploaded_file_manager import UploadedFile
 from streamlit_extras.metric_cards import style_metric_cards
 from utils import query_params
 from utils.page_config import ensure_bot_or_workflow_selected
-from components.authentication import protect_page
 
 st.set_page_config(
     page_title="Evaluation | Chattum",

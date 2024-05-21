@@ -5,10 +5,9 @@ from typing import Union
 import pydantic_models as pm
 from app.app import database
 from app.chat.tools import available_tools
-from bson import ObjectId
-from fastapi import APIRouter, HTTPException
 from app.security import check_key
-from fastapi import Depends
+from bson import ObjectId
+from fastapi import APIRouter, Depends, HTTPException
 
 router = APIRouter(prefix="/{username}/bots/{bot_id}/tools", tags=["tools"])
 

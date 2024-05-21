@@ -12,11 +12,10 @@ from app.routes.conversations import (
     get_conversations,
     put_conversations,
 )
-from bson import ObjectId
-from fastapi import APIRouter, HTTPException
-from langchain.tools import StructuredTool
 from app.security import check_key
-from fastapi import Depends
+from bson import ObjectId
+from fastapi import APIRouter, Depends, HTTPException
+from langchain.tools import StructuredTool
 
 router = APIRouter(prefix="/{username}/bots/{bot_id}/chat", tags=["chat"])
 

@@ -5,14 +5,13 @@ from jinja2 import Environment
 from langchain.llms.base import BaseLLM
 from langchain_community.chat_models import ChatOpenAI
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
-from sklearn.calibration import CalibratedClassifierCV
+from sklearn.calibration import CalibratedClassifierCV, calibration_curve
 from sklearn.metrics import (
     auc,
     classification_report,
     precision_recall_curve,
     roc_curve,
 )
-from sklearn.calibration import calibration_curve
 
 
 class ClassificationWorkflow:

@@ -7,10 +7,8 @@ from app.app import database
 from app.chat.models import available_models
 from app.security import check_key
 from bson import ObjectId
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Security, status
 from fastapi.security import APIKeyHeader
-from fastapi import Security, HTTPException, status
-from fastapi import APIRouter, Depends
 
 router = APIRouter(prefix="/{username}/bots/{bot_id}/model", tags=["models"])
 

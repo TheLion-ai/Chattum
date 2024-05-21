@@ -10,10 +10,9 @@ from app.chat.workflows.classification import (
     evaluate_classification,
 )
 from app.chat.workflows.extraction import ExtractionWorkflow
-from bson import ObjectId
-from fastapi import APIRouter, HTTPException
 from app.security import check_key
-from fastapi import Depends
+from bson import ObjectId
+from fastapi import APIRouter, Depends, HTTPException
 
 router = APIRouter(prefix="/{username}/workflows", tags=["workflows"])
 

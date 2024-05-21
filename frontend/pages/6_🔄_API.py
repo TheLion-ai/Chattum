@@ -2,11 +2,11 @@
 
 import streamlit as st
 import streamlit.components.v1 as components
+from components.authentication import protect_page
 from components.sidebar import sidebar_controller
-from constants import EXTERNAL_BACKEND_URL, USERNAME, API_KEY
+from constants import API_KEY, EXTERNAL_BACKEND_URL, USERNAME
 from utils import query_params
 from utils.page_config import ensure_bot_or_workflow_selected
-from components.authentication import protect_page
 
 st.set_page_config(
     page_title="API | Chattum",

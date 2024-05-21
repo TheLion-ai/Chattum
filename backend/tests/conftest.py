@@ -18,10 +18,12 @@ def get_mock_mongo_client():
 
 app.dependency_overrides[get_mongo_client] = get_mock_mongo_client
 
+
 @pytest.fixture(scope="session")
 def api_key():
     """Return the API key."""
     return os.getenv("API_KEY")
+
 
 @pytest.fixture(scope="session")
 def test_client():

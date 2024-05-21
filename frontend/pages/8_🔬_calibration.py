@@ -5,12 +5,12 @@ from copy import deepcopy
 import pandas as pd
 import streamlit as st
 from backend_controller import calibrate_workflow_model, evaluate_workflow, get_workflow
+from components.authentication import protect_page
 from components.sidebar import sidebar_controller
 from components.workflows import ClassificationEvaluation
 from streamlit.runtime.uploaded_file_manager import UploadedFile
 from utils import query_params
 from utils.page_config import ensure_bot_or_workflow_selected
-from components.authentication import protect_page
 
 
 def read_file(uploaded_file: UploadedFile) -> pd.DataFrame:

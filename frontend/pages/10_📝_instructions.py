@@ -10,13 +10,13 @@ from backend_controller import (
     get_model,
     get_workflow,
 )
+from components.authentication import protect_page
 from components.models import ModelPanel
 from components.sidebar import sidebar_controller
 from streamlit_ace import st_ace
 from streamlit_tags import st_tags
 from utils import query_params
 from utils.page_config import ensure_bot_or_workflow_selected
-from components.authentication import protect_page
 
 st.set_page_config(
     page_title="Settings | Chattum",
@@ -56,9 +56,9 @@ if workflow["task"].lower() == "classification":
         class_thresholds = workflow.get("class_thresholds") if workflow else None
         if class_thresholds is not None:
             for class_name, threshold in class_thresholds.items():
-                st.session_state["new_workflow"]["class_thresholds"][class_name] = (
-                    st.number_input(value=threshold, label=class_name, key=class_name)
-                )
+                st.session_state["new_workflow"]["class_thresholds"][
+                    class_name
+                ] = st.number_input(value=threshold, label=class_name, key=class_name)
 elif workflow["task"].lower() == "extraction":
     with st.container(border=True):
         with st.container(border=True):

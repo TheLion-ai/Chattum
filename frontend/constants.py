@@ -1,7 +1,6 @@
 """File for storing constants used in the frontend app."""
 
 import os
-import os
 
 import streamlit as st
 from st_pages import Page

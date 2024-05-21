@@ -5,7 +5,7 @@ from typing import Annotated, Callable, Optional
 
 import requests
 import streamlit as st
-from constants import BACKEND_URL, USERNAME, API_KEY
+from constants import API_KEY, BACKEND_URL, USERNAME
 from langchain.memory import ChatMessageHistory
 
 

@@ -6,13 +6,13 @@ import pandas as pd
 import pytz
 import streamlit as st
 from backend_controller import get_conversations
+from components.authentication import protect_page
 from components.conversations import display_conversation
 from components.sidebar import sidebar_controller
 from streamlit_chat import message
 from streamlit_date_picker import PickerType, Unit, date_picker, date_range_picker
 from utils import query_params
 from utils.page_config import ensure_bot_or_workflow_selected
-from components.authentication import protect_page
 
 st.set_page_config(
     page_title="Conversations | Chattum",

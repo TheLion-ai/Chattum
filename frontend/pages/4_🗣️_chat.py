@@ -3,11 +3,11 @@
 import streamlit as st
 from backend_controller import get_conversation, send_message
 from bson import ObjectId
+from components.authentication import protect_page
 from components.conversations import display_conversation
 from components.sidebar import sidebar_controller
 from utils import query_params
 from utils.page_config import ensure_bot_or_workflow_selected
-from components.authentication import protect_page
 
 st.set_page_config(
     page_title="Chat | Chattum",

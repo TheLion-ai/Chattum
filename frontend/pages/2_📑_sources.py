@@ -2,9 +2,9 @@
 
 import streamlit as st
 from components import SourcesGrid
+from components.authentication import protect_page
 from components.sidebar import sidebar_controller
 from utils import query_params
-from components.authentication import protect_page
 
 st.set_page_config(
     page_title="Sources | Chattum",

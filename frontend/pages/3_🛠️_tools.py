@@ -1,11 +1,11 @@
 """Tools that the bot can use to perform actions."""
 
 import streamlit as st
+from components.authentication import protect_page
 from components.sidebar import sidebar_controller
 from components.tools import ToolsPanel
 from utils import query_params
 from utils.page_config import ensure_bot_or_workflow_selected
-from components.authentication import protect_page
 
 st.set_page_config(
     page_title="Tools | Chattum",
