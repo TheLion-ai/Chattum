@@ -2,8 +2,9 @@
 
 from bson import ObjectId
 from pydantic import BaseModel
-from .models import LLM
 from pydantic_mongo import ObjectIdField
+
+from .models import LLM
 
 
 class Bot(BaseModel):

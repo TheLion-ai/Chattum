@@ -1,8 +1,8 @@
 """Base class for all LLMs."""
 from abc import ABC, abstractmethod
 
-from langchain.llms.base import BaseLLM
 from app.pydantic_models.models import UserVariable
+from langchain.llms.base import BaseLLM
 
 
 class LLMTemplate(ABC):

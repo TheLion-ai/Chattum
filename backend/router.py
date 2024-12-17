@@ -4,8 +4,6 @@ from typing import Any
 
 import app.pydantic_models as pm
 from app.app import app
-from fastapi.openapi.utils import get_openapi
-
 from app.routes import (
     bots,
     chat,
@@ -17,6 +15,7 @@ from app.routes import (
     tools,
     workflows,
 )
+from fastapi.openapi.utils import get_openapi
 
 app.include_router(bots.router)
 app.include_router(workflows.router)

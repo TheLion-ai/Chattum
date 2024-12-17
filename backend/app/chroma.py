@@ -4,6 +4,7 @@ import os
 from typing import Optional
 
 from app.file_storage import FileStorage
+from app.pydantic_models import Source
 from langchain.schema import Document
 from langchain_community.document_loaders import (
     PyPDFLoader,
@@ -12,7 +13,6 @@ from langchain_community.document_loaders import (
 )
 from langchain_community.vectorstores import Chroma
 from langchain_openai import OpenAIEmbeddings
-from app.pydantic_models import Source
 
 
 class ChromaController:

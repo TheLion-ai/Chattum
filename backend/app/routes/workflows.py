@@ -1,8 +1,8 @@
 import pickle
 from typing import Union
 
-import numpy as np
 import app.pydantic_models as pm
+import numpy as np
 from app.app import database
 from app.chat.models import available_models_dict
 from app.chat.workflows.classification import (

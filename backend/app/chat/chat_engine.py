@@ -20,6 +20,7 @@ from langchain.memory.chat_memory import BaseChatMemory
 from langchain.memory.chat_message_histories.in_memory import ChatMessageHistory
 from langchain.schema import SystemMessage, messages_from_dict, messages_to_dict
 from langchain.tools.render import render_text_description
+from langchain_community.callbacks import get_openai_callback
 from langchain_community.chat_models import ChatOpenAI
 from langchain_community.llms import OpenAI
 from langchain_core.messages import AIMessage, HumanMessage
@@ -31,7 +32,6 @@ from langchain_core.prompts import (
     PromptTemplate,
     SystemMessagePromptTemplate,
 )
-from langchain_community.callbacks import get_openai_callback
 
 
 class NewLangChainEngine:

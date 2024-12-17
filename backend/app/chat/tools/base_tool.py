@@ -3,9 +3,9 @@
 from abc import ABC, abstractmethod
 from typing import Any
 
+from app.pydantic_models.tools import UserVariable
 from langchain.tools import StructuredTool
 from pydantic import BaseModel
-from app.pydantic_models.tools import UserVariable
 
 
 class ToolTemplate(ABC):
