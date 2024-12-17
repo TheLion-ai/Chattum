@@ -18,13 +18,12 @@ class ChatOpenAIModel(LLMTemplate):
             name="model",
             description="name of the model",
             form_type="dropdown",
-            default_value="gpt-3.5-turbo",
+            default_value="gpt-4o-mini",
             available_values=[
-                "gpt-4-turbo",
-                "gpt-4",
-                "gpt-4-32k",
-                "gpt-3.5-turbo",
-                "gpt-3.5-turbo-1106",
+                "gpt-4o",
+                "gpt-4o-mini",
+                "o1-preview",
+                "o1-mini",
             ],
         ),
         UserVariable(
