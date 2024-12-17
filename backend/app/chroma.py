@@ -12,7 +12,7 @@ from langchain_community.document_loaders import (
 )
 from langchain_community.vectorstores import Chroma
 from langchain_openai import OpenAIEmbeddings
-from pydantic_models import Source
+from app.pydantic_models import Source
 
 
 class ChromaController:

@@ -4,7 +4,7 @@ from typing import List, Optional
 
 from bson import Binary, ObjectId
 from pydantic import BaseModel
-from pydantic_models.models import LLM
+from .models import LLM
 from pydantic_mongo import ObjectIdField
 
 

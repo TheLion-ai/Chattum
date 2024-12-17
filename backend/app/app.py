@@ -38,7 +38,7 @@ async def lifespan(app: FastAPI) -> None:
 
 
 app = FastAPI(lifespan=lifespan, docs_url=None)
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 

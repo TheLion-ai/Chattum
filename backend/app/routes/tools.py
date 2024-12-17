@@ -2,7 +2,7 @@
 
 from typing import Union
 
-import pydantic_models as pm
+import app.pydantic_models as pm
 from app.app import database
 from app.chat.tools import available_tools
 from app.security import check_key

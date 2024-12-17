@@ -2,7 +2,7 @@
 
 from typing import Optional
 
-import pydantic_models as pm
+import app.pydantic_models as pm
 from app.app import database
 from app.chat.models import available_models
 from app.security import check_key

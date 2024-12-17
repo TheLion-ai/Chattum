@@ -1,6 +1,6 @@
 """Create prompt endpoints."""
 
-import pydantic_models as pm
+import app.pydantic_models as pm
 from app.app import database
 from app.routes.bots import get_bot
 from app.security import check_key

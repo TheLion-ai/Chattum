@@ -1,6 +1,6 @@
 """Create conversation endpoints."""
 
-import pydantic_models as pm
+import app.pydantic_models as pm
 from app.app import chroma_controller, database
 from app.chat.chat_engine import ChatGPTEngine, GPTEngine, NewLangChainEngine
 from app.chat.models import available_models_dict
@@ -16,6 +16,7 @@ from app.security import check_key
 from bson import ObjectId
 from fastapi import APIRouter, Depends, HTTPException
 from langchain.tools import StructuredTool
+from langchain_community.callbacks import get_openai_callback
 
 router = APIRouter(prefix="/{username}/bots/{bot_id}/chat", tags=["chat"])
 
@@ -88,8 +89,11 @@ def chat(
             chat_engine = ChatGPTEngine(
                 user_prompt=bot.prompt, messages=conversation.messages, llm=llm.as_llm()
             )
-
-    response = chat_engine.chat(chat_input.message)
+    with get_openai_callback() as cb:
+        response = chat_engine.chat(chat_input.message)
+        conversation.input_token_used += cb.prompt_tokens
+        conversation.output_token_used += cb.completion_tokens
+        conversation.total_cost += cb.total_cost
     conversation.messages = chat_engine.export_messages()
 
     put_conversations(bot.id, conversation)

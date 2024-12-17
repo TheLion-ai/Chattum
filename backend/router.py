@@ -2,11 +2,11 @@
 import copy
 from typing import Any
 
-import pydantic_models as pm
+import app.pydantic_models as pm
 from app.app import app
 from fastapi.openapi.utils import get_openapi
 
-from .routes import (
+from app.routes import (
     bots,
     chat,
     conversations,

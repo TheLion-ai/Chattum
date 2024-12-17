@@ -5,7 +5,7 @@ from typing import Any
 
 from langchain.tools import StructuredTool
 from pydantic import BaseModel
-from pydantic_models.tools import UserVariable
+from app.pydantic_models.tools import UserVariable
 
 
 class ToolTemplate(ABC):

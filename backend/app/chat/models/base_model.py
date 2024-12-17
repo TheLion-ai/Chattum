@@ -2,7 +2,7 @@
 from abc import ABC, abstractmethod
 
 from langchain.llms.base import BaseLLM
-from pydantic_models.models import UserVariable
+from app.pydantic_models.models import UserVariable
 
 
 class LLMTemplate(ABC):

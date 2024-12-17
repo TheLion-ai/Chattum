@@ -4,7 +4,7 @@ import logging
 import os
 from typing import Annotated, Optional, Union
 
-import pydantic_models as pm
+import app.pydantic_models as pm
 from app.app import chroma_controller, database, file_storage
 from app.routes.bots import get_bot
 from app.security import check_key
@@ -12,7 +12,7 @@ from bson import ObjectId
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
 from fastapi.responses import FileResponse
 from starlette.background import BackgroundTasks
-from utils.scraping import scrape
+from app.utils.scraping import scrape
 
 
 def remove_file(path: str) -> None:

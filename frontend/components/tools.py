@@ -35,7 +35,7 @@ class ToolsPanel:
             self._display_new_tool()
 
         st.divider()
-        tools_list, tool_content = st.columns([3, 5], gap="large")
+        tools_list, tool_content = st.columns([2, 6], gap="large")
 
         with tools_list:
             for tool in self.tools:

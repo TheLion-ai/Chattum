@@ -1,6 +1,6 @@
 """Gather all LLMs in one place."""
 
-from .huggingface_hub import HugggingfaceHubModel
+# from .huggingface_hub import HugggingfaceHubModel
 from .openai import ChatOpenAIModel
 from .together import TogetherAIModel
 

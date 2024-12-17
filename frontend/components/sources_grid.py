@@ -11,7 +11,6 @@ from backend_controller import (
     get_sources,
 )
 from components.delete_modal import DeleteModal
-from streamlit_modal import Modal
 
 
 class SourcesGrid:

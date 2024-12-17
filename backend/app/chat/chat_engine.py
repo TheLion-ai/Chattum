@@ -31,6 +31,7 @@ from langchain_core.prompts import (
     PromptTemplate,
     SystemMessagePromptTemplate,
 )
+from langchain_community.callbacks import get_openai_callback
 
 
 class NewLangChainEngine:
@@ -47,7 +48,11 @@ class NewLangChainEngine:
         agent = create_openai_tools_agent(self.llm, tools, self.prompt)
 
         self.agent_executor = AgentExecutor(
-            agent=agent, tools=tools, verbose=True, return_intermediate_steps=True
+            agent=agent,
+            tools=tools,
+            verbose=True,
+            return_intermediate_steps=True,
+            stream_runnable=False,
         )
 
     def _create_prompt(self, user_prompt: str) -> BasePromptTemplate:
@@ -82,6 +87,7 @@ class NewLangChainEngine:
 
     def chat(self, message: str) -> str:
         self.messages.append(HumanMessage(content=message))
+
         response = self.agent_executor.invoke({"messages": self.messages})
         tool_calls = self._get_tool_calls(response)
         self.messages.append(

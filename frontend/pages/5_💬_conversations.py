@@ -9,8 +9,6 @@ from backend_controller import get_conversations
 from components.authentication import protect_page
 from components.conversations import display_conversation
 from components.sidebar import sidebar_controller
-from streamlit_chat import message
-from streamlit_date_picker import PickerType, Unit, date_picker, date_range_picker
 from utils import query_params
 from utils.page_config import ensure_bot_or_workflow_selected
 
@@ -78,6 +76,16 @@ if conversations == []:
     st.write("No conversations yet!")
 else:
     with stats_container:
+        col1, col2 = st.columns([1, 3])
+
+        col1.metric(
+            "Input Token Used",
+            sum([x.get("input_token_used", 0) for x in conversations]),
+        )
+        col2.metric(
+            "Output Token Used",
+            sum([x.get("output_token_used", 0) for x in conversations]),
+        )
         col1, col2 = st.columns([3, 1])
         with col1:
             # Generate a line chart showing the number of conversations in each hour for the time range
@@ -216,5 +224,6 @@ else:
 with conversation_content_container:
     if current_conversation:
         display_conversation(current_conversation)
+        st.chat_input()
         with st.expander("Debug"):
             st.write(current_conversation)
